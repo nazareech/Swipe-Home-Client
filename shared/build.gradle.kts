@@ -55,11 +55,15 @@ kotlin {
             // Koin (DI)
             implementation(libs.koin.core)
             implementation(libs.koin.compose)
+
+            // Для іконок
+//              implementation(libs.material.icons.extended)
         }
 
         androidMain.dependencies {
             implementation(libs.compose.uiToolingPreview)
             implementation(libs.compose.uiTooling)
+            implementation(libs.ktor.client.android)
         }
 
         commonTest.dependencies {
