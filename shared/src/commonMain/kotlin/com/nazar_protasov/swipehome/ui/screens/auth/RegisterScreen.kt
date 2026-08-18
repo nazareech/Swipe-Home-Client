@@ -1,6 +1,7 @@
 package com.nazar_protasov.swipehome.ui.screens.auth
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -18,6 +19,8 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -43,10 +46,12 @@ import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import com.nazar_protasov.swipehome.ui.utils.PhoneVisualTransformation
 import mymultiplatformproject.shared.generated.resources.Res
 import mymultiplatformproject.shared.generated.resources.ic_apple_logo
 import mymultiplatformproject.shared.generated.resources.ic_arrow_back
 import mymultiplatformproject.shared.generated.resources.ic_arrow_next
+import mymultiplatformproject.shared.generated.resources.ic_arrow_triangle_down
 import mymultiplatformproject.shared.generated.resources.ic_camera
 import mymultiplatformproject.shared.generated.resources.ic_eye_hidden
 import mymultiplatformproject.shared.generated.resources.ic_eye_visible
@@ -69,6 +74,8 @@ class RegisterScreen: Screen {
         var firstName by remember { mutableStateOf("") }
         var lastName by remember { mutableStateOf("") }
         var phone by remember { mutableStateOf("") }
+        var countryCode by remember { mutableStateOf("+380") } // Код за замовчуванням
+        var photoUri by remember { mutableStateOf<String?>(null) } // Зберігатиме шлях до обраного фото
 
         Column(
             modifier = Modifier
@@ -146,8 +153,23 @@ class RegisterScreen: Screen {
             when (currentStep){
                 1 -> Step1Content(email = email, onEmailChange = { email = it })
                 2 -> Step2Content(email = email, onEmailChange = { email = it }, password = password, onPasswordChange = { password = it })
-                3 -> Step3Content(firstName = firstName, onFirstNameChange = { firstName = it }, lastName = lastName, onLastNameChange = { lastName = it })
-                4 -> Step4Content(phone = phone, onPhoneChange = { phone = it })
+                3 -> Step3Content(
+                    firstName = firstName,
+                    onFirstNameChange = { firstName = it },
+                    lastName = lastName,
+                    onLastNameChange = { lastName = it },
+                    photoUri = photoUri,
+                    onPhotoClick = {
+                        /*TODO: Тут буде виклик бібліотеки для вибору фото з галереї.
+                        *  Після вибору робимо: photoUri = "шлях_до_фото" */
+                    }
+                )
+                4 -> Step4Content(
+                    phone = phone,
+                    onPhoneChange = { phone = it },
+                    countryCode = countryCode,
+                    onCountryCodeChange = { countryCode = it }
+                )
             }
 
             Spacer(modifier = Modifier.weight(1f)) // Виштовхує кнопки вниз
@@ -415,7 +437,9 @@ class RegisterScreen: Screen {
         firstName: String,
         onFirstNameChange: (String) -> Unit,
         lastName: String,
-        onLastNameChange: (String) -> Unit
+        onLastNameChange: (String) -> Unit,
+        photoUri: String?,
+        onPhotoClick: () -> Unit
     ){
         Column(modifier = Modifier.fillMaxWidth()) {
             // Заголовок та опис
@@ -426,34 +450,33 @@ class RegisterScreen: Screen {
                 color = MaterialTheme.colorScheme.onBackground
             )
             Spacer(modifier = Modifier.height(16.dp))
-
-//            Text(
-//                text = "Додайте інформацію про себе для пошуку",
-//                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f),
-//                fontSize = 16.sp
-//            )
-//
-//            Spacer(modifier = Modifier.height(8.dp))
-
+/*
+            Text(
+                text = "Додайте інформацію про себе для пошуку",
+                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f),
+                fontSize = 16.sp
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+*/
             // Кнопка для додавання фотографії
             Column (
                 modifier =  Modifier.fillMaxWidth(),
                 horizontalAlignment = Alignment.CenterHorizontally // Центруємо фотографію
-                ) {
-                OutlinedButton(
-                        onClick = { /*TODO: Доступ до галереї та завантаження фотографій*/},
+            ) {
+                Box(
                     modifier = Modifier
-                    .size(120.dp)
-                    .clip(CircleShape)
-                    .background(MaterialTheme.colorScheme.secondary.copy(alpha = 0.3f)),
-                    ) {
-                    Box(
-                        modifier = Modifier
-                            .size(120.dp)
-                            .clip(CircleShape)
-                            .background(MaterialTheme.colorScheme.secondary.copy(alpha = 0.3f)),
-                        contentAlignment = Alignment.Center
-                    ) {
+                        .size(120.dp)
+                        .clip(CircleShape)
+                        // Змінюємо фон, якщо фотографія завантажена
+                        .background(
+                            if (photoUri != null) MaterialTheme.colorScheme.primary.copy(alpha = 0.2f)
+                            else MaterialTheme.colorScheme.secondary.copy(alpha = 0.3f)
+                        )
+                        .clickable{ onPhotoClick() },
+                    contentAlignment = Alignment.Center
+                ) {
+                    if (photoUri == null) {
+                        // Стан "До вибору фотографії"
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
                             Icon(
                                 painterResource(Res.drawable.ic_camera),
@@ -469,6 +492,10 @@ class RegisterScreen: Screen {
                                 color = MaterialTheme.colorScheme.primary
                             )
                         }
+                    } else {
+                        // Стан "Зображення завантажено"
+                        // TODO: Тут буде код AsyncImage для відображення реального фото
+                        Text(text = "✅", fontSize = 48.sp)
                     }
                 }
             }
@@ -513,10 +540,31 @@ class RegisterScreen: Screen {
     @Composable
     fun Step4Content(
         phone: String,
-        onPhoneChange: (String) -> Unit
+        onPhoneChange: (String) -> Unit,
+        countryCode: String,
+        onCountryCodeChange: (String) -> Unit
     ){
         // Локальний стан для галочки "я погоджуюсь"
         var termsAccepted by remember { mutableStateOf(false) }
+        // Стан для відображення меню вибору країни
+        var isDropdownExpanded by remember { mutableStateOf(false) }
+        // Список доступних кодів
+        val availableCountryCodes = listOf("+380", "+48", "+1", "+44", "+49")
+
+        // Словник масок для кожної країни
+        val phoneMasks = mapOf(
+            "+380" to "XX XXX XXXX",// Україна
+            "+48" to "XXX XXX XXX", // Польща
+            "+1" to "XXX XXX XXXX", // США/Канада
+            "+44" to "XXXX XXXXXX", // Британія
+            "+49" to "XXX XXXXXXX"  // Німеччина
+        )
+
+        // Визначаємо поточну маску на основі обраного коду (з дефолтним значенням)
+        val currentMask = phoneMasks[countryCode] ?: "XX XXX XXXX"
+
+        // Рахуємо, скільки цифр дозволено вводити для цієї країни
+        val maxDigits = currentMask.count { it == 'X' }
 
         Column(modifier = Modifier.fillMaxWidth()) {
             Text(
@@ -544,25 +592,67 @@ class RegisterScreen: Screen {
                 color = MaterialTheme.colorScheme.onBackground
             )
             Spacer(modifier = Modifier.height(8.dp))
+
             OutlinedTextField(
                 value = phone,
-                onValueChange = onPhoneChange,
-                placeholder = { Text("X XXX XX XXX") },
+                onValueChange = { input ->
+                    // Фільтруємо тільки цифри та обмежуємо максимум 9 символами
+                    val digitsOnly = input.filter { it.isDigit() }
+                    if (digitsOnly.length <= maxDigits) onPhoneChange(digitsOnly)
+                },
+                // Динамічний плейсхолдер
+                placeholder = { Text(currentMask) },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
                 shape = RoundedCornerShape(12.dp),
-                //
                 keyboardOptions = KeyboardOptions(
                     keyboardType = KeyboardType.Phone
                 ),
-                // Додаємо незмінний префікс країни
+                // Підключаємо кастомне трансформування для форматування пробілів для номера
+                visualTransformation = PhoneVisualTransformation(currentMask),
+                // Додаємо красивий дизайн префікса країни з випадаючим списком
                 leadingIcon = {
-                    Text(
-                        text = "+380",
-                        modifier = Modifier.padding(start = 16.dp, end = 8.dp),
-                        fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onBackground
-                    )
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier
+                            .clickable { isDropdownExpanded = true }
+                            .padding(start = 16.dp, end = 8.dp, top = 8.dp, bottom = 8.dp)
+                    ){
+                        Text(
+                            text = countryCode,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onBackground
+                        )
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Icon(painterResource(Res.drawable.ic_arrow_triangle_down), contentDescription = null, modifier = Modifier.size(10.dp))
+                        Spacer(modifier = Modifier.width(12.dp))
+
+                        Box(
+                            modifier = Modifier
+                                .width(1.dp)
+                                .height(24.dp)
+                                .background(MaterialTheme.colorScheme.onBackground.copy(alpha = 0.2f))
+                        )
+
+                        // Саме меню вибору
+                        DropdownMenu(
+                            expanded = isDropdownExpanded,
+                            onDismissRequest = { isDropdownExpanded = false },
+                            modifier = Modifier.background(MaterialTheme.colorScheme.background)
+                        ){
+                            availableCountryCodes.forEach { code ->
+                                DropdownMenuItem(
+                                    text = { Text(text = code) },
+                                    onClick = {
+                                        // При зміні країни очищаємо введений номер
+                                        if(code != countryCode) onPhoneChange("")
+                                        onCountryCodeChange(code)
+                                        isDropdownExpanded = false
+                                    }
+                                )
+                            }
+                        }
+                    }
                 }
             )
 
@@ -593,6 +683,5 @@ class RegisterScreen: Screen {
                 }
             }
         }
-
     }
 }
