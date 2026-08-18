@@ -56,8 +56,6 @@ kotlin {
             implementation(libs.koin.core)
             implementation(libs.koin.compose)
 
-            // Для іконок
-//              implementation(libs.material.icons.extended)
         }
 
         androidMain.dependencies {

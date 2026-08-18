@@ -10,10 +10,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
@@ -36,6 +38,11 @@ import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import mymultiplatformproject.shared.generated.resources.Res
+import mymultiplatformproject.shared.generated.resources.ic_arrow_next
+import mymultiplatformproject.shared.generated.resources.ic_eye_hidden
+import mymultiplatformproject.shared.generated.resources.ic_eye_visible
+import org.jetbrains.compose.resources.painterResource
 
 class LoginScreen: Screen {
     @Composable
@@ -101,10 +108,11 @@ class LoginScreen: Screen {
                     IconButton(
                         onClick = { passwordVisible = !passwordVisible }
                     ) {
-                        // Залишаємо наші текстові емодзі всередині, трохи збільшивши їх
-                        Text(
-                            text = if (passwordVisible) "🙈" else "👁️",
-                            fontSize = 20.sp
+                        Icon(
+                            painterResource(
+                                if (passwordVisible) Res.drawable.ic_eye_visible else  Res.drawable.ic_eye_hidden
+                            ),
+                            contentDescription = null, modifier = Modifier.size(20.dp)
                         )
                     }
                 }
@@ -142,12 +150,19 @@ class LoginScreen: Screen {
             Spacer(modifier = Modifier.height(32.dp))
 
             // Розділювач для соціальних мереж
-
-            Text(
-                text = "Увійти через",
-                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f),
-                fontSize = 14.sp
-            )
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ){
+                Box(modifier = Modifier.weight(1f).height(1.dp).background(MaterialTheme.colorScheme.onBackground.copy(alpha = 0.2f)))
+                Text(
+                    text = "Увійти через",
+                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f),
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Bold
+                )
+                Box(modifier = Modifier.weight(1f).height(1.dp).background(MaterialTheme.colorScheme.onBackground.copy(alpha = 0.2f)))
+            }
 
             Spacer(modifier = Modifier.height(16.dp))
 
@@ -187,7 +202,8 @@ class LoginScreen: Screen {
                     text = "Ще немає акаунта?",
                     color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f)
                 )
-                TextButton(onClick = { /*TODO: Навігація на екран реєстрації RegisterScreen*/ }) {
+                TextButton(onClick = { navigator.push(RegisterScreen()) })
+                {
                     Text(
                         text = "Зареєструватися",
                         color = MaterialTheme.colorScheme.primary,

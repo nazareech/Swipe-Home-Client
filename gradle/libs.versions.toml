@@ -20,7 +20,6 @@ ktor = "2.3.12"
 voyager = "1.1.0-beta02"
 koin-core = "3.5.6"
 koin-compose = "1.1.2"
-#material-icons = "1.7.8"
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
@@ -57,9 +56,6 @@ voyager-transitions = { module = "cafe.adriel.voyager:voyager-transitions", vers
 # Koin (Dependency Injection)
 koin-core = { module = "io.insert-koin:koin-core", version.ref = "koin-core" }
 koin-compose = { module = "io.insert-koin:koin-compose", version.ref = "koin-compose" }
-
-# Для іконок
-#material-icons-extended = { group = "androidx.compose.material3", name = "material3-icons-extended", version = "material-icons" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
