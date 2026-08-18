@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
@@ -39,9 +40,10 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import mymultiplatformproject.shared.generated.resources.Res
-import mymultiplatformproject.shared.generated.resources.ic_arrow_next
+import mymultiplatformproject.shared.generated.resources.ic_apple_logo
 import mymultiplatformproject.shared.generated.resources.ic_eye_hidden
 import mymultiplatformproject.shared.generated.resources.ic_eye_visible
+import mymultiplatformproject.shared.generated.resources.ic_google_logo
 import org.jetbrains.compose.resources.painterResource
 
 class LoginScreen: Screen {
@@ -178,16 +180,20 @@ class LoginScreen: Screen {
                         .height(56.dp),
                     shape = RoundedCornerShape(12.dp)
                 ){
-                    Text("Google", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onBackground)
+                    Icon(painterResource(Res.drawable.ic_google_logo), contentDescription = null, modifier = Modifier.size(24.dp))
+                    Spacer(modifier = Modifier.width(16.dp))
+                    Text("Продовжити з Google", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onBackground)
                 }
-                OutlinedButton(
+                Button(
                     onClick = { /*TODO: Логіка авторизації Apple*/ },
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(56.dp),
                     shape = RoundedCornerShape(12.dp)
                 ){
-                    Text("Apple", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onBackground)
+                    Icon(painterResource(Res.drawable.ic_apple_logo), contentDescription = null, modifier = Modifier.size(32.dp))
+                    Spacer(modifier = Modifier.width(16.dp))
+                    Text("Продовжити з Apple ID", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.background)
                 }
             }
 
