@@ -13,9 +13,11 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Checkbox
@@ -33,6 +35,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -71,15 +74,15 @@ class RegisterScreen: Screen {
         val coroutineScope = rememberCoroutineScope()
 
         // Головний стан майстра реєстрації
-        var currentStep by remember { mutableStateOf(1) }
+        var currentStep by rememberSaveable { mutableStateOf(1) }
 
         // Стани для збереження даних користувача (будуть заповнюватися на різних кроках)
-        var email by remember { mutableStateOf("") }
-        var password by remember { mutableStateOf("") }
-        var firstName by remember { mutableStateOf("") }
-        var lastName by remember { mutableStateOf("") }
-        var phone by remember { mutableStateOf("") }
-        var countryCode by remember { mutableStateOf("+380") } // Код за замовчуванням
+        var email by rememberSaveable { mutableStateOf("") }
+        var password by rememberSaveable { mutableStateOf("") }
+        var firstName by rememberSaveable { mutableStateOf("") }
+        var lastName by rememberSaveable { mutableStateOf("") }
+        var phone by rememberSaveable { mutableStateOf("") }
+        var countryCode by rememberSaveable { mutableStateOf("+380") } // Код за замовчуванням
         var photoByteArray by remember { mutableStateOf<ByteArray?>(null) }  // Готовий тип файл для POST-запиту
 
         // Створюємо лаунчер для галереї
@@ -92,9 +95,13 @@ class RegisterScreen: Screen {
             }
         )
 
+        // Змінна для прокручуваного екрану
+        val scrollState = rememberScrollState()
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .verticalScroll(scrollState)
                 .background(MaterialTheme.colorScheme.background)
                 .padding(horizontal = 24.dp)
                 .padding(top = 16.dp, bottom = 24.dp)
