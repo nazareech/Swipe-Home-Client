@@ -56,6 +56,8 @@ kotlin {
             implementation(libs.koin.core)
             implementation(libs.koin.compose)
 
+            // Peekaboo (Доступ та дозвіл до файлів)
+            implementation(libs.peekaboo.image.picker)
         }
 
         androidMain.dependencies {

@@ -4,5 +4,7 @@
 <dict>
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
+	<key>NSPhotoLibraryUsageDescription</key>
+    <string>Додаток потребує доступу до галереї, щоб ви могли встановити фото профілю.</string>
 </dict>
 </plist>

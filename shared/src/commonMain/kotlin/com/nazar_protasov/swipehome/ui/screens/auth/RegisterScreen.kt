@@ -32,6 +32,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -59,11 +60,15 @@ import mymultiplatformproject.shared.generated.resources.ic_google_logo
 import mymultiplatformproject.shared.generated.resources.ic_hint
 import org.jetbrains.compose.resources.painterResource
 import kotlin.repeat
+import com.preat.peekaboo.image.picker.rememberImagePickerLauncher
+import com.preat.peekaboo.image.picker.SelectionMode
+import mymultiplatformproject.shared.generated.resources.ic_image_upload
 
 class RegisterScreen: Screen {
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
+        val coroutineScope = rememberCoroutineScope()
 
         // Головний стан майстра реєстрації
         var currentStep by remember { mutableStateOf(1) }
@@ -75,7 +80,17 @@ class RegisterScreen: Screen {
         var lastName by remember { mutableStateOf("") }
         var phone by remember { mutableStateOf("") }
         var countryCode by remember { mutableStateOf("+380") } // Код за замовчуванням
-        var photoUri by remember { mutableStateOf<String?>(null) } // Зберігатиме шлях до обраного фото
+        var photoByteArray by remember { mutableStateOf<ByteArray?>(null) }  // Готовий тип файл для POST-запиту
+
+        // Створюємо лаунчер для галереї
+        val singleImagePicker = rememberImagePickerLauncher(
+            selectionMode = SelectionMode.Single,
+            scope = coroutineScope,
+            onResult = { byteArrays ->
+                // Отримуємо перше вибране фото
+                photoByteArray = byteArrays.firstOrNull()
+            }
+        )
 
         Column(
             modifier = Modifier
@@ -158,10 +173,10 @@ class RegisterScreen: Screen {
                     onFirstNameChange = { firstName = it },
                     lastName = lastName,
                     onLastNameChange = { lastName = it },
-                    photoUri = photoUri,
+                    photoData = photoByteArray,
                     onPhotoClick = {
-                        /*TODO: Тут буде виклик бібліотеки для вибору фото з галереї.
-                        *  Після вибору робимо: photoUri = "шлях_до_фото" */
+                        // икликає галарею при натисканні
+                        singleImagePicker.launch()
                     }
                 )
                 4 -> Step4Content(
@@ -432,13 +447,14 @@ class RegisterScreen: Screen {
         }
     }
 
+    // Про себе
     @Composable
     fun Step3Content(
         firstName: String,
         onFirstNameChange: (String) -> Unit,
         lastName: String,
         onLastNameChange: (String) -> Unit,
-        photoUri: String?,
+        photoData: ByteArray?,
         onPhotoClick: () -> Unit
     ){
         Column(modifier = Modifier.fillMaxWidth()) {
@@ -469,13 +485,13 @@ class RegisterScreen: Screen {
                         .clip(CircleShape)
                         // Змінюємо фон, якщо фотографія завантажена
                         .background(
-                            if (photoUri != null) MaterialTheme.colorScheme.primary.copy(alpha = 0.2f)
+                            if (photoData != null) MaterialTheme.colorScheme.primary.copy(alpha = 0.2f)
                             else MaterialTheme.colorScheme.secondary.copy(alpha = 0.3f)
                         )
                         .clickable{ onPhotoClick() },
                     contentAlignment = Alignment.Center
                 ) {
-                    if (photoUri == null) {
+                    if (photoData == null) {
                         // Стан "До вибору фотографії"
                         Column(horizontalAlignment = Alignment.CenterHorizontally) {
                             Icon(
@@ -495,7 +511,22 @@ class RegisterScreen: Screen {
                     } else {
                         // Стан "Зображення завантажено"
                         // TODO: Тут буде код AsyncImage для відображення реального фото
-                        Text(text = "✅", fontSize = 48.sp)
+                        // Заглушка, поки ми не додамо бібліотеку типу Coil для рендеру ByteArra
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            Icon(
+                                painterResource(Res.drawable.ic_image_upload),
+                                contentDescription = null,
+                                modifier = Modifier.size(32.dp)
+                            )
+                            Spacer(modifier = Modifier.height(4.dp))
+                            Text(
+                                text = "Фото завантажено",
+                                fontSize = 12.sp,
+                                fontWeight = FontWeight.Bold,
+                                textAlign = TextAlign.Center,
+                                color = MaterialTheme.colorScheme.primary
+                            )
+                        }
                     }
                 }
             }
@@ -553,18 +584,18 @@ class RegisterScreen: Screen {
 
         // Словник масок для кожної країни
         val phoneMasks = mapOf(
-            "+380" to "XX XXX XXXX",// Україна
-            "+48" to "XXX XXX XXX", // Польща
-            "+1" to "XXX XXX XXXX", // США/Канада
-            "+44" to "XXXX XXXXXX", // Британія
-            "+49" to "XXX XXXXXXX"  // Німеччина
+            "+380" to "00 000 0000",// Україна
+            "+48" to "000 000 000", // Польща
+            "+1" to "000 000 0000", // США/Канада
+            "+44" to "0000 000000", // Британія
+            "+49" to "000 0000000"  // Німеччина
         )
 
         // Визначаємо поточну маску на основі обраного коду (з дефолтним значенням)
-        val currentMask = phoneMasks[countryCode] ?: "XX XXX XXXX"
+        val currentMask = phoneMasks[countryCode] ?: "00 000 0000"
 
         // Рахуємо, скільки цифр дозволено вводити для цієї країни
-        val maxDigits = currentMask.count { it == 'X' }
+        val maxDigits = currentMask.count { it == '0' }
 
         Column(modifier = Modifier.fillMaxWidth()) {
             Text(
