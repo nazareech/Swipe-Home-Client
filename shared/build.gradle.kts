@@ -58,6 +58,9 @@ kotlin {
 
             // Peekaboo (Доступ та дозвіл до файлів)
             implementation(libs.peekaboo.image.picker)
+
+            // Coil, щоб красиво відмалювати завантажену аватарку
+            implementation(libs.coil.compose)
         }
 
         androidMain.dependencies {

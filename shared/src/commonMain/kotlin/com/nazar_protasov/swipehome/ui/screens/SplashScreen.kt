@@ -18,8 +18,11 @@ import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import com.nazar_protasov.swipehome.ui.screens.auth.RegisterScreen
 import kotlinx.coroutines.delay
+import mymultiplatformproject.shared.generated.resources.Res
+import mymultiplatformproject.shared.generated.resources.app_name
+import mymultiplatformproject.shared.generated.resources.app_title
+import org.jetbrains.compose.resources.stringResource
 
 class SplashScreen : Screen {
     @Composable
@@ -53,7 +56,7 @@ class SplashScreen : Screen {
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Text(
-                    text = "SwipeHome",
+                    text = stringResource(Res.string.app_name),
                     style = MaterialTheme.typography.headlineMedium,
                     color = MaterialTheme.colorScheme.primary,
                     fontSize = 32.sp,
@@ -63,7 +66,7 @@ class SplashScreen : Screen {
                 Spacer(modifier = Modifier.height(8.dp))
 
                 Text(
-                    text = "Find your place",
+                    text = stringResource(Res.string.app_title),
                     color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f),
                     fontSize = 32.sp
                 )

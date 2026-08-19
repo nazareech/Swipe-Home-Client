@@ -1,0 +1,63 @@
+<resources>
+    <!-- Загальні -->
+    <string name="app_name">Swipe Home</string>
+    <string name="app_title">Find your place</string>
+    <string name="btn_next">Next</string>
+    <string name="btn_back">Back</string>
+    <string name="btn_register">Sign Up</string>
+    <string name="or_divider">OR</string>
+    <string name="email_login_label">Email або Логін</string>
+    <string name="password_label">Password</string>
+    <string name="password_placeholder">Введіть ваш пароль</string>
+
+    <!--    Екран Онбординг-->
+    <string name="onboarding_title_1">Swipe Right ti Save\nYour Dream Home</string>
+    <string name="onboarding_description_1">Browse curated properties effortlessly. Love it? Swipe right to save it to your favorites.</string>
+    <string name="onboarding_title_2">Natch &amp; Chat\nYour Dream Home</string>
+    <string name="onboarding_description_2">Once you match with a property, connect directly with the owner to arrange a viewing instantly.</string>
+    <string name="onboarding_title_3">Verified Listings Only</string>
+    <string name="onboarding_description_3">We rigorously verify all property owners, agents, and legal documents so you can browse with absolute peace of mind.</string>
+    <string name="onboarding_btn_skip">Skip</string>
+    <string name="onboarding_btn_get_started">Get Started</string>
+
+    <!--    Екран логування-->
+    <string name="login_title">Welcome Back!</string>
+    <string name="login_subtitle">Log in to your account</string>
+    <string name="login_fogot_password">Forgot your password?</string>
+    <string name="login_btn_enter">Log In</string>
+    <string name="login_enter_with">Log in with</string>
+    <string name="login_create_account">Don't have an account yet?</string>
+
+    <!-- Екран реєстрації: Крок 1 -->
+    <string name="reg_step_indicaton">Step</string>
+    <string name="reg_step_indicaton_of">of</string>
+    <string name="reg_agree1">By clicking “Continue,” you agree to </string>
+    <string name="reg_agree2">the Terms of Use</string>
+
+    <string name="reg_title_step1">Create Account</string>
+    <string name="reg_subtitle_step1">Quick start to find your perfect home</string>
+    <string name="reg_email_label">Email address</string>
+    <string name="reg_email_placeholder">Enter your email</string>
+    <string name="reg_continue_google">Continue with Google</string>
+    <string name="reg_continue_apple">Continue with Apple ID</string>
+
+    <!-- Екран реєстрації: Крок 2 -->
+    <string name="reg_title_step2">Security</string>
+    <string name="reg_subtitle_step2">Create secure credentials to protect your account.</string>
+    <string name="reg_hiden_password">Enter at least one digit and one uppercase letter</string>
+
+    <!--    Екран реєстрації Крок 3-->
+    <string name="reg_title_step3">About</string>
+    <string name="reg_subtitle_step3">Add information about yourself to the search</string>
+    <string name="reg_photo_upload">Upload photo</string>
+    <string name="reg_profile_photo">Profile photo</string>
+    <string name="reg_name">Name</string>
+    <string name="reg_last_name">Last Name</string>
+
+    <!--    Екран реєстрації Крок 4-->
+    <string name="reg_title_step4">Contact</string>
+    <string name="reg_subtitle_step4">The final step in creating your profile</string>
+    <string name="reg_phone_number">Phone Number</string>
+    <string name="reg_rules_agree">I agree to the Terms of Use and Privacy Policy</string>
+
+</resources>

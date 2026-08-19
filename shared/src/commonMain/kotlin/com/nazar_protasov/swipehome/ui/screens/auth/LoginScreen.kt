@@ -42,11 +42,23 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import mymultiplatformproject.shared.generated.resources.Res
+import mymultiplatformproject.shared.generated.resources.btn_register
 import mymultiplatformproject.shared.generated.resources.ic_apple_logo
 import mymultiplatformproject.shared.generated.resources.ic_eye_hidden
 import mymultiplatformproject.shared.generated.resources.ic_eye_visible
 import mymultiplatformproject.shared.generated.resources.ic_google_logo
+import mymultiplatformproject.shared.generated.resources.login_btn_enter
+import mymultiplatformproject.shared.generated.resources.login_create_account
+import mymultiplatformproject.shared.generated.resources.email_login_label
+import mymultiplatformproject.shared.generated.resources.login_enter_with
+import mymultiplatformproject.shared.generated.resources.login_fogot_password
+import mymultiplatformproject.shared.generated.resources.password_label
+import mymultiplatformproject.shared.generated.resources.login_subtitle
+import mymultiplatformproject.shared.generated.resources.login_title
+import mymultiplatformproject.shared.generated.resources.reg_continue_apple
+import mymultiplatformproject.shared.generated.resources.reg_continue_google
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 
 class LoginScreen: Screen {
     @Composable
@@ -58,7 +70,7 @@ class LoginScreen: Screen {
         var password by remember { mutableStateOf("") }
         // Змінна для перемикання видимості пароля
         var passwordVisible by remember { mutableStateOf(false) }
-        // Змінна для прокручуваного екрану
+        // Змінна для прокручуваного екрана
         val scrollState = rememberScrollState()
 
         Column(
@@ -72,14 +84,14 @@ class LoginScreen: Screen {
         ){
             // Заголовок
             Text(
-                text = "Welcome Back",
+                text = stringResource(Res.string.login_title),
                 fontSize = 32.sp,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.primary
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(
-                text = "Увійдіть до свого акаунта",
+                text = stringResource(Res.string.login_subtitle),
                 color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f),
                 fontSize = 16.sp
             )
@@ -90,7 +102,7 @@ class LoginScreen: Screen {
             OutlinedTextField(
                 value = email,
                 onValueChange = { email = it },
-                label = { Text("Email або Логін") },
+                label = { Text(stringResource(Res.string.email_login_label)) },
                 modifier = Modifier.fillMaxWidth(),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
                 singleLine = true,
@@ -103,7 +115,7 @@ class LoginScreen: Screen {
             OutlinedTextField(
                 value = password,
                 onValueChange = { password = it },
-                label = { Text("Пароль") },
+                label = { Text(stringResource(Res.string.password_label)) },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
                 shape = RoundedCornerShape(12.dp),
@@ -131,7 +143,7 @@ class LoginScreen: Screen {
             ){
                 TextButton(onClick = { /*TODO: Навігація на екрані відновлення пароля*/ }) {
                     Text(
-                        text = "Забули пароль?",
+                        text = stringResource(Res.string.login_fogot_password),
                         color = MaterialTheme.colorScheme.primary,
                         fontWeight = FontWeight.SemiBold
                     )
@@ -151,7 +163,7 @@ class LoginScreen: Screen {
                     containerColor = MaterialTheme.colorScheme.primary
                 )
             ){
-                Text("Увійти", fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                Text(stringResource(Res.string.login_btn_enter), fontSize = 18.sp, fontWeight = FontWeight.Bold)
             }
 
             Spacer(modifier = Modifier.height(32.dp))
@@ -163,7 +175,7 @@ class LoginScreen: Screen {
             ){
                 Box(modifier = Modifier.weight(1f).height(1.dp).background(MaterialTheme.colorScheme.onBackground.copy(alpha = 0.2f)))
                 Text(
-                    text = "Увійти через",
+                    text = stringResource(Res.string.login_enter_with),
                     color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f),
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Bold
@@ -187,7 +199,7 @@ class LoginScreen: Screen {
                 ){
                     Icon(painterResource(Res.drawable.ic_google_logo), contentDescription = null, modifier = Modifier.size(24.dp))
                     Spacer(modifier = Modifier.width(16.dp))
-                    Text("Продовжити з Google", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onBackground)
+                    Text(stringResource(Res.string.reg_continue_google), fontSize = 18.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onBackground)
                 }
                 Button(
                     onClick = { /*TODO: Логіка авторизації Apple*/ },
@@ -198,7 +210,7 @@ class LoginScreen: Screen {
                 ){
                     Icon(painterResource(Res.drawable.ic_apple_logo), contentDescription = null, modifier = Modifier.size(32.dp))
                     Spacer(modifier = Modifier.width(16.dp))
-                    Text("Продовжити з Apple ID", fontSize = 18.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.background)
+                    Text(stringResource(Res.string.reg_continue_apple), fontSize = 18.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.background)
                 }
             }
 
@@ -210,13 +222,13 @@ class LoginScreen: Screen {
                 verticalAlignment = Alignment.CenterVertically
             ){
                 Text(
-                    text = "Ще немає акаунта?",
+                    text = stringResource(Res.string.login_create_account),
                     color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f)
                 )
                 TextButton(onClick = { navigator.push(RegisterScreen()) })
                 {
                     Text(
-                        text = "Зареєструватися",
+                        text = stringResource(Res.string.btn_register),
                         color = MaterialTheme.colorScheme.primary,
                         fontWeight = FontWeight.SemiBold
                     )

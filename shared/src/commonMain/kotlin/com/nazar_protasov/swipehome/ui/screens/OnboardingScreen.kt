@@ -36,6 +36,17 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.nazar_protasov.swipehome.ui.screens.auth.LoginScreen
 import kotlinx.coroutines.launch
+import mymultiplatformproject.shared.generated.resources.Res
+import mymultiplatformproject.shared.generated.resources.btn_next
+import mymultiplatformproject.shared.generated.resources.onboarding_btn_get_started
+import mymultiplatformproject.shared.generated.resources.onboarding_description_1
+import mymultiplatformproject.shared.generated.resources.onboarding_description_2
+import mymultiplatformproject.shared.generated.resources.onboarding_description_3
+import mymultiplatformproject.shared.generated.resources.onboarding_title_1
+import mymultiplatformproject.shared.generated.resources.onboarding_title_2
+import mymultiplatformproject.shared.generated.resources.onboarding_title_3
+import mymultiplatformproject.shared.generated.resources.onboarding_btn_skip
+import org.jetbrains.compose.resources.stringResource
 
 // Модель даних для слайда
 class OnboardingPage(
@@ -48,24 +59,24 @@ class OnboardingScreen : Screen {
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
         val coroutineScope = rememberCoroutineScope()
-        // Змінна для прокручуваного екрану
+        // Змінна для прокручуваного екрана
         val scrollState = rememberScrollState()
 
         // Дані для слайдів
         val pages = listOf(
             OnboardingPage(
-                title = "Swipe Right ti Save\nYour Dream Home",
-                description = "Browse curated properties effortlessly. Love it? Swipe right to save it to your favorites.",
+                title = stringResource(Res.string.onboarding_title_1),
+                description = stringResource(Res.string.onboarding_description_1),
                 iconEmoji = "❤\uFE0F"
             ),
             OnboardingPage(
-                title = "Natch & Chat",
-                description = "Once you match with a property, connect directly with the owner to arrange a viewing instantly.",
+                title = stringResource(Res.string.onboarding_title_2),
+                description = stringResource(Res.string.onboarding_description_2),
                 iconEmoji = "\uD83D\uDCAC"
             ),
             OnboardingPage(
-                title = "Verified Listings Only",
-                description = "We rigorously verify all property owners, agents, and legal documents so you can browse with absolute peace of mind.",
+                title = stringResource(Res.string.onboarding_title_3),
+                description = stringResource(Res.string.onboarding_description_3),
                 iconEmoji = "\uD83D\uDEE1\uFE0F"
             )
         )
@@ -76,19 +87,6 @@ class OnboardingScreen : Screen {
                 .fillMaxSize()
                 .background(MaterialTheme.colorScheme.background), // Додаємо фон з нашої теми
         ) {
-            TextButton(
-                onClick = { navigator.push(LoginScreen()) },
-                modifier = Modifier
-                    .align(Alignment.TopEnd)
-                    .padding(top = 40.dp, end = 16.dp)
-            ) {
-                Text(
-                    text = "Skip",
-                    color = MaterialTheme.colorScheme.primary,
-                    fontWeight = FontWeight.Bold
-                )
-            }
-
             // Головна колонка екрана
             Column(
                 modifier = Modifier.fillMaxSize().verticalScroll(scrollState),
@@ -149,11 +147,25 @@ class OnboardingScreen : Screen {
                     )
                 ) {
                     Text(
-                        text = if (pagerState.currentPage == pages.size - 1) "Get Started" else "Next step",
+                        text = if (pagerState.currentPage == pages.size - 1) stringResource(Res.string.onboarding_btn_get_started) else stringResource(Res.string.btn_next),
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold
                     )
                 }
+            }
+
+            // Кнопка Skip, щоб вона малювалась поверх колонки
+            TextButton(
+                onClick = { navigator.replace(LoginScreen()) },
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .padding(top = 40.dp, end = 16.dp)
+            ) {
+                Text(
+                    text = stringResource(Res.string.onboarding_btn_skip),
+                    color = MaterialTheme.colorScheme.primary,
+                    fontWeight = FontWeight.Bold
+                )
             }
         }
     }

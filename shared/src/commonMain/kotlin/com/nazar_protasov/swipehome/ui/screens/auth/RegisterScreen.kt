@@ -40,6 +40,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -50,6 +51,7 @@ import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import coil3.compose.AsyncImage
 import com.nazar_protasov.swipehome.ui.utils.PhoneVisualTransformation
 import mymultiplatformproject.shared.generated.resources.Res
 import mymultiplatformproject.shared.generated.resources.ic_apple_logo
@@ -65,7 +67,37 @@ import org.jetbrains.compose.resources.painterResource
 import kotlin.repeat
 import com.preat.peekaboo.image.picker.rememberImagePickerLauncher
 import com.preat.peekaboo.image.picker.SelectionMode
-import mymultiplatformproject.shared.generated.resources.ic_image_upload
+import mymultiplatformproject.shared.generated.resources.app_name
+import mymultiplatformproject.shared.generated.resources.btn_back
+import mymultiplatformproject.shared.generated.resources.btn_next
+import mymultiplatformproject.shared.generated.resources.btn_register
+import mymultiplatformproject.shared.generated.resources.email_login_label
+import mymultiplatformproject.shared.generated.resources.or_divider
+import mymultiplatformproject.shared.generated.resources.password_label
+import mymultiplatformproject.shared.generated.resources.password_placeholder
+import mymultiplatformproject.shared.generated.resources.reg_agree1
+import mymultiplatformproject.shared.generated.resources.reg_agree2
+import mymultiplatformproject.shared.generated.resources.reg_continue_apple
+import mymultiplatformproject.shared.generated.resources.reg_continue_google
+import mymultiplatformproject.shared.generated.resources.reg_email_label
+import mymultiplatformproject.shared.generated.resources.reg_email_placeholder
+import mymultiplatformproject.shared.generated.resources.reg_hiden_password
+import mymultiplatformproject.shared.generated.resources.reg_last_name
+import mymultiplatformproject.shared.generated.resources.reg_name
+import mymultiplatformproject.shared.generated.resources.reg_phone_number
+import mymultiplatformproject.shared.generated.resources.reg_photo_upload
+import mymultiplatformproject.shared.generated.resources.reg_profile_photo
+import mymultiplatformproject.shared.generated.resources.reg_rules_agree
+import mymultiplatformproject.shared.generated.resources.reg_step_indicaton
+import mymultiplatformproject.shared.generated.resources.reg_step_indicaton_of
+import mymultiplatformproject.shared.generated.resources.reg_subtitle_step1
+import mymultiplatformproject.shared.generated.resources.reg_subtitle_step2
+import mymultiplatformproject.shared.generated.resources.reg_subtitle_step4
+import mymultiplatformproject.shared.generated.resources.reg_title_step1
+import mymultiplatformproject.shared.generated.resources.reg_title_step2
+import mymultiplatformproject.shared.generated.resources.reg_title_step3
+import mymultiplatformproject.shared.generated.resources.reg_title_step4
+import org.jetbrains.compose.resources.stringResource
 
 class RegisterScreen: Screen {
     @Composable
@@ -125,7 +157,7 @@ class RegisterScreen: Screen {
                 }
 
                 Text(
-                    text = "Swipe Home",
+                    text = stringResource(Res.string.app_name),
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.primary,
@@ -160,7 +192,7 @@ class RegisterScreen: Screen {
                 }
             }
             Text(
-                text = "Крок $currentStep з 4",
+                text = stringResource(Res.string.reg_step_indicaton) + " $currentStep " + stringResource(Res.string.reg_step_indicaton_of) +" 4",
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(top = 8.dp),
@@ -206,7 +238,7 @@ class RegisterScreen: Screen {
                     shape = RoundedCornerShape(12.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
                 ) {
-                    Text("Далі", fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                    Text(stringResource(Res.string.btn_next), fontSize = 18.sp, fontWeight = FontWeight.Bold)
                     Spacer(modifier = Modifier.width(8.dp))
                     Icon(
                         painterResource(Res.drawable.ic_arrow_next),
@@ -223,7 +255,7 @@ class RegisterScreen: Screen {
                     horizontalAlignment = Alignment.CenterHorizontally
                 ){
                     Text(
-                        text = "Натискання продовжити, ви погоджуєтесь з",
+                        text = stringResource(Res.string.reg_agree1),
                         color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f),
                         fontSize = 12.sp,
                         textAlign = TextAlign.Center
@@ -231,7 +263,7 @@ class RegisterScreen: Screen {
                     TextButton(onClick = { /*TODO: Посилання на політику використання*/ })
                     {
                         Text(
-                            text = "Умовами використання",
+                            text = stringResource(Res.string.reg_agree2),
                             fontSize = 12.sp,
                             color = MaterialTheme.colorScheme.primary,
                             fontWeight = FontWeight.SemiBold
@@ -251,7 +283,7 @@ class RegisterScreen: Screen {
                     shape = RoundedCornerShape(12.dp),
                     colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
                 ){
-                    Text(if (currentStep == 4) "Зареєструватися" else "Далі", fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                    Text(if (currentStep == 4) stringResource(Res.string.btn_register) else stringResource(Res.string.btn_next), fontSize = 18.sp, fontWeight = FontWeight.Bold)
                     if (currentStep != 4){
                         Spacer(modifier = Modifier.width(8.dp))
                         Icon(painterResource(Res.drawable.ic_arrow_next), contentDescription = null, modifier = Modifier.size(20.dp))
@@ -267,7 +299,7 @@ class RegisterScreen: Screen {
                         .height(56.dp),
                     shape = RoundedCornerShape(12.dp)
                 ){
-                    Text("Назад", fontSize = 18.sp, color = MaterialTheme.colorScheme.primary)
+                    Text(stringResource(Res.string.btn_back), fontSize = 18.sp, color = MaterialTheme.colorScheme.primary)
                 }
             }
         }
@@ -278,7 +310,7 @@ class RegisterScreen: Screen {
     fun Step1Content(email: String, onEmailChange: (String) -> Unit) {
         Column(modifier = Modifier.fillMaxWidth()) {
             Text(
-                text = "Створити акаунт",
+                text = stringResource(Res.string.reg_title_step1),
                 fontSize = 32.sp,
                 fontWeight = FontWeight.ExtraBold,
                 color = MaterialTheme.colorScheme.onBackground
@@ -287,7 +319,7 @@ class RegisterScreen: Screen {
             Spacer(modifier = Modifier.height(8.dp))
 
             Text(
-                text = "Швидкий старт для пошуку ідеального дому",
+                text = stringResource(Res.string.reg_subtitle_step1),
                 color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f),
                 fontSize = 16.sp
             )
@@ -302,7 +334,7 @@ class RegisterScreen: Screen {
             ){
                 Icon(painterResource(Res.drawable.ic_google_logo), contentDescription = null, modifier = Modifier.size(24.dp))
                 Spacer(modifier = Modifier.width(16.dp))
-                Text("Продовжити з Google", fontSize = 16.sp, color = MaterialTheme.colorScheme.onBackground)
+                Text(stringResource(Res.string.reg_continue_google), fontSize = 16.sp, color = MaterialTheme.colorScheme.onBackground)
             }
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -314,7 +346,7 @@ class RegisterScreen: Screen {
             ){
                 Icon(painterResource(Res.drawable.ic_apple_logo), contentDescription = null, modifier = Modifier.size(32.dp))
                 Spacer(modifier = Modifier.width(16.dp))
-                Text("Продовжити з Apple ID", fontSize = 16.sp, color = MaterialTheme.colorScheme.background)
+                Text(stringResource(Res.string.reg_continue_apple), fontSize = 16.sp, color = MaterialTheme.colorScheme.background)
             }
 
             Spacer(modifier = Modifier.height(32.dp))
@@ -326,7 +358,7 @@ class RegisterScreen: Screen {
             ){
                 Box(modifier = Modifier.weight(1f).height(1.dp).background(MaterialTheme.colorScheme.onBackground.copy(alpha = 0.2f)))
                 Text(
-                    text = "АБО",
+                    text = stringResource(Res.string.or_divider),
                     color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f),
                     fontSize = 12.sp,
                     fontWeight = FontWeight.Bold
@@ -337,7 +369,7 @@ class RegisterScreen: Screen {
             Spacer(modifier = Modifier.height(32.dp))
 
             Text(
-                text = "Email адреса",
+                text = stringResource(Res.string.reg_email_label),
                 fontWeight = FontWeight.SemiBold,
                 fontSize = 14.sp,
                 color = MaterialTheme.colorScheme.onBackground
@@ -346,8 +378,8 @@ class RegisterScreen: Screen {
             OutlinedTextField(
                 value = email,
                 onValueChange = onEmailChange,
-                label = { Text("Email") },
-                placeholder = { Text("Email") },
+                label = { Text(stringResource(Res.string.reg_email_label)) },
+                placeholder = { Text(stringResource(Res.string.reg_email_placeholder)) },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
                 shape = RoundedCornerShape(12.dp)
@@ -367,7 +399,7 @@ class RegisterScreen: Screen {
 
         Column(modifier = Modifier.fillMaxWidth()) {
             Text(
-                text = "Безпека",
+                text = stringResource(Res.string.reg_title_step2),
                 fontSize = 32.sp,
                 fontWeight = FontWeight.ExtraBold,
                 color = MaterialTheme.colorScheme.onBackground
@@ -376,7 +408,7 @@ class RegisterScreen: Screen {
             Spacer(modifier = Modifier.height(8.dp))
 
             Text(
-                text = "Створіть надійниі облікові дані для захисту вашого акаунта.",
+                text = stringResource(Res.string.reg_subtitle_step2),
                 color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f),
                 fontSize = 16.sp
             )
@@ -385,7 +417,7 @@ class RegisterScreen: Screen {
 
             // Поле Email (користувач може його змінити якщо помилився на першому кроці)
             Text(
-                text = "Email або Логін",
+                text = stringResource(Res.string.email_login_label),
                 fontWeight = FontWeight.SemiBold,
                 fontSize = 14.sp,
                 color = MaterialTheme.colorScheme.onBackground
@@ -394,8 +426,8 @@ class RegisterScreen: Screen {
             OutlinedTextField(
                 value = email,
                 onValueChange = onEmailChange,
-                label = { Text("Email або Логін") },
-                placeholder = { Text("Введіть ваш Email") },
+                label = { Text(stringResource(Res.string.email_login_label)) },
+                placeholder = { Text(stringResource(Res.string.reg_email_placeholder)) },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
                 shape = RoundedCornerShape(12.dp)
@@ -405,7 +437,7 @@ class RegisterScreen: Screen {
 
             // Поле Пароль
             Text(
-                text = "Пароль",
+                text = stringResource(Res.string.password_label),
                 fontWeight = FontWeight.SemiBold,
                 fontSize = 14.sp,
                 color = MaterialTheme.colorScheme.onBackground
@@ -414,9 +446,9 @@ class RegisterScreen: Screen {
             OutlinedTextField(
                 value = password,
                 onValueChange = onPasswordChange,
-                label = { Text("Пароль") },
+                label = { Text(stringResource(Res.string.password_label)) },
                 modifier = Modifier.fillMaxWidth(),
-                placeholder = {Text("Введіть ваш пароль")},
+                placeholder = {Text(stringResource(Res.string.password_placeholder))},
                 singleLine = true,
                 shape = RoundedCornerShape(12.dp),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
@@ -444,7 +476,7 @@ class RegisterScreen: Screen {
                 Icon(painterResource(Res.drawable.ic_hint), contentDescription = null, modifier = Modifier.size(12.dp))
                 Spacer(modifier = Modifier.width(6.dp))
                 Text(
-                    text = "Додайте щонайменше одну цифру та велику літеру",
+                    text = stringResource(Res.string.reg_hiden_password),
                     color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f),
                     fontSize = 12.sp
                 )
@@ -467,7 +499,7 @@ class RegisterScreen: Screen {
         Column(modifier = Modifier.fillMaxWidth()) {
             // Заголовок та опис
             Text(
-                text = "Про себе",
+                text = stringResource(Res.string.reg_title_step3),
                 fontSize = 32.sp,
                 fontWeight = FontWeight.ExtraBold,
                 color = MaterialTheme.colorScheme.onBackground
@@ -475,7 +507,7 @@ class RegisterScreen: Screen {
             Spacer(modifier = Modifier.height(16.dp))
 /*
             Text(
-                text = "Додайте інформацію про себе для пошуку",
+                text = stringResource(Res.string.reg_subtitle_step3),
                 color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f),
                 fontSize = 16.sp
             )
@@ -508,7 +540,7 @@ class RegisterScreen: Screen {
                             )
                             Spacer(modifier = Modifier.height(4.dp))
                             Text(
-                                text = "Додати фото",
+                                text = stringResource(Res.string.reg_photo_upload),
                                 fontSize = 12.sp,
                                 fontWeight = FontWeight.Bold,
                                 textAlign = TextAlign.Center,
@@ -517,23 +549,14 @@ class RegisterScreen: Screen {
                         }
                     } else {
                         // Стан "Зображення завантажено"
-                        // TODO: Тут буде код AsyncImage для відображення реального фото
-                        // Заглушка, поки ми не додамо бібліотеку типу Coil для рендеру ByteArra
-                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            Icon(
-                                painterResource(Res.drawable.ic_image_upload),
-                                contentDescription = null,
-                                modifier = Modifier.size(32.dp)
-                            )
-                            Spacer(modifier = Modifier.height(4.dp))
-                            Text(
-                                text = "Фото завантажено",
-                                fontSize = 12.sp,
-                                fontWeight = FontWeight.Bold,
-                                textAlign = TextAlign.Center,
-                                color = MaterialTheme.colorScheme.primary
-                            )
-                        }
+                       AsyncImage(
+                           model = photoData, // Coli автоматично читає ByteArray
+                           contentDescription = stringResource(Res.string.reg_profile_photo),
+                           modifier = Modifier
+                               .fillMaxSize() // Займаємо всі 120.dp нашого Box
+                               .clip(CircleShape), // Обрізаємо кути, щоб фото не вилазило за коло
+                           contentScale = ContentScale.Crop // Маштабуємо фото, щоб воно заповнило весь Box без спотворень
+                       )
                     }
                 }
             }
@@ -541,7 +564,7 @@ class RegisterScreen: Screen {
             Spacer(modifier = Modifier.height(8.dp))
 
             Text(
-                text = "Ім'я",
+                text = stringResource(Res.string.reg_name),
                 fontWeight = FontWeight.SemiBold,
                 fontSize = 14.sp,
                 color = MaterialTheme.colorScheme.onBackground
@@ -549,8 +572,8 @@ class RegisterScreen: Screen {
             OutlinedTextField(
                 value = firstName,
                 onValueChange = onFirstNameChange,
-                label = { Text("Ім'я") },
-                placeholder = { Text("Ім'я") },
+                label = { Text(stringResource(Res.string.reg_name)) },
+                placeholder = { Text(stringResource(Res.string.reg_name)) },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
                 shape = RoundedCornerShape(12.dp)
@@ -558,7 +581,7 @@ class RegisterScreen: Screen {
             Spacer(modifier = Modifier.height(16.dp))
 
             Text(
-                text = "Прізвище",
+                text = stringResource(Res.string.reg_last_name),
                 fontWeight = FontWeight.SemiBold,
                 fontSize = 14.sp,
                 color = MaterialTheme.colorScheme.onBackground
@@ -566,8 +589,8 @@ class RegisterScreen: Screen {
             OutlinedTextField(
                 value = lastName,
                 onValueChange = onLastNameChange,
-                label = { Text("Прізвище") },
-                placeholder = { Text("Прізвище") },
+                label = { Text(stringResource(Res.string.reg_last_name)) },
+                placeholder = { Text(stringResource(Res.string.reg_last_name)) },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
                 shape = RoundedCornerShape(12.dp)
@@ -606,7 +629,7 @@ class RegisterScreen: Screen {
 
         Column(modifier = Modifier.fillMaxWidth()) {
             Text(
-                text = "Контакти",
+                text = stringResource(Res.string.reg_title_step4),
                 fontSize = 32.sp,
                 fontWeight = FontWeight.ExtraBold,
                 color = MaterialTheme.colorScheme.onBackground
@@ -615,7 +638,7 @@ class RegisterScreen: Screen {
             Spacer(modifier = Modifier.height(8.dp))
 
             Text(
-                text = "Останній крок для створення вашого профілю",
+                text = stringResource(Res.string.reg_subtitle_step4),
                 color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f),
                 fontSize = 16.sp
             )
@@ -624,7 +647,7 @@ class RegisterScreen: Screen {
 
             // Поле для номера телефону
             Text(
-                text = "Номер телефону",
+                text = stringResource(Res.string.reg_phone_number),
                 fontWeight = FontWeight.SemiBold,
                 fontSize = 14.sp,
                 color = MaterialTheme.colorScheme.onBackground
@@ -713,7 +736,7 @@ class RegisterScreen: Screen {
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
-                        text = "Я погоджуюсь з Умовами використання та Політикою конфіденціальності",
+                        text = stringResource(Res.string.reg_rules_agree),
                         fontSize = 14.sp,
                         color = MaterialTheme.colorScheme.onBackground,
                         lineHeight = 20.sp

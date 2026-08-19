@@ -1,0 +1,64 @@
+<resources>
+    <!-- Загальні -->
+    <string name="app_name">Swipe Home</string>
+    <string name="app_title">Знайди свій дім</string>
+    <string name="btn_next">Далі</string>
+    <string name="btn_back">Назад</string>
+    <string name="btn_register">Зареєструватися</string>
+    <string name="or_divider">АБО</string>
+    <string name="email_login_label">Email або Логін</string>
+    <string name="password_label">Пароль</string>
+    <string name="password_placeholder">Введіть ваш пароль</string>
+
+    <!--    Екран Онбординг-->
+    <string name="onboarding_title_1">Свайпни вправо, щоб зберегти\nбудинок своєї мрії</string>
+    <string name="onboarding_description_1">Легко переглядайте підібрані об’єкти нерухомості. Сподобалося? Проведіть пальцем вправо, щоб додати його до обраного.</string>
+    <string name="onboarding_title_2">Підбір та спілкування\nБудинок вашої мрії</string>
+    <string name="onboarding_description_2">Як тільки ви знайдете відповідне житло, зв’яжіться безпосередньо з власником, щоб одразу домовитися про огляд.</string>
+    <string name="onboarding_title_3">Тільки перевірені оголошення</string>
+    <string name="onboarding_description_3">Ми ретельно перевіряємо всіх власників нерухомості, агентів та юридичні документи, щоб ви могли переглядати пропозиції з повним спокоєм.</string>
+    <string name="onboarding_btn_skip">Пропустити</string>
+    <string name="onboarding_btn_get_started">Почнемо</string>
+
+    <!--    Екран логування-->
+    <string name="login_title">Ласкаво просимо!</string>
+    <string name="login_subtitle">Увійдіть до свого акаунта</string>
+    <string name="login_fogot_password">Забули пароль?</string>
+    <string name="login_btn_enter">Увійти</string>
+    <string name="login_enter_with">Увійти через</string>
+    <string name="login_create_account">Ще немає акаунта?</string>
+
+    <!--    Екран реєс  трації Крок 1-->
+    <string name="reg_step_indicaton">Крок</string>
+    <string name="reg_step_indicaton_of">з</string>
+    <string name="reg_agree1">Натискання продовжити, ви погоджуєтесь з</string>
+    <string name="reg_agree2">Умовами використання</string>
+
+    <string name="reg_title_step1">Створити акаунт</string>
+    <string name="reg_subtitle_step1">Швидкий старт для пошуку ідеального дому</string>
+    <string name="reg_email_label">Email адреса</string>
+    <string name="reg_email_placeholder">Введіть ваш email</string>
+    <string name="reg_continue_google">Продовжити з Google</string>
+    <string name="reg_continue_apple">Продовжити з Apple ID</string>
+
+    <!--    Екран реєстрації Крок 2-->
+    <string name="reg_title_step2">Безпека</string>
+    <string name="reg_subtitle_step2">Створіть <надійний></надійний> облікові дані для захисту вашого акаунта.</string>
+    <string name="reg_hiden_password">Додайте щонайменше одну цифру та велику літеру</string>
+
+    <!--    Екран реєстрації Крок 3-->
+    <string name="reg_title_step3">Про себе</string>
+    <string name="reg_subtitle_step3">Додайте інформацію про себе для пошуку</string>
+    <string name="reg_photo_upload">Додати фото</string>
+    <string name="reg_profile_photo">Фото профілю</string>
+    <string name="reg_name">Ім'я</string>
+    <string name="reg_last_name">Прізвище</string>
+
+
+    <!--    Екран реєстрації Крок 4-->
+    <string name="reg_title_step4">Контакти</string>
+    <string name="reg_subtitle_step4">Останній крок для створення вашого профілю</string>
+    <string name="reg_phone_number">Номер телефону</string>
+    <string name="reg_rules_agree">Я погоджуюсь з Умовами використання та Політикою конфіденціальності</string>
+
+</resources>
