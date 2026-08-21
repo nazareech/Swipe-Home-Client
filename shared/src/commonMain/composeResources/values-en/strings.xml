@@ -60,4 +60,38 @@
     <string name="reg_phone_number">Phone Number</string>
     <string name="reg_rules_agree">I agree to the Terms of Use and Privacy Policy</string>
 
+    <!-- Екран відновлення пароля -->
+    <string name="fogot_paswd_title_step1">Password Recovery</string>
+    <string name="fogot_paswd_title_step2">Verification</string>
+    <string name="fogot_paswd_title_step3">New Password</string>
+
+    <string name="btn_send_code">Send Code</string>
+    <string name="btn_accept_code">Verify</string>
+    <string name="btn_reset_paswd">Reset Password</string>
+
+    <string name="fogot_paswd_header_step1">Choose recovery method</string>
+    <string name="fogot_paswd_subtitle_step1">We will send you a secure code to reset your password. Please choose a convenient option.</string>
+    <string name="fogot_paswd_header_step2">Enter code</string>
+    <string name="fogot_paswd_subtitle_step2">We have sent a code to your email address</string>
+
+    <string name="fogot_paswd_method_sms_title">Via SMS</string>
+    <string name="fogot_paswd_method_sms_subtitle">We will send a code to your number</string>
+    <string name="fogot_paswd_method_email_title">Via Email</string>
+    <string name="fogot_paswd_method_email_subtitle">We will send a code to your email</string>
+
+    <string name="btn_resend_code">Resend code</string>
+
+    <string name="fogot_paswd_header_step3">Create new password</string>
+    <string name="fogot_paswd_subtitle_step3">Your new password must be different from previously used passwords</string>
+    <string name="fogot_paswd_new_password_label">New password</string>
+    <string name="fogot_paswd_new_password_placeholder">Enter new password</string>
+    <string name="fogot_paswd_confirm_password_label">Confirm password</string>
+    <string name="fogot_paswd_confirm_password_placeholder">Confirm your new password</string>
+    <string name="fogot_paswd_strength_prefix">Strength: </string>
+    <string name="password_strength_weak">Weak</string>
+    <string name="password_strength_medium">Medium</string>
+    <string name="password_strength_strong">Strong</string>
+    <string name="password_strength_very_strong">Very strong</string>
+    <string name="fogot_paswd_hint">Password must be at least 8 characters long and contain a combination of letters, numbers, and symbols.</string>
+
 </resources>

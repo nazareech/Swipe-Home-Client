@@ -137,11 +137,11 @@ class LoginScreen: Screen {
                 }
             )
 
-            // Посилання "Забили пароль?"
+            // Посилання "Забули пароль?"
             Box(modifier = Modifier.fillMaxWidth(),
                 contentAlignment = Alignment.CenterEnd
             ){
-                TextButton(onClick = { /*TODO: Навігація на екрані відновлення пароля*/ }) {
+                TextButton(onClick = { navigator.push(ForgotPasswordScreen()) }) {
                     Text(
                         text = stringResource(Res.string.login_fogot_password),
                         color = MaterialTheme.colorScheme.primary,

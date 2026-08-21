@@ -61,4 +61,41 @@
     <string name="reg_phone_number">Номер телефону</string>
     <string name="reg_rules_agree">Я погоджуюсь з Умовами використання та Політикою конфіденціальності</string>
 
+    <!-- Екран відновлення пароля -->
+    <string name="fogot_paswd_title_step1">Відновлення пароля</string>
+    <string name="fogot_paswd_title_step2">Підтвердження</string>
+    <string name="fogot_paswd_title_step3">Новий пароль</string>
+
+    <string name="btn_send_code">Відправити код</string>
+    <string name="btn_accept_code">Підтвердити</string>
+    <string name="btn_reset_paswd">Відновити пароль</string>
+
+    <string name="fogot_paswd_header_step1">Оберіть спосіб відновлення</string>
+    <string name="fogot_paswd_subtitle_step1">Ми надішлемо вам безпечний код для скидання вашого пароля. Будь ласка, оберіть зручний для вас варіант.</string>
+    <string name="fogot_paswd_header_step2">Введіть код</string>
+    <string name="fogot_paswd_subtitle_email_step2">Ми надіслали код на вашу електронну адресу</string>
+    <string name="fogot_paswd_subtitle_sms_step2">Ми надіслали код на ваш номер телефону</string>
+
+    <string name="fogot_paswd_method_sms_title">Через SMS</string>
+    <string name="fogot_paswd_method_sms_subtitle">Ми надішлемо код на ваш номер</string>
+    <string name="fogot_paswd_method_email_title">Через Email</string>
+    <string name="fogot_paswd_method_email_subtitle">Ми надішлемо код на вашу пошту</string>
+
+    <string name="btn_resend_code">Відправити код повторно</string>
+
+    <string name="fogot_paswd_header_step3">Створити новий пароль</string>
+    <string name="fogot_paswd_subtitle_step3">Ваш новий пароль повинен відрізнятися від раніше використованих паролів</string>
+    <string name="fogot_paswd_new_password_label">Новий пароль</string>
+    <string name="fogot_paswd_new_password_placeholder">Введіть новий пароль</string>
+    <string name="fogot_paswd_confirm_password_label">Підтвердити пароль</string>
+    <string name="fogot_paswd_confirm_password_placeholder">Підтвердіть новий пароль</string>
+    <string name="fogot_paswd_strength_prefix">Надійність: </string>
+    <string name="password_strength_weak">Слабкий</string>
+    <string name="password_strength_medium">Середній</string>
+    <string name="password_strength_strong">Надійний</string>
+    <string name="password_strength_very_strong">Дуже надійний</string>
+    <string name="fogot_paswd_hint">Пароль повинен мати довжину не менше 8 символів і містити комбінацію літер, цифр та символів.</string>
+
+
+
 </resources>
