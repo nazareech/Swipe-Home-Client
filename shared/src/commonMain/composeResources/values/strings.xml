@@ -45,6 +45,7 @@
     <string name="reg_title_step2">Безпека</string>
     <string name="reg_subtitle_step2">Створіть <надійний></надійний> облікові дані для захисту вашого акаунта.</string>
     <string name="reg_hiden_password">Додайте щонайменше одну цифру та велику літеру</string>
+    <string name="reg_password_placeholder">Створіть пароль</string>
 
     <!--    Екран реєстрації Крок 3-->
     <string name="reg_title_step3">Про себе</string>

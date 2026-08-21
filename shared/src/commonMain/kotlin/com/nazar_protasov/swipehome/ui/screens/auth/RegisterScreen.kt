@@ -40,6 +40,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -72,9 +73,13 @@ import mymultiplatformproject.shared.generated.resources.btn_back
 import mymultiplatformproject.shared.generated.resources.btn_next
 import mymultiplatformproject.shared.generated.resources.btn_register
 import mymultiplatformproject.shared.generated.resources.email_login_label
+import mymultiplatformproject.shared.generated.resources.fogot_paswd_strength_prefix
 import mymultiplatformproject.shared.generated.resources.or_divider
 import mymultiplatformproject.shared.generated.resources.password_label
-import mymultiplatformproject.shared.generated.resources.password_placeholder
+import mymultiplatformproject.shared.generated.resources.password_strength_medium
+import mymultiplatformproject.shared.generated.resources.password_strength_strong
+import mymultiplatformproject.shared.generated.resources.password_strength_very_strong
+import mymultiplatformproject.shared.generated.resources.password_strength_weak
 import mymultiplatformproject.shared.generated.resources.reg_agree1
 import mymultiplatformproject.shared.generated.resources.reg_agree2
 import mymultiplatformproject.shared.generated.resources.reg_continue_apple
@@ -84,6 +89,7 @@ import mymultiplatformproject.shared.generated.resources.reg_email_placeholder
 import mymultiplatformproject.shared.generated.resources.reg_hiden_password
 import mymultiplatformproject.shared.generated.resources.reg_last_name
 import mymultiplatformproject.shared.generated.resources.reg_name
+import mymultiplatformproject.shared.generated.resources.reg_password_placeholder
 import mymultiplatformproject.shared.generated.resources.reg_phone_number
 import mymultiplatformproject.shared.generated.resources.reg_photo_upload
 import mymultiplatformproject.shared.generated.resources.reg_profile_photo
@@ -127,7 +133,7 @@ class RegisterScreen: Screen {
             }
         )
 
-        // Змінна для прокручуваного екрану
+        // Змінна для прокручуваного екрана
         val scrollState = rememberScrollState()
 
         Column(
@@ -151,7 +157,7 @@ class RegisterScreen: Screen {
                 ) {
                     Icon(
                         painter = painterResource(Res.drawable.ic_arrow_back),
-                        contentDescription = "Назад",
+                        contentDescription = stringResource(Res.string.btn_back),
                         tint = MaterialTheme.colorScheme.onBackground
                     )
                 }
@@ -442,33 +448,91 @@ class RegisterScreen: Screen {
                 fontSize = 14.sp,
                 color = MaterialTheme.colorScheme.onBackground
             )
-            Spacer(modifier = Modifier.height(8.dp))
-            OutlinedTextField(
-                value = password,
-                onValueChange = onPasswordChange,
-                label = { Text(stringResource(Res.string.password_label)) },
-                modifier = Modifier.fillMaxWidth(),
-                placeholder = {Text(stringResource(Res.string.password_placeholder))},
-                singleLine = true,
-                shape = RoundedCornerShape(12.dp),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-                // Маскуємо пароль крапочками, якщо passwordVisible == false
-                visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
-                // Іконка для перемикання видимості пароля
-                trailingIcon = {
-                    IconButton(
-                        onClick = { passwordVisible = !passwordVisible }
-                    ) {
-                        Icon(
-                            painterResource(
-                                if (passwordVisible) Res.drawable.ic_eye_visible else  Res.drawable.ic_eye_hidden
-                            ),
-                            contentDescription = null, modifier = Modifier.size(20.dp)
+
+            //region Нова логіка введення пароля
+            // Логіка визначення надійності пароля (від 0 до 4)
+            val strength = remember(password) {
+                var score = 0
+                if (password.isNotEmpty()) {
+                    if (password.length >= 8) score++
+                    if (password.any { it.isLetter() }) score++
+                    if (password.any { it.isDigit() }) score++
+                    if (password.any { !it.isLetterOrDigit() }) score++
+                }
+                score
+            }
+
+            // Визначаємо текст та колір залежно від рівня надійності
+            val strengthText = when (strength) {
+                1 -> stringResource(Res.string.password_strength_weak)
+                2 -> stringResource(Res.string.password_strength_medium)
+                3 -> stringResource(Res.string.password_strength_strong)
+                4 -> stringResource(Res.string.password_strength_very_strong)
+                else -> ""
+            }
+            val strengthColor = when (strength) {
+                1 -> Color(0xFFE53935) // Червоний
+                2 -> Color(0xFFFB8C00) // Помаранчевий
+                3 -> Color(0xFF7CB342) // Світло-зелений
+                4 -> Color(0xFF43A047) // Темно-зелений
+                else -> Color.Transparent
+            }
+
+            Column(modifier = Modifier.fillMaxWidth()) {
+
+                Spacer(modifier = Modifier.height(8.dp))
+                OutlinedTextField(
+                    value = password,
+                    onValueChange = onPasswordChange,
+                    placeholder = { Text(stringResource(Res.string.reg_password_placeholder)) },
+                    modifier = Modifier.fillMaxWidth(),
+                    singleLine = true,
+                    shape = RoundedCornerShape(12.dp),
+                    visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                    trailingIcon = {
+                        IconButton(onClick = { passwordVisible = !passwordVisible }) {
+                            Icon(
+                                painterResource(
+                                    if (passwordVisible) Res.drawable.ic_eye_visible else Res.drawable.ic_eye_hidden
+                                ),
+                                contentDescription = null, modifier = Modifier.size(20.dp)
+                            )
+                        }
+                    }
+                )
+
+                Spacer(modifier = Modifier.height(8.dp))
+
+                // Індикатор надійності
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    repeat(4) { index ->
+                        Box(
+                            modifier = Modifier
+                                .weight(1f)
+                                .height(4.dp)
+                                .clip(RoundedCornerShape(2.dp))
+                                .background(
+                                    if (password.isNotEmpty() && index < strength) strengthColor
+                                    else MaterialTheme.colorScheme.onBackground.copy(alpha = 0.1f)
+                                )
                         )
                     }
                 }
-            )
 
+                if (password.isNotEmpty()) {
+                    Spacer(modifier = Modifier.height(8.dp))
+                    Text(
+                        text = stringResource(Res.string.fogot_paswd_strength_prefix) + strengthText,
+                        color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f),
+                        fontSize = 12.sp
+                    )
+                }
+            }
+
+                //endregion
             Spacer(modifier = Modifier.height(8.dp))
 
             // Підказка про складність пароля

@@ -74,7 +74,6 @@ import mymultiplatformproject.shared.generated.resources.fogot_paswd_strength_pr
 import mymultiplatformproject.shared.generated.resources.fogot_paswd_subtitle_email_step2
 import mymultiplatformproject.shared.generated.resources.fogot_paswd_subtitle_sms_step2
 import mymultiplatformproject.shared.generated.resources.fogot_paswd_subtitle_step1
-import mymultiplatformproject.shared.generated.resources.fogot_paswd_subtitle_step2
 import mymultiplatformproject.shared.generated.resources.fogot_paswd_subtitle_step3
 import mymultiplatformproject.shared.generated.resources.fogot_paswd_title_step1
 import mymultiplatformproject.shared.generated.resources.fogot_paswd_title_step2
@@ -139,13 +138,13 @@ class ForgotPasswordScreen : Screen {
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.fillMaxSize(),
+                    modifier = Modifier.weight(1f),
                     textAlign = TextAlign.Center
                 )
-                Spacer(modifier = Modifier.padding(48.dp))
+                // Порожній блок для балансу заголовка по центру
+                Spacer(modifier = Modifier.size(48.dp))
             }
-
-            Spacer(modifier = Modifier.padding(32.dp))
+                Spacer(modifier = Modifier.height(24.dp))
 
             // --- ВМІСТ КРОКІВ ---
             when(currentStep){
@@ -337,7 +336,7 @@ class ForgotPasswordScreen : Screen {
                             ) {
                                 // Якщо символ є, показуємо його або крапку
                                 Text(
-                                    text = if (char.isNotEmpty()) char else "-",
+                                    text = char.ifEmpty { "-" },
                                     fontSize = 32.sp,
                                     fontWeight = FontWeight.Bold,
                                     color = MaterialTheme.colorScheme.primary

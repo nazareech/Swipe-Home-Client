@@ -45,6 +45,7 @@
     <string name="reg_title_step2">Security</string>
     <string name="reg_subtitle_step2">Create secure credentials to protect your account.</string>
     <string name="reg_hiden_password">Enter at least one digit and one uppercase letter</string>
+    <string name="reg_password_placeholder">Create a password</string>
 
     <!--    Екран реєстрації Крок 3-->
     <string name="reg_title_step3">About</string>
