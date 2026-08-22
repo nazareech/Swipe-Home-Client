@@ -11,6 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
 import com.nazar_protasov.swipehome.ui.components.PropertyCard
+import com.nazar_protasov.swipehome.ui.components.SwipeableCard
 import com.nazar_protasov.swipehome.ui.models.Property
 
 class HomeScreen: Screen {
@@ -30,16 +31,28 @@ class HomeScreen: Screen {
                 contentAlignment = Alignment.Center
             ) {
                 // Викликаємо картку з текстовими даними
-                PropertyCard(
-                    property = Property(
-                        id = "1",
-                        imageUrl = "http://localhost:8080/uploads/application-number-1/bd3e357c-f613-42d3-b420-9d0bc285fcd1.jpg",
-                        price = "$120,000",
-                        title = "Чьотка халупа з видом на озеро",
-                        location = "Люблін, Віенява",
-                        details = "4 кімтани - 120м - 2 поверх"
-                    )
+                val mockProperty = Property(
+                    id = "1",
+                    imageUrl = "http://localhost:8080/uploads/application-number-1/bd3e357c-f613-42d3-b420-9d0bc285fcd1.jpg",
+                    price = "$120,000",
+                    title = "Чьотка халупа з видом на озеро",
+                    location = "Люблін, Віенява",
+                    details = "4 кімтани - 120м - 2 поверх"
                 )
+
+                // Свайп обгортка
+                SwipeableCard(
+                    onSwipeLeft = {
+                        println("Swipe Left (Dislike)")
+                        /*TODO*/
+                    },
+                    onSwipeRight = {
+                        println("Swipe Right (Like)")
+                        /*TODO*/
+                    }
+                ){
+                    PropertyCard( property = mockProperty)
+                }
             }
         }
     }
