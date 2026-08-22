@@ -41,7 +41,7 @@ import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import com.nazar_protasov.swipehome.ui.screens.HomeScreen
+import com.nazar_protasov.swipehome.ui.screens.home.HomeScreen
 import mymultiplatformproject.shared.generated.resources.Res
 import mymultiplatformproject.shared.generated.resources.btn_register
 import mymultiplatformproject.shared.generated.resources.ic_apple_logo
