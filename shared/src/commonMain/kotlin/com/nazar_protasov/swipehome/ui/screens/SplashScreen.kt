@@ -23,6 +23,7 @@ import mymultiplatformproject.shared.generated.resources.Res
 import mymultiplatformproject.shared.generated.resources.app_name
 import mymultiplatformproject.shared.generated.resources.app_title
 import org.jetbrains.compose.resources.stringResource
+import kotlin.time.Duration.Companion.milliseconds
 
 class SplashScreen : Screen {
     @Composable
@@ -31,7 +32,7 @@ class SplashScreen : Screen {
 
         //LaunchedEffect запускає корутину при відкритті екрана
         LaunchedEffect(Unit){
-            delay(2000) // Затримка 2 секунди (в мілісекундах 2000)
+            delay(2000.milliseconds) // Затримка 2 секунди (в мілісекундах 2000)
 
             // Використовуємо replace замість push
             // Це видаляє SplashScreen з історії, щоб користувач не міг повернутися на нього кнопкою назад на телефоні

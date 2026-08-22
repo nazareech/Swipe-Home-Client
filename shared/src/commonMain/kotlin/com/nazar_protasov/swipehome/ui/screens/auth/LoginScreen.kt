@@ -41,6 +41,7 @@ import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import com.nazar_protasov.swipehome.ui.screens.HomeScreen
 import mymultiplatformproject.shared.generated.resources.Res
 import mymultiplatformproject.shared.generated.resources.btn_register
 import mymultiplatformproject.shared.generated.resources.ic_apple_logo
@@ -154,7 +155,10 @@ class LoginScreen: Screen {
 
             // Головна кнопка увійти
             Button(
-                onClick = { /*TODO: Логіка авторизації Ktor*/ },
+                onClick = {
+                /*TODO: Логіка авторизації Ktor*/
+                    navigator.push(HomeScreen())
+                },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(56.dp),
