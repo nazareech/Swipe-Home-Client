@@ -6,9 +6,9 @@
     <string name="btn_back">Back</string>
     <string name="btn_register">Sign Up</string>
     <string name="or_divider">OR</string>
-    <string name="email_login_label">Email або Логін</string>
+    <string name="email_login_label">Email or Login</string>
     <string name="password_label">Password</string>
-    <string name="password_placeholder">Введіть ваш пароль</string>
+    <string name="password_placeholder">Enter your password</string>
 
     <!--    Екран Онбординг-->
     <string name="onboarding_title_1">Swipe Right ti Save\nYour Dream Home</string>
@@ -73,7 +73,9 @@
     <string name="fogot_paswd_header_step1">Choose recovery method</string>
     <string name="fogot_paswd_subtitle_step1">We will send you a secure code to reset your password. Please choose a convenient option.</string>
     <string name="fogot_paswd_header_step2">Enter code</string>
-    <string name="fogot_paswd_subtitle_step2">We have sent a code to your email address</string>
+    <string name="fogot_paswd_subtitle_email_step2">We've sent a code to your email address</string>
+    <string name="fogot_paswd_subtitle_sms_step2">We've sent a code to your phone number</string>
+
 
     <string name="fogot_paswd_method_sms_title">Via SMS</string>
     <string name="fogot_paswd_method_sms_subtitle">We will send a code to your number</string>

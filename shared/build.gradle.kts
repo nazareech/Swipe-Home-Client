@@ -20,6 +20,7 @@ kotlin {
 
     // Налаштування для Android
     android {
+        withHostTest {}
         namespace = "com.nazar_protasov.swipehome.shared"
         compileSdk = libs.versions.android.compileSdk.get().toInt()
         minSdk = libs.versions.android.minSdk.get().toInt()
@@ -31,6 +32,10 @@ kotlin {
             enable = true
         }
     }
+
+
+
+
 
     sourceSets {
         commonMain.dependencies {
@@ -59,14 +64,8 @@ kotlin {
             // Peekaboo (Доступ та дозвіл до файлів)
             implementation(libs.peekaboo.image.picker)
 
-            // Coil, щоб красиво відмалювати завантажену аватарку
+            // Coil (Завантаження зображень)
             implementation(libs.coil.compose)
-        }
-
-        androidMain.dependencies {
-            implementation(libs.compose.uiToolingPreview)
-            implementation(libs.compose.uiTooling)
-            implementation(libs.ktor.client.android)
         }
 
         commonTest.dependencies {
