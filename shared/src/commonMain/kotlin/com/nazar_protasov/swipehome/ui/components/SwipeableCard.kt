@@ -9,6 +9,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalDensity
 import kotlinx.coroutines.launch
 
 @Composable
@@ -17,8 +18,12 @@ fun SwipeableCard(
     onSwipeRight: () -> Unit,
     modifier: Modifier = Modifier,
     content: @Composable () -> Unit
+
 ){
     val coroutineScope = rememberCoroutineScope()
+    // Отримуємо density для налаштування перспективи камери при 3D-обертанні
+    // Цей параметр віддаляє віртуальну "камеру", роблячи перекручування реалістичним
+    val density = LocalDensity.current.density
 
     // Анімовані значення зсуву по осях X та Y
     val offsetX = remember { Animatable(0f) }
@@ -29,24 +34,31 @@ fun SwipeableCard(
             .graphicsLayer{
                 translationX = offsetX.value
                 translationY = offsetY.value
-                // Обертання: чим далі тягнемо по Х, тим сильніше картинка нахиляється
-                // Ділимо на 20f, щоб нахил був плавним і реалістичним
-                rotationZ = offsetX.value / 15f
+
+                // Головна змінна для перекручування навколо осі Y (3D-ефект фліпу)
+                //Значення 8f можна змінити: чим воно менше, тим швидше/сильніше картка перекручуватиметься.
+                rotationY = -offsetX.value / 8f
+
+                // Легкий нахил по осі Z
+                rotationZ = offsetX.value / 10f
+
+                // Налаштування перспективи, щоб 3D-обертання не спотворювало картку
+                cameraDistance = 12f * density
             }
             .pointerInput(Unit){
                 detectDragGestures(
                     onDragEnd = {
                         coroutineScope.launch {
-                            // Визначаємо поріг для успішного свайпу (третина ширини екрана)
-                            val thershold = size.width / 3f
+                            // Визначаємо поріг для успішного свайпу (1/4 ширини екрана)
+                            val threshold = size.width / 4f
 
-                            if(offsetX.value > thershold){
+                            if(offsetX.value > threshold){
                                 // Свайп вправо (Лайк) -> Анімуємо виліт далеко за правий край
-                                offsetX.animateTo(size.width.toFloat() * 2)
+                                launch { offsetX.animateTo(size.width.toFloat() * 2)}
                                 onSwipeRight()
-                            } else if (offsetX.value < -thershold){
+                            } else if (offsetX.value < -threshold){
                                 // Свайп вліво (Дисайк) -> Анімуємо виліт далеко за лівий край
-                                offsetX.animateTo(-size.width.toFloat() * 2)
+                                launch { offsetX.animateTo(-size.width.toFloat() * 2)}
                                 onSwipeLeft()
                             } else {
                                 // Не дотягнули -> Плавне повернення в центр
