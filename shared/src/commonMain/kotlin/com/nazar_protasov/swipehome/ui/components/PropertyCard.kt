@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -38,7 +39,7 @@ fun PropertyCard(
     modifier: Modifier = Modifier
 ){
     Card(
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier.fillMaxWidth().fillMaxHeight(0.95f),
         shape = RoundedCornerShape(16.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
     ){
@@ -48,7 +49,12 @@ fun PropertyCard(
                 property.imageUrl,
                 contentDescription = "Фото нерухомості",
                 modifier = Modifier.fillMaxSize(),
-                contentScale = ContentScale.Crop
+                contentScale = ContentScale.Crop,
+                onError = { error ->
+                    // Виведемо помилку в консоль (Logcat)
+                    println("COIL ERROR: ${error.result.throwable.message}")
+                    error.result.throwable.printStackTrace()
+                }
             )
 
             // Градієнтне затемнення знизу

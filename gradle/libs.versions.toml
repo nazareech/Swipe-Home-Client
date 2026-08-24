@@ -49,11 +49,14 @@ ktor-client-core = { module = "io.ktor:ktor-client-core", version.ref = "ktor" }
 ktor-client-content-negotiation = { module = "io.ktor:ktor-client-content-negotiation", version.ref = "ktor" }
 ktor-serialization-kotlinx-json = { module = "io.ktor:ktor-serialization-kotlinx-json", version.ref = "ktor" }
 ktor-client-android = { module = "io.ktor:ktor-client-android", version.ref = "ktor" }
+ktor-client-darwin = { module = "io.ktor:ktor-client-darwin", version.ref = "ktor" }
 
 
 # Voyager (Бібліотека для навігації між екранами)
 voyager-navigator = { module = "cafe.adriel.voyager:voyager-navigator", version.ref = "voyager" }
 voyager-transitions = { module = "cafe.adriel.voyager:voyager-transitions", version.ref = "voyager" }
+# У libs.versions.toml
+voyager-tab-navigator = { module = "cafe.adriel.voyager:voyager-tab-navigator", version.ref = "voyager" }
 
 # Koin (Dependency Injection)
 koin-core = { module = "io.insert-koin:koin-core", version.ref = "koin-core" }
@@ -64,6 +67,8 @@ peekaboo-image-picker = { module = "io.github.onseok:peekaboo-image-picker", ver
 
 # Coil, щоб красиво відмалювати завантажену аватарку
 coil-compose = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coil3"}
+# Додаємо рушій мережі (якщо у вашому проєкті Ktor версії 3.x)
+coil-network-ktor = { module = "io.coil-kt.coil3:coil-network-ktor3", version.ref = "coil3" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }

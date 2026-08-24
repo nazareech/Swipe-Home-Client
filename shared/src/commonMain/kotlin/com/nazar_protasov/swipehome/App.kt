@@ -5,7 +5,6 @@ import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.transitions.SlideTransition
 import com.nazar_protasov.swipehome.di.appModule
 import com.nazar_protasov.swipehome.ui.screens.SplashScreen
-import com.nazar_protasov.swipehome.ui.screens.home.HomeScreen
 import com.nazar_protasov.swipehome.ui.theme.SwipeHomeTheme
 import org.koin.compose.KoinApplication
 

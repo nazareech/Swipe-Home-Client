@@ -52,10 +52,12 @@ kotlin {
             implementation(libs.ktor.client.core)
             implementation(libs.ktor.client.content.negotiation)
             implementation(libs.ktor.serialization.kotlinx.json)
+            implementation(libs.ktor.client.android)
 
             // Voyager (Навігація)
             implementation(libs.voyager.navigator)
             implementation(libs.voyager.transitions)
+            implementation(libs.voyager.tab.navigator)
 
             // Koin (DI)
             implementation(libs.koin.core)
@@ -66,10 +68,15 @@ kotlin {
 
             // Coil (Завантаження зображень)
             implementation(libs.coil.compose)
+            implementation(libs.coil.network.ktor)
         }
 
         commonTest.dependencies {
             implementation(libs.kotlin.test)
+        }
+
+        iosMain.dependencies {
+            implementation(libs.ktor.client.darwin)
         }
     }
 }

@@ -97,6 +97,7 @@
     <string name="password_strength_very_strong">Дуже надійний</string>
     <string name="fogot_paswd_hint">Пароль повинен мати довжину не менше 8 символів і містити комбінацію літер, цифр та символів.</string>
 
-
+    <!-- Bottom Navigation -->
+    <string name="main_bottom_nav_search">Пошук</string>
 
 </resources>
