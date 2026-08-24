@@ -1,9 +1,11 @@
 package com.nazar_protasov.swipehome.ui.screens.home
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
@@ -77,64 +79,77 @@ object HomeTab: Tab {
                 )
             }
 
-            // Центральна зона для карток
-            Box(
+            Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(paddingValues)
-                    .padding(16.dp),
-                contentAlignment = Alignment.Center
+                    .background(MaterialTheme.colorScheme.background)
             ) {
-                if(properties.isEmpty()){
-                    // Стан, коли картки закінчилися
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        Text("🎉", fontSize = 48.sp)
-                        Spacer(modifier = Modifier.height(16.dp))
-                        Text(
-                            text = "Ви переглянули всі пропозиції!",
-                            fontSize = 18.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.onBackground
-                        )
-                    }
-                } else {
-                    // Беремо максимум 2 верхні картки
-                    // reversed() потрібен, щоб перша картка малювалася ОСТАННЬОЮ (поверх усіх інших у Box)
-                    val visibleCards = properties.take(2).reversed()
 
-                    visibleCards.forEach { property ->
-                        val isTopCard = property.id == properties.first().id
+                // Верхня панель
+                HomeTopBar()
 
-                        // key допомагає Comppose розуміти, яка саме картка видалилася, щоб не забивати анімації
-                        key(property.id) {
-                            if(isTopCard){
-                                // Активна картка (можна свайпати)
-                                // Свайп обгортка
-                                SwipeableCard(
-                                    onSwipeLeft = {
-                                        println("Swipe Left (Dislike)")
-                                        properties = properties.drop(1)
-                                        /*TODO*/
-                                    },
-                                    onSwipeRight = {
-                                        println("Swipe Right (Like)")
-                                        properties = properties.drop(1)
-                                        /*TODO*/
+                // Центральна зона для карток
+                Box(
+                    modifier = Modifier
+                        .weight(1f)
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    if (properties.isEmpty()) {
+                        // Стан, коли картки закінчилися
+                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                            Text("🎉", fontSize = 48.sp)
+                            Spacer(modifier = Modifier.height(16.dp))
+                            Text(
+                                text = "Ви переглянули всі пропозиції!",
+                                fontSize = 18.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.onBackground
+                            )
+                        }
+                    } else {
+                        // Беремо максимум 2 верхні картки
+                        // reversed() потрібен, щоб перша картка малювалася ОСТАННЬОЮ (поверх усіх інших у Box)
+                        val visibleCards = properties.take(2).reversed()
+
+                        visibleCards.forEach { property ->
+                            val isTopCard = property.id == properties.first().id
+
+                            // key допомагає Comppose розуміти, яка саме картка видалилася, щоб не забивати анімації
+                            key(property.id) {
+                                if (isTopCard) {
+                                    // Активна картка (можна свайпати)
+                                    // Свайп обгортка
+                                    SwipeableCard(
+                                        onSwipeLeft = {
+                                            println("Swipe Left (Dislike)")
+                                            properties = properties.drop(1)
+                                            /*TODO*/
+                                        },
+                                        onSwipeRight = {
+                                            println("Swipe Right (Like)")
+                                            properties = properties.drop(1)
+                                            /*TODO*/
+                                        }
+                                    ) {
+                                        PropertyCard(property = property)
                                     }
-                                ){
-                                    PropertyCard( property = property)
+                                } else {
+                                    PropertyCard(
+                                        property = property,
+                                        modifier = Modifier
+                                            .scale(0.95f)
+                                            .padding(vertical = 16.dp)
+                                    )
                                 }
-                            }else{
-                                PropertyCard(
-                                    property = property,
-                                    modifier = Modifier
-                                        .scale(0.95f)
-                                        .padding(vertical = 16.dp))
                             }
                         }
                     }
                 }
 
+                // Нижні кнопки дій (автоматично притиснуться до низу над Bottom Navigation)
+                HomeBottomActionButtons()
             }
         }
     }
