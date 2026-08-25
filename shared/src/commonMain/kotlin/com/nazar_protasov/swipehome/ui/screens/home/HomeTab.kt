@@ -23,6 +23,8 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import cafe.adriel.voyager.core.screen.Screen
+import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabOptions
 import com.nazar_protasov.swipehome.ui.components.PropertyCard
@@ -53,6 +55,13 @@ object HomeTab: Tab {
         }
     }
 
+    @Composable
+    override fun Content() {
+        Navigator(HomeScreen)
+    }
+}
+
+internal object HomeScreen : Screen {
     @Composable
     override fun Content() {
         setSingletonImageLoaderFactory { context ->

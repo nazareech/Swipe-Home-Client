@@ -16,5 +16,8 @@ val SurfaceWhite = Color(0xFFFFFFFF) // Чистий білий для карт�
 val TextPrimary = Color(0xFF1A1A1A) // Темно-сірий/майже чорний для заголовків
 val TextSecondary = Color(0xFF757575) // Світліший сірий для підписів (напр. "Ще немає акаунта?")
 
+// Додатковий колір для сірих плашок
+val SurfaceGray = Color(0xFFF3F4F6)
+
 // Системні кольори
 val ErrorRed = Color(0xFFD32F2F) // Червоний для повідомлень про помилки вводу

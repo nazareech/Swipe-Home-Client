@@ -1,6 +1,7 @@
 package com.nazar_protasov.swipehome.ui.screens.home
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -21,12 +22,23 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.currentOrThrow
 import mymultiplatformproject.shared.generated.resources.Res
 import mymultiplatformproject.shared.generated.resources.ic_filtres_tune
 import org.jetbrains.compose.resources.painterResource
 
 @Composable
 fun HomeTopBar() {
+    val navigator = LocalNavigator.currentOrThrow
+
+    // Шукаємо кореневий навігатор, щоб FilterScreen відкривався на весь екран (поверх BottomBar)
+    // і щоб уникнути помилки ClassCastException в TabNavigator
+    var rootNavigator = navigator
+    while (rootNavigator.parent != null) {
+        rootNavigator = rootNavigator.parent!!
+    }
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -51,10 +63,13 @@ fun HomeTopBar() {
             modifier = Modifier
                 .size(48.dp)
                 .clip(CircleShape)
-                .background(MaterialTheme.colorScheme.secondary.copy(alpha = 0.2f)),
+                .background(MaterialTheme.colorScheme.secondary.copy(alpha = 0.2f))
+                .clickable{
+                    rootNavigator.push(FilterScreen())
+                },
             contentAlignment = Alignment.Center
         ) {
-            Icon(painterResource(Res.drawable.ic_filtres_tune), contentDescription = null, modifier = Modifier.size(32.dp))
+            Icon(painterResource(Res.drawable.ic_filtres_tune), contentDescription = null)
         }
     }
 }

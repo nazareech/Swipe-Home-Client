@@ -52,7 +52,6 @@ kotlin {
             implementation(libs.ktor.client.core)
             implementation(libs.ktor.client.content.negotiation)
             implementation(libs.ktor.serialization.kotlinx.json)
-            implementation(libs.ktor.client.android)
 
             // Voyager (Навігація)
             implementation(libs.voyager.navigator)
@@ -73,6 +72,10 @@ kotlin {
 
         commonTest.dependencies {
             implementation(libs.kotlin.test)
+        }
+
+        androidMain.dependencies {
+            implementation(libs.ktor.client.android)
         }
 
         iosMain.dependencies {
