@@ -100,4 +100,53 @@
     <!-- Bottom Navigation -->
     <string name="main_bottom_nav_search">Пошук</string>
 
+    <!-- Екран Фільтрів -->
+    <string name="filter_screen_title">Фільтри</string>
+    <string name="filter_clear">Очистити</string>
+    <string name="filter_apply">Застосувати фільтри</string>
+    <string name="filter_cancel">Скасувати</string>
+    <string name="filter_section_property_type">ТИП НЕРУХОМОСТІ</string>
+    <string name="filter_property_apartment">Квартира</string>
+    <string name="filter_property_house">Будинок</string>
+    <string name="filter_property_rooms">Кімнати</string>
+    <string name="filter_section_deal_type">ТИП УГОДИ</string>
+    <string name="filter_deal_all">Все</string>
+    <string name="filter_deal_rent">Винайм</string>
+    <string name="filter_deal_sale">Продаж</string>
+    <string name="filter_section_price">ЦІНА ($)</string>
+    <string name="filter_price_from">Від</string>
+    <string name="filter_price_to">До</string>
+    <string name="filter_price_placeholder_min">0</string>
+    <string name="filter_price_placeholder_max">500,000+</string>
+    <string name="filter_section_area">ПЛОЩА (М²)</string>
+    <string name="filter_area_placeholder_min">20</string>
+    <string name="filter_area_placeholder_max">200+</string>
+    <string name="filter_section_rooms_count">КІЛЬКІСТЬ КІМНАТ</string>
+    <string name="filter_rooms_studio">Студія</string>
+    <string name="filter_section_building_type">ТИП БУДІВЛІ</string>
+    <string name="filter_building_all">Всі типи</string>
+    <string name="filter_building_new">Новобудова</string>
+    <string name="filter_building_khrushchovka">Хрущовка</string>
+    <string name="filter_building_house">Будинок</string>
+    <string name="filter_building_apartment">Квартира</string>
+    <string name="filter_building_room">Кімната</string>
+    <string name="filter_section_floor">ПОВЕРХ</string>
+    <string name="filter_floor_any">Будь-який</string>
+    <string name="filter_floor_first">Перший</string>
+    <string name="filter_floor_middle">Середній</string>
+    <string name="filter_floor_last">Останній</string>
+    <string name="filter_section_parking">ПАРКІНГ</string>
+    <string name="filter_parking_all">Все</string>
+    <string name="filter_parking_garage">В гаражі</string>
+    <string name="filter_parking_street">На вулиці</string>
+    <string name="filter_parking_secured">Під охороною</string>
+    <string name="filter_amenities_pets">Тварини</string>
+    <string name="filter_amenities_pets_desc">Можна з домашніми улюбленцями</string>
+    <string name="filter_amenities_elevator">Ліфт</string>
+    <string name="filter_amenities_elevator_desc">Обов\'язкова наявність ліфта</string>
+    <string name="filter_amenities_furniture">Меблі</string>
+    <string name="filter_amenities_furniture_desc">Повністю мебльовано</string>
+    <string name="filter_amenities_balcony">Балкон</string>
+    <string name="filter_amenities_balcony_desc">Наявність балкону</string>
+
 </resources>

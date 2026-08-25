@@ -100,5 +100,53 @@
     <!-- Bottom Navigation -->
     <string name="main_bottom_nav_search">Search</string>
 
+    <!-- Filter Screen -->
+    <string name="filter_screen_title">Filters</string>
+    <string name="filter_clear">Clear</string>
+    <string name="filter_apply">Apply filters</string>
+    <string name="filter_cancel">Cancel</string>
+    <string name="filter_section_property_type">PROPERTY TYPE</string>
+    <string name="filter_property_apartment">Apartment</string>
+    <string name="filter_property_house">House</string>
+    <string name="filter_property_rooms">Rooms</string>
+    <string name="filter_section_deal_type">DEAL TYPE</string>
+    <string name="filter_deal_all">All</string>
+    <string name="filter_deal_rent">Rent</string>
+    <string name="filter_deal_sale">Sale</string>
+    <string name="filter_section_price">PRICE ($)</string>
+    <string name="filter_price_from">From</string>
+    <string name="filter_price_to">To</string>
+    <string name="filter_price_placeholder_min">0</string>
+    <string name="filter_price_placeholder_max">500,000+</string>
+    <string name="filter_section_area">AREA (M²)</string>
+    <string name="filter_area_placeholder_min">20</string>
+    <string name="filter_area_placeholder_max">200+</string>
+    <string name="filter_section_rooms_count">NUMBER OF ROOMS</string>
+    <string name="filter_rooms_studio">Studio</string>
+    <string name="filter_section_building_type">BUILDING TYPE</string>
+    <string name="filter_building_all">All types</string>
+    <string name="filter_building_new">New building</string>
+    <string name="filter_building_khrushchovka">Khrushchovka</string>
+    <string name="filter_building_house">House</string>
+    <string name="filter_building_apartment">Apartment</string>
+    <string name="filter_building_room">Room</string>
+    <string name="filter_section_floor">FLOOR</string>
+    <string name="filter_floor_any">Any</string>
+    <string name="filter_floor_first">First</string>
+    <string name="filter_floor_middle">Middle</string>
+    <string name="filter_floor_last">Last</string>
+    <string name="filter_section_parking">PARKING</string>
+    <string name="filter_parking_all">All</string>
+    <string name="filter_parking_garage">In the garage</string>
+    <string name="filter_parking_street">On the street</string>
+    <string name="filter_parking_secured">Secured</string>
+    <string name="filter_amenities_pets">Pets</string>
+    <string name="filter_amenities_pets_desc">Pets allowed</string>
+    <string name="filter_amenities_elevator">Elevator</string>
+    <string name="filter_amenities_elevator_desc">Elevator required</string>
+    <string name="filter_amenities_furniture">Furniture</string>
+    <string name="filter_amenities_furniture_desc">Fully furnished</string>
+    <string name="filter_amenities_balcony">Balcony</string>
+    <string name="filter_amenities_balcony_desc">Balcony available</string>
 
 </resources>

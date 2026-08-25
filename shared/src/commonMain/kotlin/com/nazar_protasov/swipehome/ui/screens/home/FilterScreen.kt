@@ -26,6 +26,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuAnchorType
 import androidx.compose.material3.ExposedDropdownMenuBox
 import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.HorizontalDivider
@@ -64,14 +65,8 @@ import com.nazar_protasov.swipehome.ui.theme.SurfaceGray
 import com.nazar_protasov.swipehome.ui.theme.SurfaceWhite
 import com.nazar_protasov.swipehome.ui.theme.TextPrimary
 import com.nazar_protasov.swipehome.ui.theme.TextSecondary
-import mymultiplatformproject.shared.generated.resources.Res
+import mymultiplatformproject.shared.generated.resources.*
 import mymultiplatformproject.shared.generated.resources.Res.string
-import mymultiplatformproject.shared.generated.resources.btn_back
-import mymultiplatformproject.shared.generated.resources.ic_arrow_back
-import mymultiplatformproject.shared.generated.resources.ic_balcony
-import mymultiplatformproject.shared.generated.resources.ic_elevator
-import mymultiplatformproject.shared.generated.resources.ic_pets_allowed
-import mymultiplatformproject.shared.generated.resources.ic_sofa
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 
@@ -82,9 +77,20 @@ class FilterScreen : Screen {
         val navigator = LocalNavigator.currentOrThrow
         val scrollState = rememberScrollState()
 
+        // Localized strings
+        val apartmentStr = stringResource(string.filter_property_apartment)
+        val houseStr = stringResource(string.filter_property_house)
+        val roomsStr = stringResource(string.filter_property_rooms)
+        val allStr = stringResource(string.filter_deal_all)
+        val rentStr = stringResource(string.filter_deal_rent)
+        val saleStr = stringResource(string.filter_deal_sale)
+        val allTypesStr = stringResource(string.filter_building_all)
+        val anyFloorStr = stringResource(string.filter_floor_any)
+        val studioStr = stringResource(string.filter_rooms_studio)
+
         // --- Стани фільтрів ---
-        var selectedCategory by remember { mutableStateOf("Квартира") }
-        var selectedDealType by remember { mutableStateOf("Все") }
+        var selectedCategory by remember(apartmentStr) { mutableStateOf(apartmentStr) }
+        var selectedDealType by remember(allStr) { mutableStateOf(allStr) }
         var minPrice by remember { mutableStateOf("") }
         var maxPrice by remember { mutableStateOf("") }
         var minArea by remember { mutableStateOf("") }
@@ -93,12 +99,12 @@ class FilterScreen : Screen {
 
         // Стани для випадаючих списків
         var buildingTypeExpanded by remember { mutableStateOf(false) }
-        var selectedTypeExpanded by remember { mutableStateOf("Всі типи") }
+        var selectedTypeExpanded by remember(allTypesStr) { mutableStateOf(allTypesStr) }
 
         var floorExpanded by remember { mutableStateOf(false) }
-        var selectedFloor by remember { mutableStateOf("Будь-який") }
+        var selectedFloor by remember(anyFloorStr) { mutableStateOf(anyFloorStr) }
 
-        var selectedParking by remember { mutableStateOf("Все") }
+        var selectedParking by remember(allStr) { mutableStateOf(allStr) }
 
         // Світчі
         var petsAllowed by remember { mutableStateOf(false) }
@@ -117,26 +123,26 @@ class FilterScreen : Screen {
                             verticalAlignment = Alignment.Bottom
                         ){
                           Text(
-                                text = "Фільтри",
+                                text = stringResource(string.filter_screen_title),
                                 fontSize = 24.sp,
                                 fontWeight = FontWeight.ExtraBold,
                                 color = TextPrimary // Колір для заголовка
                             )
                             Text(
-                                text = "Очистити",
+                                text = stringResource(string.filter_clear),
                                 fontSize = 14.sp,
                                 fontWeight = FontWeight.Bold,
                                 color = ErrorRed, // Колір для очищення
                                 modifier = Modifier
                                     .clickable {
-                                        selectedCategory = "Квартира"
-                                        selectedDealType = "Все"
+                                        selectedCategory = apartmentStr
+                                        selectedDealType = allStr
                                         minPrice = ""; maxPrice = ""
                                         minArea = ""; maxArea = ""
                                         selectedRooms = "1"
-                                        selectedTypeExpanded = "Всі типи"
-                                        selectedFloor = "Будь-який"
-                                        selectedParking = "Все"
+                                        selectedTypeExpanded = allTypesStr
+                                        selectedFloor = anyFloorStr
+                                        selectedParking = allStr
                                         petsAllowed = false; hasElevator = false; withFurniture = false
                                     }
                                     .padding(bottom = 2.dp)
@@ -172,7 +178,7 @@ class FilterScreen : Screen {
                         shape = RoundedCornerShape(12.dp),
                         colors = ButtonDefaults.buttonColors(containerColor = PrimaryGreen)
                     ){
-                        Text("Застосувати фільтри", fontSize = 16.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
+                        Text(stringResource(string.filter_apply), fontSize = 16.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
                     }
                     Button(
                         onClick = {
@@ -185,7 +191,7 @@ class FilterScreen : Screen {
                         shape = RoundedCornerShape(12.dp),
                         colors = ButtonDefaults.buttonColors(containerColor = PrimaryGreen)
                     ){
-                        Text("Скасувати", fontSize = 16.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
+                        Text(stringResource(string.filter_cancel), fontSize = 16.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
                     }
                 }
             },
@@ -203,9 +209,9 @@ class FilterScreen : Screen {
                 Spacer(modifier = Modifier.height(12.dp))
 
                 // --- Тип нерухомості ---
-                FilterSection(title = "ТИП НЕРУХОМОСТІ"){
+                FilterSection(title = stringResource(string.filter_section_property_type)){
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)){
-                        val categories = listOf("Квартира", "Будинок", "Кімнати")
+                        val categories = listOf(apartmentStr, houseStr, roomsStr)
                         categories.forEach { category ->
                             CustomChip(
                                 text = category,
@@ -218,9 +224,9 @@ class FilterScreen : Screen {
                 }
 
                 // --- Тип угоди ---
-                FilterSection(title = "ТИП УГОДИ"){
+                FilterSection(title = stringResource(string.filter_section_deal_type)){
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)){
-                        val typeOfDeal = listOf("Все", "Винайм", "Продаж")
+                        val typeOfDeal = listOf(allStr, rentStr, saleStr)
                         typeOfDeal.forEach { type ->
                             CustomChip(
                                 text = type,
@@ -233,70 +239,87 @@ class FilterScreen : Screen {
                 }
 
                 // --- Ціна ---
-                FilterSection(title = "ЦІНА ($)"){
+                FilterSection(title = stringResource(string.filter_section_price)){
                     RangeInputRow(
-                        minValue = minPrice, onMinChange = { minPrice = it }, minPlaceholder = "0",
-                        maxValue = maxPrice, onMaxChange = { maxPrice = it }, maxPlaceholder = "500,000+"
+                        minValue = minPrice, onMinChange = { minPrice = it }, minPlaceholder = stringResource(string.filter_price_placeholder_min),
+                        maxValue = maxPrice, onMaxChange = { maxPrice = it }, maxPlaceholder = stringResource(string.filter_price_placeholder_max)
                     )
                 }
 
                 // --- Площа ---
-                FilterSection(title = "ПЛОЩА (М²)"){
+                FilterSection(title = stringResource(string.filter_section_area)){
                     RangeInputRow(
-                        minValue = minArea, onMinChange = { minArea = it }, minPlaceholder = "20",
-                        maxValue = maxArea, onMaxChange = { maxArea = it }, maxPlaceholder = "200+"
+                        minValue = minArea, onMinChange = { minArea = it }, minPlaceholder = stringResource(string.filter_area_placeholder_min),
+                        maxValue = maxArea, onMaxChange = { maxArea = it }, maxPlaceholder = stringResource(string.filter_area_placeholder_max)
                     )
                 }
 
                 // --- Кількість кімнат ---
-                FilterSection(title = "КІЛЬКІСТЬ КІМНАТ") {
+                FilterSection(title = stringResource(string.filter_section_rooms_count)) {
                     FlowRow(
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
                         verticalArrangement = Arrangement.spacedBy(8.dp),
                         modifier = Modifier.fillMaxWidth()
                     ){
-                        val roomCounts = listOf("1", "2", "3", "4", "5", "Студія")
+                        val roomCounts = listOf("1", "2", "3", "4", "5", studioStr)
                         roomCounts.forEach { room ->
                             CustomChip(
                                 text = room,
                                 isSelected = selectedRooms == room,
                                 onClick = { selectedRooms = room },
-                                modifier = if (room == "Студія") Modifier.weight(1f) else Modifier.defaultMinSize(minWidth = 48.dp)
+                                modifier = if (room == studioStr) Modifier.weight(1f) else Modifier.defaultMinSize(minWidth = 48.dp)
                             )
                         }
                     }
                 }
 
                 // --- Тип будівлі (Dropdown) ---
-                FilterSection(title = "ТИП БУДІВЛІ"){
+                FilterSection(title = stringResource(string.filter_section_building_type)){
                     CustomDropdown(
                         expanded = buildingTypeExpanded,
                         onExpandedChange = { buildingTypeExpanded = it },
                         selectedValue = selectedTypeExpanded,
                         onValueSelected = { selectedTypeExpanded = it; buildingTypeExpanded = false },
-                        options = listOf("Всі типи", "Новобудова", "Хрущовка", "Будинок", "Квартира", "Кімната")
+                        options = listOf(
+                            allTypesStr,
+                            stringResource(string.filter_building_new),
+                            stringResource(string.filter_building_khrushchovka),
+                            stringResource(string.filter_building_house),
+                            stringResource(string.filter_building_apartment),
+                            stringResource(string.filter_building_room)
+                        )
                     )
                 }
 
                 // --- Поверх (Dropdown) ---
-                FilterSection(title = "ПОВЕРХ"){
+                FilterSection(title = stringResource(string.filter_section_floor)){
                     CustomDropdown(
                         expanded = floorExpanded,
                         onExpandedChange = { floorExpanded = it },
                         selectedValue = selectedFloor,
                         onValueSelected = { selectedFloor = it; floorExpanded = false },
-                        options = listOf("Будь-який", "Перший", "Середній", "Останній")
+                        options = listOf(
+                            anyFloorStr,
+                            stringResource(string.filter_floor_first),
+                            stringResource(string.filter_floor_middle),
+                            stringResource(string.filter_floor_last)
+                        )
                     )
                 }
 
                 // --- Паркінг ---
-                FilterSection(title = "ПАРКІНГ") {
+                FilterSection(title = stringResource(string.filter_section_parking)) {
                     FlowRow(
                         horizontalArrangement = Arrangement.spacedBy(8.dp),
                         verticalArrangement = Arrangement.spacedBy(8.dp),
                         modifier = Modifier.fillMaxWidth()
                     ){
-                        val parkingOptions = listOf("Все", "В гаражі", "На вулиці", "Під охороною")
+                        val parkingOptions = listOf(
+                            allStr,
+                            stringResource(string.filter_parking_garage),
+                            stringResource(string.filter_parking_street),
+                            stringResource(string.filter_parking_secured)
+                        )
                         parkingOptions.forEach { parking ->
                             CustomChip(
                                 text = parking,
@@ -316,28 +339,32 @@ class FilterScreen : Screen {
                ){
                    Column(modifier = Modifier.padding(16.dp)) {
                        SwitchRowExpanded(
-                           title = "Тварини", subtitle = "Можна з домашніми улюбленцями",
+                           title = stringResource(string.filter_amenities_pets),
+                           subtitle = stringResource(string.filter_amenities_pets_desc),
                            icon = painterResource(Res.drawable.ic_pets_allowed),
                            checked = petsAllowed, onCheckedChange = { petsAllowed = it}
                        )
                        HorizontalDivider(color = SurfaceGray, modifier = Modifier.padding(vertical = 12.dp))
 
                        SwitchRowExpanded(
-                           title = "Ліфт", subtitle = "Обов'язкова наявність ліфта",
+                           title = stringResource(string.filter_amenities_elevator),
+                           subtitle = stringResource(string.filter_amenities_elevator_desc),
                            icon = painterResource(Res.drawable.ic_elevator),
                            checked = hasElevator, onCheckedChange = { hasElevator = it}
                        )
                        HorizontalDivider(color = SurfaceGray, modifier = Modifier.padding(vertical = 12.dp))
 
                        SwitchRowExpanded(
-                           title = "Меблі", subtitle = "Повність мебльовано",
+                           title = stringResource(string.filter_amenities_furniture),
+                           subtitle = stringResource(string.filter_amenities_furniture_desc),
                            icon = painterResource(Res.drawable.ic_sofa),
                            checked = withFurniture, onCheckedChange = { withFurniture = it}
                        )
                        HorizontalDivider(color = SurfaceGray, modifier = Modifier.padding(vertical = 12.dp))
 
                        SwitchRowExpanded(
-                           title = "Балкон", subtitle = "Наявність балкону",
+                           title = stringResource(string.filter_amenities_balcony),
+                           subtitle = stringResource(string.filter_amenities_balcony_desc),
                            icon = painterResource(Res.drawable.ic_balcony),
                            checked = hasBalcony, onCheckedChange = { hasBalcony = it}
                        )
@@ -407,12 +434,12 @@ fun RangeInputRow(
     Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
         CustomTextField(
             value = minValue, onMinChange,
-            label = "Від", placeholder = minPlaceholder, modifier = Modifier.weight(1f)
+            label = stringResource(string.filter_price_from), placeholder = minPlaceholder, modifier = Modifier.weight(1f)
         )
         Text("-", color = TextSecondary)
         CustomTextField(
             value = maxValue, onValueChange = onMaxChange,
-            label = "До", placeholder = maxPlaceholder, modifier = Modifier.weight(1f)
+            label = stringResource(string.filter_price_to), placeholder = maxPlaceholder, modifier = Modifier.weight(1f)
         )
     }
 }
@@ -457,7 +484,7 @@ fun CustomDropdown(
             readOnly = true,
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
             modifier = Modifier
-                .menuAnchor()
+                .menuAnchor(type = ExposedDropdownMenuAnchorType.PrimaryNotEditable, enabled = true)
                 .fillMaxWidth()
                 .height(56.dp),
             shape = RoundedCornerShape(12.dp),
