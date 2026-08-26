@@ -23,7 +23,10 @@ import org.jetbrains.compose.resources.painterResource
 
 
 @Composable
-fun HomeBottomActionButtons() {
+fun HomeBottomActionButtons(
+    onDislikeClick: () -> Unit,
+    onLikeClick: () -> Unit
+) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -34,7 +37,7 @@ fun HomeBottomActionButtons() {
     ) {
         // Кнопка Dislike (Пропустити)
         Button(
-            onClick = { /* TODO */ },
+            onClick = onDislikeClick,
             modifier = Modifier.size(72.dp),
             shape = CircleShape,
             colors = ButtonDefaults.buttonColors(
@@ -48,7 +51,7 @@ fun HomeBottomActionButtons() {
 
         // Кнопка Like (В обране)
         Button(
-            onClick = { /* TODO */ },
+            onClick = onLikeClick,
             modifier = Modifier.size(72.dp),
             shape = CircleShape,
             colors = ButtonDefaults.buttonColors(
