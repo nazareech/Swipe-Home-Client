@@ -31,7 +31,10 @@ import coil3.compose.AsyncImage
 import com.nazar_protasov.swipehome.ui.models.Property
 import mymultiplatformproject.shared.generated.resources.Res
 import mymultiplatformproject.shared.generated.resources.ic_location_pin
+import mymultiplatformproject.shared.generated.resources.search_card_rooms_count
+import mymultiplatformproject.shared.generated.resources.search_card_section_area
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun PropertyCard(
@@ -118,8 +121,11 @@ fun PropertyCard(
                         .background(Color.White.copy(alpha = 0.2f))
                         .padding(horizontal = 12.dp, vertical = 6.dp)
                 ){
+                    val detailsText = "${property.rooms} " + stringResource(Res.string.search_card_rooms_count) +
+                            " • ${property.area} " + stringResource(Res.string.search_card_section_area) +
+                            " • ${property.buildingType}"
                     Text(
-                        text = property.details,
+                        text = detailsText,
                         color = Color.White,
                         fontSize = 12.sp,
                         fontWeight = FontWeight.SemiBold

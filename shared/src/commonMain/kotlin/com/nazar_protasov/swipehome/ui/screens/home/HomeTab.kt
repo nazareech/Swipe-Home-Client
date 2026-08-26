@@ -8,32 +8,29 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheetDefaults.properties
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.key
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
+import cafe.adriel.voyager.core.screen.uniqueScreenKey
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabOptions
 import com.nazar_protasov.swipehome.ui.components.PropertyCard
 import com.nazar_protasov.swipehome.ui.components.SwipeableCard
-import com.nazar_protasov.swipehome.ui.models.Property
 import mymultiplatformproject.shared.generated.resources.Res
 import mymultiplatformproject.shared.generated.resources.ic_search_cards
 import mymultiplatformproject.shared.generated.resources.main_bottom_nav_search
@@ -42,12 +39,15 @@ import org.jetbrains.compose.resources.stringResource
 
 import coil3.ImageLoader
 import coil3.compose.setSingletonImageLoaderFactory
-import coil3.network.ktor3.KtorNetworkFetcherFactory // Або ktor2, залежно від того, що ви обрали
+import coil3.network.ktor3.KtorNetworkFetcherFactory
 import com.nazar_protasov.swipehome.ui.components.rememberSwipeCardState
 import kotlinx.coroutines.launch
+import org.koin.compose.koinInject
 import kotlin.math.abs
 
-object HomeTab: Tab {
+class HomeTab : Tab {
+    override val key = uniqueScreenKey
+
     override val options: TabOptions
     @Composable
     get() {
@@ -64,35 +64,36 @@ object HomeTab: Tab {
 
     @Composable
     override fun Content() {
-        Navigator(HomeScreen)
+        val homeScreen = remember { HomeScreen() }
+        Navigator(homeScreen)
     }
 }
 
-internal object HomeScreen : Screen {
+internal class HomeScreen : Screen {
+    override val key = uniqueScreenKey
+
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     override fun Content() {
+
         // Стан та скоуп для анімації
         val swipeCardState = rememberSwipeCardState()
         val coroutineScope = rememberCoroutineScope()
 
+        // Отримуємо синглтон ScreenModel з Koin
+        val screenModel: HomeScreenModel = koinInject()
+
+        // Спостерігаємо за станами (дані для сервера)
+        val properties by screenModel.properties.collectAsState()
+        val isLoading by screenModel.isLoading.collectAsState()
+
+        // --- Налаштування Coil
         setSingletonImageLoaderFactory { context ->
             ImageLoader.Builder(context)
                 .components {
                     add(KtorNetworkFetcherFactory())
                 }
                 .build()
-        }
-
-        // Тимчасовий список для тестування (імітація відповіді бекенду)
-        var properties by remember {
-            mutableStateOf(
-                listOf(
-                    Property("1", "http://192.168.0.78:8080/uploads/application-number-1/687a274c-b193-4b84-918e-23c054d17bc5.jpg", "$120,000", "Халупа з видом на озеро", "Люблін", "4 кімнати - 120м"),
-                    Property("2", "http://192.168.0.78:8080/uploads/application-number-1/5239453d-88ab-48bc-b0ae-8b8d8e41cb36.jpg", "$350,000", "Сучасна Вілла", "Варшава", "5 кімнат - 200м"),
-                    Property("3", "http://192.168.0.78:8080/uploads/application-number-1/bd3e357c-f613-42d3-b420-9d0bc285fcd1.jpg", "$85,000", "Затишна квартира", "Краків", "2 кімнати - 45м")
-                )
-            )
         }
 
         Column(
@@ -102,7 +103,7 @@ internal object HomeScreen : Screen {
         ) {
 
             // Верхня панель
-            HomeTopBar()
+            HomeTopBar(screenModel)
 
             // Центральна зона для карток
             Box(
@@ -112,7 +113,12 @@ internal object HomeScreen : Screen {
                     .padding(horizontal = 16.dp),
                 contentAlignment = Alignment.Center
             ) {
-                if (properties.isEmpty()) {
+                // ПОКАЗУЄМО ІНДИКАТОР ЗАВАНТАЖЕННЯ
+                if (isLoading) {
+                    CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
+                }
+                // АБО ПОКАЗУЄМО ПОРОЖНІЙ СТАН
+                else if (properties.isEmpty()) {
                     // Стан, коли картки закінчилися
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         Text("🎉", fontSize = 48.sp)
@@ -124,6 +130,7 @@ internal object HomeScreen : Screen {
                             color = MaterialTheme.colorScheme.onBackground
                         )
                     }
+                // АБО МАЛЮЄМО СТОПКУ КАРТИНОК
                 } else {
                     // Беремо максимум 2 верхні картки
                     // reversed() потрібен, щоб перша картка малювалася ОСТАННЬОЮ (поверх усіх інших у Box)
@@ -132,7 +139,7 @@ internal object HomeScreen : Screen {
                     visibleCards.forEach { property ->
                         val isTopCard = property.id == properties.first().id
 
-                        // key допомагає Comppose розуміти, яка саме картка видалилася, щоб не забивати анімації
+                        // key допомагає Compose розуміти, яка саме картка видалилася, щоб не забивати анімації
                         key(property.id) {
                             if (isTopCard) {
                                 // Активна картка (можна свайпати)
@@ -142,14 +149,14 @@ internal object HomeScreen : Screen {
                                     onSwipeLeft = {
                                         coroutineScope.launch {
                                             swipeCardState.swipeLeft()
-                                            properties = properties.drop(1)
+                                            screenModel.onCardSwiped()
                                             swipeCardState.snapToCenter()
                                         }
                                     },
                                     onSwipeRight = {
                                         coroutineScope.launch {
                                             swipeCardState.swipeRight()
-                                            properties = properties.drop(1)
+                                            screenModel.onCardSwiped()
                                             swipeCardState.snapToCenter()
                                         }
                                     }
@@ -172,7 +179,6 @@ internal object HomeScreen : Screen {
                                             scaleY = animationScale
                                             alpha = 0.95f + (0.05f * progress)
                                         }
-//                                        .padding(vertical = 16.dp)
                                 )
                             }
                         }
@@ -186,7 +192,7 @@ internal object HomeScreen : Screen {
                     if (properties.isNotEmpty()) {
                         coroutineScope.launch {
                             swipeCardState.swipeLeft()
-                            properties = properties.drop(1)
+                            screenModel.onCardSwiped()
                             swipeCardState.snapToCenter()
                         }
                     }
@@ -195,7 +201,7 @@ internal object HomeScreen : Screen {
                     if (properties.isNotEmpty()) {
                         coroutineScope.launch {
                             swipeCardState.swipeRight()
-                            properties = properties.drop(1)
+                            screenModel.onCardSwiped()
                             swipeCardState.snapToCenter()
                         }
                     }

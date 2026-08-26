@@ -11,8 +11,10 @@ import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import cafe.adriel.voyager.core.screen.Screen
+import cafe.adriel.voyager.core.screen.uniqueScreenKey
 import cafe.adriel.voyager.navigator.tab.CurrentTab
 import cafe.adriel.voyager.navigator.tab.LocalTabNavigator
 import cafe.adriel.voyager.navigator.tab.Tab
@@ -20,15 +22,19 @@ import cafe.adriel.voyager.navigator.tab.TabNavigator
 import com.nazar_protasov.swipehome.ui.screens.home.HomeTab
 
 class RootScreen : Screen {
+    override val key = uniqueScreenKey
+
     @Composable
     override fun Content() {
-        TabNavigator(HomeTab) {
+        val homeTab = remember { HomeTab() }
+
+        TabNavigator(homeTab) {
             Scaffold(
                 bottomBar = {
                     NavigationBar(
                         containerColor = MaterialTheme.colorScheme.background
                     ) {
-                        TabNavigationItem(HomeTab)
+                        TabNavigationItem(homeTab)
                         // TODO: Додамо інші вкладки, коли будуть створені
                         // TabNavigationItem(FavoritesTab)
                         // TabNavigationItem(ChatsTab)

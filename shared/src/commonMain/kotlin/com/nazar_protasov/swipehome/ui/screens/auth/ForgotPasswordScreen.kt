@@ -50,6 +50,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
+import cafe.adriel.voyager.core.screen.uniqueScreenKey
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import mymultiplatformproject.shared.generated.resources.Res
@@ -92,6 +93,8 @@ import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 
 class ForgotPasswordScreen : Screen {
+    override val key = uniqueScreenKey
+
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow

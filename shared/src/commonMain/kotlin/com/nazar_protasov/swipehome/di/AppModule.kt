@@ -1,5 +1,7 @@
 package com.nazar_protasov.swipehome.di
 
+import com.nazar_protasov.swipehome.network.PropertyApiService
+import com.nazar_protasov.swipehome.ui.screens.home.HomeScreenModel
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.serialization.kotlinx.json.json
@@ -20,4 +22,7 @@ val appModule: Module = module {
             }
         }
     }
+
+    single { PropertyApiService(get()) }
+    single { HomeScreenModel(get()) }
 }

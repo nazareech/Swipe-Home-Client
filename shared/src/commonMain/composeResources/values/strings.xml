@@ -149,4 +149,8 @@
     <string name="filter_amenities_balcony">Балкон</string>
     <string name="filter_amenities_balcony_desc">Наявність балкону</string>
 
+    <string name="search_card_rooms_count">кімнати</string>
+    <string name="search_card_section_area">(М²)</string>
+
+
 </resources>

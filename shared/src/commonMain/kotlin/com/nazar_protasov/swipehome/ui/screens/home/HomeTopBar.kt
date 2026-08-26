@@ -29,7 +29,7 @@ import mymultiplatformproject.shared.generated.resources.ic_filtres_tune
 import org.jetbrains.compose.resources.painterResource
 
 @Composable
-fun HomeTopBar() {
+fun HomeTopBar(homeScreenModel: HomeScreenModel) {
     val navigator = LocalNavigator.currentOrThrow
 
     // Шукаємо кореневий навігатор, щоб FilterScreen відкривався на весь екран (поверх BottomBar)
@@ -65,7 +65,7 @@ fun HomeTopBar() {
                 .clip(CircleShape)
                 .background(MaterialTheme.colorScheme.secondary.copy(alpha = 0.2f))
                 .clickable{
-                    rootNavigator.push(FilterScreen())
+                    rootNavigator.push(FilterScreen(homeScreenModel))
                 },
             contentAlignment = Alignment.Center
         ) {

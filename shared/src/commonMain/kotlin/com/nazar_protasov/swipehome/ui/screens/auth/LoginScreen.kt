@@ -39,10 +39,10 @@ import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
+import cafe.adriel.voyager.core.screen.uniqueScreenKey
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.nazar_protasov.swipehome.ui.screens.RootScreen
-import com.nazar_protasov.swipehome.ui.screens.home.HomeTab
 import mymultiplatformproject.shared.generated.resources.Res
 import mymultiplatformproject.shared.generated.resources.btn_register
 import mymultiplatformproject.shared.generated.resources.ic_apple_logo
@@ -63,6 +63,8 @@ import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 
 class LoginScreen: Screen {
+    override val key = uniqueScreenKey
+
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
@@ -74,6 +76,8 @@ class LoginScreen: Screen {
         var passwordVisible by remember { mutableStateOf(false) }
         // Змінна для прокручуваного екрана
         val scrollState = rememberScrollState()
+        // Змінна для стану завантаження
+        var isLoading by remember { mutableStateOf(false) }
 
         Column(
             modifier = Modifier
@@ -157,9 +161,13 @@ class LoginScreen: Screen {
             // Головна кнопка увійти
             Button(
                 onClick = {
-                /*TODO: Логіка авторизації Ktor*/
-                    navigator.push(RootScreen())
+                    if (!isLoading) {
+                        isLoading = true
+                        /*TODO: Логіка авторизації Ktor*/
+                        navigator.replaceAll(RootScreen())
+                    }
                 },
+                enabled = !isLoading,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(56.dp),

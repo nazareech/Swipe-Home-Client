@@ -1,5 +1,6 @@
 package com.nazar_protasov.swipehome.ui.screens.home
 
+import com.nazar_protasov.swipehome.network.dto.FilterRequestDTO
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -55,6 +56,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
+import cafe.adriel.voyager.core.screen.uniqueScreenKey
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.nazar_protasov.swipehome.ui.theme.BackgroundLight
@@ -70,7 +72,9 @@ import mymultiplatformproject.shared.generated.resources.Res.string
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 
-class FilterScreen : Screen {
+class FilterScreen(private val homeScreenModel: HomeScreenModel) : Screen {
+    override val key = uniqueScreenKey
+
     @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     override fun Content() {
@@ -88,29 +92,60 @@ class FilterScreen : Screen {
         val anyFloorStr = stringResource(string.filter_floor_any)
         val studioStr = stringResource(string.filter_rooms_studio)
 
+        // Отримуємо поточні (раніше збережені) фільтри
+        val activeFilters = homeScreenModel.currentFilters.value
+
         // --- Стани фільтрів ---
-        var selectedCategory by remember(apartmentStr) { mutableStateOf(apartmentStr) }
-        var selectedDealType by remember(allStr) { mutableStateOf(allStr) }
-        var minPrice by remember { mutableStateOf("") }
-        var maxPrice by remember { mutableStateOf("") }
-        var minArea by remember { mutableStateOf("") }
-        var maxArea by remember { mutableStateOf("") }
-        var selectedRooms by remember { mutableStateOf("1") }
+        
+        // Мапінг категорій
+        val categoryToLabel = mapOf(
+            FilterRequestDTO.CATEGORY_APARTMENT to apartmentStr,
+            FilterRequestDTO.CATEGORY_HOUSE to houseStr,
+            FilterRequestDTO.CATEGORY_ROOM to roomsStr
+        )
+        val labelToCategory = categoryToLabel.entries.associate { it.value to it.key }
+        
+        var selectedCategoryLabel by remember(apartmentStr) { 
+            mutableStateOf(categoryToLabel[activeFilters.category] ?: apartmentStr) 
+        }
+
+        // Мапінг типів угоди
+        val dealToLabel = mapOf(
+            null to allStr,
+            FilterRequestDTO.DEAL_RENT to rentStr,
+            FilterRequestDTO.DEAL_SALE to saleStr
+        )
+        val labelToDeal = dealToLabel.entries.associate { it.value to it.key }
+        
+        var selectedDealLabel by remember(allStr) { 
+            mutableStateOf(dealToLabel[activeFilters.subcategory] ?: allStr) 
+        }
+
+        var minPrice by remember { mutableStateOf(activeFilters.priceMin?.toInt()?.toString() ?: "") }
+        var maxPrice by remember { mutableStateOf(activeFilters.priceMax?.toInt()?.toString() ?: "") }
+        var minArea by remember { mutableStateOf(activeFilters.areaMin?.toInt()?.toString() ?: "") }
+        var maxArea by remember { mutableStateOf(activeFilters.areaMax?.toInt()?.toString() ?: "") }
+        
+        var selectedRooms by remember(studioStr) {
+            mutableStateOf(
+                if (activeFilters.rooms == null && activeFilters.category != null) studioStr else activeFilters.rooms?.toString() ?: "1"
+            )
+        }
 
         // Стани для випадаючих списків
         var buildingTypeExpanded by remember { mutableStateOf(false) }
-        var selectedTypeExpanded by remember(allTypesStr) { mutableStateOf(allTypesStr) }
+        var selectedTypeExpanded by remember(allTypesStr) { mutableStateOf(activeFilters.buildingType ?: allTypesStr) }
 
         var floorExpanded by remember { mutableStateOf(false) }
-        var selectedFloor by remember(anyFloorStr) { mutableStateOf(anyFloorStr) }
+        var selectedFloor by remember(anyFloorStr) { mutableStateOf(activeFilters.floor ?: anyFloorStr) }
 
-        var selectedParking by remember(allStr) { mutableStateOf(allStr) }
+        var selectedParking by remember(allStr) { mutableStateOf(activeFilters.parking ?: allStr) }
 
         // Світчі
-        var petsAllowed by remember { mutableStateOf(false) }
-        var withFurniture by remember { mutableStateOf(false) }
-        var hasElevator by remember { mutableStateOf(false) }
-        var hasBalcony by remember { mutableStateOf(false) }
+        var petsAllowed by remember { mutableStateOf(activeFilters.petsAllowed ?: false) }
+        var withFurniture by remember { mutableStateOf(activeFilters.furniture ?: false) }
+        var hasElevator by remember { mutableStateOf(activeFilters.elevator ?: false) }
+        var hasBalcony by remember { mutableStateOf(activeFilters.balcony ?: false) }
 
         Scaffold(
             topBar = {
@@ -135,15 +170,15 @@ class FilterScreen : Screen {
                                 color = ErrorRed, // Колір для очищення
                                 modifier = Modifier
                                     .clickable {
-                                        selectedCategory = apartmentStr
-                                        selectedDealType = allStr
+                                        selectedCategoryLabel = apartmentStr
+                                        selectedDealLabel = allStr
                                         minPrice = ""; maxPrice = ""
                                         minArea = ""; maxArea = ""
                                         selectedRooms = "1"
                                         selectedTypeExpanded = allTypesStr
                                         selectedFloor = anyFloorStr
                                         selectedParking = allStr
-                                        petsAllowed = false; hasElevator = false; withFurniture = false
+                                        petsAllowed = false; hasElevator = false; withFurniture = false; hasBalcony = false
                                     }
                                     .padding(bottom = 2.dp)
                             )
@@ -169,25 +204,44 @@ class FilterScreen : Screen {
                 ){
                     Button(
                         onClick = {
+                            // Збираємо актуальні дані з UI й створюємо новий DTO
+                            val request = FilterRequestDTO(
+                                limit = 10,
+                                offset = 0,
+                                // Базові фільтри
+                                category = labelToCategory[selectedCategoryLabel],
+                                subcategory = labelToDeal[selectedDealLabel],
+                                localization = null,
+
+                                // Діапазони
+                                priceMin = minPrice.toDoubleOrNull(),
+                                priceMax = maxPrice.toDoubleOrNull(),
+                                areaMin = minArea.toDoubleOrNull(),
+                                areaMax = maxArea.toDoubleOrNull(),
+
+                                // Специфічні фільтри
+                                rooms = if (selectedRooms == studioStr) null else selectedRooms.toIntOrNull(),
+                                floor = if (selectedFloor == anyFloorStr) null else selectedFloor,
+                                parking = if (selectedParking == allStr) null else selectedParking,
+                                petsAllowed = petsAllowed,
+                                elevator = hasElevator,
+                                furniture = withFurniture,
+                                balcony = hasBalcony,
+                                buildingType = if (selectedTypeExpanded == allTypesStr) null else selectedTypeExpanded,
+                            )
                         // TODO: Зібрати всі дані, оновити глобальний стан і закрити екран
+                            homeScreenModel.updateFilters(request)
                             navigator.pop()
                         },
-                        modifier = Modifier
-                            .weight(1.5f)
-                            .height(56.dp),
+                        modifier = Modifier.weight(1.5f).height(56.dp),
                         shape = RoundedCornerShape(12.dp),
                         colors = ButtonDefaults.buttonColors(containerColor = PrimaryGreen)
                     ){
                         Text(stringResource(string.filter_apply), fontSize = 16.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
                     }
                     Button(
-                        onClick = {
-                        // TODO: Зібрати всі дані, оновити глобальний стан і закрити екран
-                            navigator.pop()
-                        },
-                        modifier = Modifier
-                            .weight(1.5f)
-                            .height(56.dp),
+                        onClick = { navigator.pop() },
+                        modifier = Modifier.weight(1.5f).height(56.dp),
                         shape = RoundedCornerShape(12.dp),
                         colors = ButtonDefaults.buttonColors(containerColor = PrimaryGreen)
                     ){
@@ -205,7 +259,6 @@ class FilterScreen : Screen {
                     .verticalScroll(scrollState),
                 verticalArrangement = Arrangement.spacedBy(24.dp)
             ){
-
                 Spacer(modifier = Modifier.height(12.dp))
 
                 // --- Тип нерухомості ---
@@ -215,8 +268,8 @@ class FilterScreen : Screen {
                         categories.forEach { category ->
                             CustomChip(
                                 text = category,
-                                isSelected = selectedCategory == category,
-                                onClick = { selectedCategory = category },
+                                isSelected = selectedCategoryLabel == category,
+                                onClick = { selectedCategoryLabel = category },
                                 modifier = Modifier.weight(1f)
                             )
                         }
@@ -230,8 +283,8 @@ class FilterScreen : Screen {
                         typeOfDeal.forEach { type ->
                             CustomChip(
                                 text = type,
-                                isSelected = selectedDealType == type,
-                                onClick = { selectedDealType = type },
+                                isSelected = selectedDealLabel == type,
+                                onClick = { selectedDealLabel = type },
                                 modifier = Modifier.weight(1f)
                             )
                         }
@@ -370,7 +423,6 @@ class FilterScreen : Screen {
                        )
                    }
                }
-
                 Spacer(modifier = Modifier.height(32.dp))
             }
         }
@@ -392,23 +444,6 @@ fun FilterSection(title: String, content: @Composable () -> Unit){
         content()
     }
 }
-@Composable
-fun CustomChip( text: String, isSelected: Boolean, onClick: () -> Unit){
-    val bdColor = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface
-    val textColor = if (isSelected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface
-
-    Box(
-        modifier = Modifier
-            .clip(RoundedCornerShape(12.dp))
-            .background(bdColor)
-            .clickable { onClick() }
-            .padding(horizontal = 16.dp, vertical = 12.dp),
-        contentAlignment = Alignment.Center
-    ){
-        Text(text = text, fontSize = 14.sp, fontWeight = FontWeight.Medium, color = textColor)
-    }
-}
-
 @Composable
 fun CustomChip(text: String, isSelected: Boolean, onClick: () -> Unit, modifier: Modifier = Modifier){
     val bdColor = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface

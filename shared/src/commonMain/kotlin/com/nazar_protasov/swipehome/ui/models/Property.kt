@@ -6,5 +6,7 @@ data class Property(
     val price: String,
     val title: String,
     val location: String,
-    val details: String // Наприклад: "3 кімнати • 85 м² • 5 поверх"
+    val rooms: Int,
+    val area: Double,
+    val buildingType: String
 )

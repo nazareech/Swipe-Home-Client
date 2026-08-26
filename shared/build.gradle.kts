@@ -57,6 +57,7 @@ kotlin {
             implementation(libs.voyager.navigator)
             implementation(libs.voyager.transitions)
             implementation(libs.voyager.tab.navigator)
+            implementation(libs.voyager.screenmodel)
 
             // Koin (DI)
             implementation(libs.koin.core)

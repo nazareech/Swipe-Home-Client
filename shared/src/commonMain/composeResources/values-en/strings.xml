@@ -149,4 +149,7 @@
     <string name="filter_amenities_balcony">Balcony</string>
     <string name="filter_amenities_balcony_desc">Balcony available</string>
 
+    <string name="search_card_rooms_count">rooms</string>
+    <string name="search_card_section_area">(М²)</string>
+
 </resources>
