@@ -2,7 +2,7 @@ package com.nazar_protasov.swipehome.ui.models
 
 data class Property(
     val id: String,
-    val imageUrl: String,
+    val imagesUrl: List<String>,
     val price: String,
     val title: String,
     val location: String,

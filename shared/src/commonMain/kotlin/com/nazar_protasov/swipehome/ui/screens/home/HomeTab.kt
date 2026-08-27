@@ -177,7 +177,7 @@ internal class HomeScreen : Screen {
 
                                             scaleX = animationScale
                                             scaleY = animationScale
-                                            alpha = 0.95f + (0.05f * progress)
+                                            alpha = 0.5f + (0.5f * progress)
                                         }
                                 )
                             }

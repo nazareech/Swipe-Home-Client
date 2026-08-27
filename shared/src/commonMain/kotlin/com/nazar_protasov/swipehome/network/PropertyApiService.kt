@@ -41,21 +41,20 @@ data class PropertyDTO(
 // Функція-розширення для мапінгу
 fun PropertyDTO.toUIProperty(): Property {
     // Формуємо повний URL для зображення
-    val rawImage = this.images_map?.entries?.firstOrNull { it.value }?.key
-        ?: this.images_map?.keys?.firstOrNull()
+    val rawImages = this.images_map?.keys?.toList() ?: emptyList()
 
-    val mainImage = if (rawImage != null) {
+    val imageUrls = if (rawImages.isNotEmpty()) {
         // Додаємо /uploads/, оскільки сервер зазвичай віддає статику за цим префіксом
-        "${PropertyApiService.BASE_URL}/uploads$rawImage"
+        rawImages.map{ "${PropertyApiService.BASE_URL}/uploads$it" }
     } else {
-        "${PropertyApiService.BASE_URL}/uploads/" // Заглушка
+        listOf("${PropertyApiService.BASE_URL}/uploads/") // Заглушка якщо фото немає
     }
 
     val formattedPrice = "$${this.price.toInt()}"
 
     return Property(
         id = this.id_property?.toString() ?: "0",
-        imageUrl = mainImage,
+        imagesUrl = imageUrls,
         price = formattedPrice,
         title = this.title,
         location = this.localization,
@@ -67,7 +66,7 @@ fun PropertyDTO.toUIProperty(): Property {
 
 class PropertyApiService(private val client: io.ktor.client.HttpClient){
     companion object {
-        const val BASE_URL = "http://10.14.0.242:8080"
+        const val BASE_URL = "http://192.168.0.78:8080"
     }
 
     suspend fun fetchProperties(
