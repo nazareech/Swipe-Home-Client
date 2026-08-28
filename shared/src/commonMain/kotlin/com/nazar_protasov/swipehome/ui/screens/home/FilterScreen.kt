@@ -34,6 +34,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
@@ -202,6 +203,13 @@ class FilterScreen(private val homeScreenModel: HomeScreenModel) : Screen {
                     .navigationBarsPadding(),
                     horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ){
+                    OutlinedButton(
+                        onClick = { navigator.pop() },
+                        modifier = Modifier.weight(1.5f).height(56.dp),
+                        shape = RoundedCornerShape(12.dp)
+                    ){
+                        Text(stringResource(string.filter_cancel), fontSize = 16.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
+                    }
                     Button(
                         onClick = {
                             // Збираємо актуальні дані з UI й створюємо новий DTO
@@ -238,14 +246,6 @@ class FilterScreen(private val homeScreenModel: HomeScreenModel) : Screen {
                         colors = ButtonDefaults.buttonColors(containerColor = PrimaryGreen)
                     ){
                         Text(stringResource(string.filter_apply), fontSize = 16.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
-                    }
-                    Button(
-                        onClick = { navigator.pop() },
-                        modifier = Modifier.weight(1.5f).height(56.dp),
-                        shape = RoundedCornerShape(12.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = PrimaryGreen)
-                    ){
-                        Text(stringResource(string.filter_cancel), fontSize = 16.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
                     }
                 }
             },

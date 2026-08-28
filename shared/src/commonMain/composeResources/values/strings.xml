@@ -29,7 +29,7 @@
     <string name="login_enter_with">Увійти через</string>
     <string name="login_create_account">Ще немає акаунта?</string>
 
-    <!--    Екран реєс  трації Крок 1-->
+    <!--    Екран реєстрації Крок 1-->
     <string name="reg_step_indicaton">Крок</string>
     <string name="reg_step_indicaton_of">з</string>
     <string name="reg_agree1">Натискання продовжити, ви погоджуєтесь з</string>
@@ -64,10 +64,12 @@
     <string name="reg_rules_agree">Я погоджуюсь з Умовами використання та Політикою конфіденціальності</string>
 
     <!-- Екран відновлення пароля -->
-    <string name="fogot_paswd_title_step1">Відновлення пароля</string>
-    <string name="fogot_paswd_title_step2">Підтвердження</string>
-    <string name="fogot_paswd_title_step3">Новий пароль</string>
+    <string name="fogot_paswd_title_step1">Введіть дані</string>
+    <string name="fogot_paswd_title_step2">Відновлення пароля</string>
+    <string name="fogot_paswd_title_step3">Підтвердження</string>
+    <string name="fogot_paswd_title_step4">Новий пароль</string>
 
+    <string name="btn_choice_method">Обрати метод</string>
     <string name="btn_send_code">Відправити код</string>
     <string name="btn_accept_code">Підтвердити</string>
     <string name="btn_reset_paswd">Відновити пароль</string>

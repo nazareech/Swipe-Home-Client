@@ -56,9 +56,11 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import mymultiplatformproject.shared.generated.resources.Res
 import mymultiplatformproject.shared.generated.resources.btn_accept_code
 import mymultiplatformproject.shared.generated.resources.btn_back
+import mymultiplatformproject.shared.generated.resources.btn_choice_method
 import mymultiplatformproject.shared.generated.resources.btn_resend_code
 import mymultiplatformproject.shared.generated.resources.btn_reset_paswd
 import mymultiplatformproject.shared.generated.resources.btn_send_code
+import mymultiplatformproject.shared.generated.resources.email_login_label
 import mymultiplatformproject.shared.generated.resources.fogot_paswd_confirm_password_label
 import mymultiplatformproject.shared.generated.resources.fogot_paswd_confirm_password_placeholder
 import mymultiplatformproject.shared.generated.resources.fogot_paswd_header_step1
@@ -79,6 +81,7 @@ import mymultiplatformproject.shared.generated.resources.fogot_paswd_subtitle_st
 import mymultiplatformproject.shared.generated.resources.fogot_paswd_title_step1
 import mymultiplatformproject.shared.generated.resources.fogot_paswd_title_step2
 import mymultiplatformproject.shared.generated.resources.fogot_paswd_title_step3
+import mymultiplatformproject.shared.generated.resources.fogot_paswd_title_step4
 import mymultiplatformproject.shared.generated.resources.ic_arrow_back
 import mymultiplatformproject.shared.generated.resources.ic_email
 import mymultiplatformproject.shared.generated.resources.ic_eye_hidden
@@ -89,6 +92,7 @@ import mymultiplatformproject.shared.generated.resources.password_strength_mediu
 import mymultiplatformproject.shared.generated.resources.password_strength_strong
 import mymultiplatformproject.shared.generated.resources.password_strength_very_strong
 import mymultiplatformproject.shared.generated.resources.password_strength_weak
+import mymultiplatformproject.shared.generated.resources.reg_email_placeholder
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 
@@ -102,6 +106,7 @@ class ForgotPasswordScreen : Screen {
 
         // Стани екрана
         var currentStep by rememberSaveable { mutableStateOf(1) }
+        var loginOrEmail by rememberSaveable { mutableStateOf("") } // "login" або "email"
         var recoveryMethod by rememberSaveable { mutableStateOf("sms") } // "sms" або "email"
         var otpCode by rememberSaveable { mutableStateOf("") }
         var newPassword by rememberSaveable { mutableStateOf("") }
@@ -136,7 +141,8 @@ class ForgotPasswordScreen : Screen {
                     text = when(currentStep){
                         1 -> stringResource(Res.string.fogot_paswd_title_step1)
                         2 -> stringResource(Res.string.fogot_paswd_title_step2)
-                        else -> stringResource(Res.string.fogot_paswd_title_step3)
+                        3 -> stringResource(Res.string.fogot_paswd_title_step3)
+                        else -> stringResource(Res.string.fogot_paswd_title_step4)
                     },
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
@@ -152,15 +158,19 @@ class ForgotPasswordScreen : Screen {
             // --- ВМІСТ КРОКІВ ---
             when(currentStep){
                 1 -> Step1RecoveryMethod(
+                    loginOrEmail = loginOrEmail,
+                    onLoginOrEmailChange = { loginOrEmail = it }
+                )
+                2 -> Step2RecoveryMethod(
                     selectedMethod = recoveryMethod,
                     onMethodSelected = { recoveryMethod = it }
                 )
-                2 -> Step2OutpInput(
+                3 -> Step2OutpInput(
                     otpCode = otpCode,
                     onOtpCodeChange = { otpCode = it },
                     selectedMethod = recoveryMethod,
                 )
-                3 -> Step3NewPassword(
+                4 -> Step3NewPassword(
                     newPassword = newPassword,
                     onNewPasswordChange = { newPassword = it },
                     confirmPassword = confirmPassword,
@@ -183,8 +193,9 @@ class ForgotPasswordScreen : Screen {
             ){
                 Text(
                     text = when (currentStep){
-                        1 -> stringResource(Res.string.btn_send_code)
-                        2 -> stringResource(Res.string.btn_accept_code)
+                        1 -> stringResource(Res.string.btn_choice_method)
+                        2 -> stringResource(Res.string.btn_send_code)
+                        3 -> stringResource(Res.string.btn_accept_code)
                         else -> stringResource(Res.string.btn_reset_paswd)
                     },
                     fontSize = 18.sp,
@@ -193,10 +204,35 @@ class ForgotPasswordScreen : Screen {
             }
         }
     }
+    @Composable
+    fun Step1RecoveryMethod(loginOrEmail: String, onLoginOrEmailChange: (String) -> Unit){
+        Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+            Text(
+                text = stringResource(Res.string.email_login_label),
+                fontWeight = FontWeight.SemiBold,
+                fontSize = 14.sp,
+                color = MaterialTheme.colorScheme.onBackground
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            OutlinedTextField(
+                value = loginOrEmail,
+                onValueChange = onLoginOrEmailChange,
+                label = { Text(stringResource(Res.string.email_login_label)) },
+                placeholder = { Text(stringResource(Res.string.reg_email_placeholder)) },
+                modifier = Modifier.fillMaxWidth(),
+                singleLine = true,
+                shape = RoundedCornerShape(12.dp)
+            )
+
+            Spacer(modifier = Modifier.height(24.dp))
+
+
+        }
+    }
 
     // --- Крок 1: Вибір способу ---
     @Composable
-    fun Step1RecoveryMethod(selectedMethod: String, onMethodSelected: (String) -> Unit) {
+    fun Step2RecoveryMethod(selectedMethod: String, onMethodSelected: (String) -> Unit) {
         Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
 
             Text(

@@ -63,10 +63,12 @@
     <string name="reg_rules_agree">I agree to the Terms of Use and Privacy Policy</string>
 
     <!-- Екран відновлення пароля -->
-    <string name="fogot_paswd_title_step1">Password Recovery</string>
-    <string name="fogot_paswd_title_step2">Verification</string>
-    <string name="fogot_paswd_title_step3">New Password</string>
+    <string name="fogot_paswd_title_step1">Enter data</string>
+    <string name="fogot_paswd_title_step2">Password Recovery</string>
+    <string name="fogot_paswd_title_step3">Verification</string>
+    <string name="fogot_paswd_title_step4">New Password</string>
 
+    <string name="btn_choice_method">Choice method</string>
     <string name="btn_send_code">Send Code</string>
     <string name="btn_accept_code">Verify</string>
     <string name="btn_reset_paswd">Reset Password</string>
