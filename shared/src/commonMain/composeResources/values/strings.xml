@@ -4,6 +4,7 @@
     <string name="app_title">Знайди свій дім</string>
     <string name="btn_next">Далі</string>
     <string name="btn_back">Назад</string>
+    <string name="btn_share">Поділитися</string>
     <string name="btn_register">Зареєструватися</string>
     <string name="or_divider">АБО</string>
     <string name="email_login_label">Email або Логін</string>

@@ -46,7 +46,8 @@ import org.jetbrains.compose.resources.stringResource
 @Composable
 fun PropertyCard(
     property: Property,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onCardClick: () -> Unit = {}
 ){
     // Стан для відстеження поточної фотографії
     var currentImageIndex by remember { mutableIntStateOf(0) }
@@ -163,6 +164,12 @@ fun PropertyCard(
             Column(
                 modifier = Modifier
                     .align(Alignment.BottomStart)
+                    .padding(24.dp)
+                    .clickable(
+                        interactionSource = remember { MutableInteractionSource() },
+                        indication = null, // прибираємо сірий ефект від натискання, якщо потрібно
+                        onClick = onCardClick
+                    )
                     .padding(24.dp)
             ) {
                 Text(

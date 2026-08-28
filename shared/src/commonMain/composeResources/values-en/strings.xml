@@ -4,6 +4,7 @@
     <string name="app_title">Find your place</string>
     <string name="btn_next">Next</string>
     <string name="btn_back">Back</string>
+    <string name="btn_share">Share</string>
     <string name="btn_register">Sign Up</string>
     <string name="or_divider">OR</string>
     <string name="email_login_label">Email or Login</string>

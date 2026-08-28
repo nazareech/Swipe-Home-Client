@@ -1,6 +1,7 @@
 package com.nazar_protasov.swipehome.ui.screens.home
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -26,7 +27,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.uniqueScreenKey
+import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.Navigator
+import cafe.adriel.voyager.navigator.currentOrThrow
 import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabOptions
 import com.nazar_protasov.swipehome.ui.components.PropertyCard
@@ -41,6 +44,7 @@ import coil3.ImageLoader
 import coil3.compose.setSingletonImageLoaderFactory
 import coil3.network.ktor3.KtorNetworkFetcherFactory
 import com.nazar_protasov.swipehome.ui.components.rememberSwipeCardState
+import com.nazar_protasov.swipehome.ui.screens.details.PropertyDetailsScreen
 import kotlinx.coroutines.launch
 import org.koin.compose.koinInject
 import kotlin.math.abs
@@ -82,6 +86,15 @@ internal class HomeScreen : Screen {
 
         // Отримуємо синглтон ScreenModel з Koin
         val screenModel: HomeScreenModel = koinInject()
+
+        val navigator = LocalNavigator.currentOrThrow
+
+        // Шукаємо кореневий навігатор, щоб деталі відкривалися на весь екран (поверх BottomBar)
+        // і щоб уникнути помилки ClassCastException в TabNavigator
+        var rootNavigator = navigator
+        while (rootNavigator.parent != null) {
+            rootNavigator = rootNavigator.parent!!
+        }
 
         // Спостерігаємо за станами (дані для сервера)
         val properties by screenModel.properties.collectAsState()
@@ -161,7 +174,13 @@ internal class HomeScreen : Screen {
                                         }
                                     }
                                 ) {
-                                    PropertyCard(property = property)
+                                    // Додали клік
+                                    PropertyCard(
+                                        property = property,
+                                        onCardClick = {
+                                            rootNavigator.push(PropertyDetailsScreen(property.id))
+                                        }
+                                    )
                                 }
                             } else {
                                 PropertyCard(
