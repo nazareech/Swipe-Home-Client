@@ -1,7 +1,6 @@
 package com.nazar_protasov.swipehome.ui.screens.home
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -9,8 +8,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -43,9 +45,12 @@ import org.jetbrains.compose.resources.stringResource
 import coil3.ImageLoader
 import coil3.compose.setSingletonImageLoaderFactory
 import coil3.network.ktor3.KtorNetworkFetcherFactory
+import com.nazar_protasov.swipehome.network.toUIDetailsProperty
 import com.nazar_protasov.swipehome.ui.components.rememberSwipeCardState
 import com.nazar_protasov.swipehome.ui.screens.details.PropertyDetailsScreen
+import com.nazar_protasov.swipehome.network.toUIProperty
 import kotlinx.coroutines.launch
+import mymultiplatformproject.shared.generated.resources.ic_refresh
 import org.koin.compose.koinInject
 import kotlin.math.abs
 
@@ -142,6 +147,35 @@ internal class HomeScreen : Screen {
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.onBackground
                         )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Text(
+                            text = "Спробуйте змінити фільтри або оновити список",
+                            fontSize = 14.sp,
+                            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f)
+                        )
+                        Spacer(modifier = Modifier.height(24.dp))
+
+                        androidx.compose.foundation.layout.Row(
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            IconButton(
+                                onClick = {
+                                    screenModel.fetchProperties()
+                                }
+                            ){
+                                Icon(painterResource(Res.drawable.ic_refresh), contentDescription = "Оновити")
+                            }
+
+                            Spacer(modifier = Modifier.width(16.dp))
+
+                            androidx.compose.material3.TextButton(
+                                onClick = {
+                                    rootNavigator.push(FilterScreen(screenModel))
+                                }
+                            ) {
+                                Text("Змінити фільтри", color = MaterialTheme.colorScheme.primary)
+                            }
+                        }
                     }
                 // АБО МАЛЮЄМО СТОПКУ КАРТИНОК
                 } else {
@@ -150,10 +184,10 @@ internal class HomeScreen : Screen {
                     val visibleCards = properties.take(2).reversed()
 
                     visibleCards.forEach { property ->
-                        val isTopCard = property.id == properties.first().id
+                        val isTopCard = property.id_property == properties.first().id_property
 
                         // key допомагає Compose розуміти, яка саме картка видалилася, щоб не забивати анімації
-                        key(property.id) {
+                        key(property.id_property) {
                             if (isTopCard) {
                                 // Активна картка (можна свайпати)
                                 // Свайп обгортка
@@ -176,15 +210,15 @@ internal class HomeScreen : Screen {
                                 ) {
                                     // Додали клік
                                     PropertyCard(
-                                        property = property,
+                                        property = property.toUIProperty(),
                                         onCardClick = {
-                                            rootNavigator.push(PropertyDetailsScreen(property.id))
+                                            rootNavigator.push(PropertyDetailsScreen(property.toUIDetailsProperty()))
                                         }
                                     )
                                 }
                             } else {
                                 PropertyCard(
-                                    property = property,
+                                    property = property.toUIProperty(),
                                     modifier = Modifier
                                         .graphicsLayer {
                                             // Беремо значення зсуву по модулю (щоб працювало і вліво, і вправо)

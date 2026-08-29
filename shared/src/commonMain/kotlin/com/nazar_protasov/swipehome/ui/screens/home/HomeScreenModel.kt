@@ -4,7 +4,7 @@ import com.nazar_protasov.swipehome.network.dto.FilterRequestDTO
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import com.nazar_protasov.swipehome.network.PropertyApiService
-import com.nazar_protasov.swipehome.ui.models.Property
+import com.nazar_protasov.swipehome.network.PropertyDTO
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -13,8 +13,8 @@ import kotlinx.coroutines.launch
 class HomeScreenModel(private val apiService: PropertyApiService) : ScreenModel {
 
     // Стан списку нерухомості
-    private val _properties = MutableStateFlow<List<Property>>(emptyList())
-    val properties: StateFlow<List<Property>> = _properties.asStateFlow()
+    private val _properties = MutableStateFlow<List<PropertyDTO>>(emptyList())
+    val properties: StateFlow<List<PropertyDTO>> = _properties.asStateFlow()
 
 
     // Стан завантаження (щоб показувати крутилку)

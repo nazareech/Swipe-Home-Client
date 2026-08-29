@@ -61,7 +61,7 @@ fun PropertyCard(
         Box(modifier = Modifier.fillMaxSize()){
             // Фотографія на весь фон картки
             AsyncImage(
-                property.imagesUrl.getOrNull(currentImageIndex),
+                model = property.imagesUrl.getOrNull(currentImageIndex),
                 contentDescription = "Фото нерухомості",
                 modifier = Modifier.fillMaxSize(),
                 contentScale = ContentScale.Crop,
