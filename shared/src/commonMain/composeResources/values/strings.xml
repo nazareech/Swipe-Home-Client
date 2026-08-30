@@ -64,6 +64,8 @@
     <string name="reg_rules_agree">Я погоджуюсь з Умовами використання та Політикою конфіденціальності</string>
 
     <!-- Екран відновлення пароля -->
+    <string name="fogot_paswd_subtitle_step0">Введіть ваш Email або Логін, щоб ми могли знайти ваш акаунт та надіслати код підтвердження.</string>
+
     <string name="fogot_paswd_title_step1">Введіть дані</string>
     <string name="fogot_paswd_title_step2">Відновлення пароля</string>
     <string name="fogot_paswd_title_step3">Підтвердження</string>

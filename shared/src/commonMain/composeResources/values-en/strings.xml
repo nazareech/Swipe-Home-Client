@@ -63,6 +63,9 @@
     <string name="reg_rules_agree">I agree to the Terms of Use and Privacy Policy</string>
 
     <!-- Екран відновлення пароля -->
+
+    <string name="fogot_paswd_subtitle_step0">Enter your email address or username so we can find your account and send you a verification code.</string>
+
     <string name="fogot_paswd_title_step1">Enter data</string>
     <string name="fogot_paswd_title_step2">Password Recovery</string>
     <string name="fogot_paswd_title_step3">Verification</string>

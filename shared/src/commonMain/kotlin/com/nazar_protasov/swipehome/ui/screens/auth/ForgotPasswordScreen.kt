@@ -57,6 +57,7 @@ import mymultiplatformproject.shared.generated.resources.Res
 import mymultiplatformproject.shared.generated.resources.btn_accept_code
 import mymultiplatformproject.shared.generated.resources.btn_back
 import mymultiplatformproject.shared.generated.resources.btn_choice_method
+import mymultiplatformproject.shared.generated.resources.btn_next
 import mymultiplatformproject.shared.generated.resources.btn_resend_code
 import mymultiplatformproject.shared.generated.resources.btn_reset_paswd
 import mymultiplatformproject.shared.generated.resources.btn_send_code
@@ -76,6 +77,7 @@ import mymultiplatformproject.shared.generated.resources.fogot_paswd_new_passwor
 import mymultiplatformproject.shared.generated.resources.fogot_paswd_strength_prefix
 import mymultiplatformproject.shared.generated.resources.fogot_paswd_subtitle_email_step2
 import mymultiplatformproject.shared.generated.resources.fogot_paswd_subtitle_sms_step2
+import mymultiplatformproject.shared.generated.resources.fogot_paswd_subtitle_step0
 import mymultiplatformproject.shared.generated.resources.fogot_paswd_subtitle_step1
 import mymultiplatformproject.shared.generated.resources.fogot_paswd_subtitle_step3
 import mymultiplatformproject.shared.generated.resources.fogot_paswd_title_step1
@@ -165,12 +167,12 @@ class ForgotPasswordScreen : Screen {
                     selectedMethod = recoveryMethod,
                     onMethodSelected = { recoveryMethod = it }
                 )
-                3 -> Step2OutpInput(
+                3 -> Step3OutpInput(
                     otpCode = otpCode,
                     onOtpCodeChange = { otpCode = it },
                     selectedMethod = recoveryMethod,
                 )
-                4 -> Step3NewPassword(
+                4 -> Step4NewPassword(
                     newPassword = newPassword,
                     onNewPasswordChange = { newPassword = it },
                     confirmPassword = confirmPassword,
@@ -193,7 +195,7 @@ class ForgotPasswordScreen : Screen {
             ){
                 Text(
                     text = when (currentStep){
-                        1 -> stringResource(Res.string.btn_choice_method)
+                        1 -> stringResource(Res.string.btn_next)
                         2 -> stringResource(Res.string.btn_send_code)
                         3 -> stringResource(Res.string.btn_accept_code)
                         else -> stringResource(Res.string.btn_reset_paswd)
@@ -204,16 +206,29 @@ class ForgotPasswordScreen : Screen {
             }
         }
     }
+
+    // --- Крок 1: Ввід логіну ---
     @Composable
     fun Step1RecoveryMethod(loginOrEmail: String, onLoginOrEmailChange: (String) -> Unit){
         Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
             Text(
                 text = stringResource(Res.string.email_login_label),
-                fontWeight = FontWeight.SemiBold,
-                fontSize = 14.sp,
-                color = MaterialTheme.colorScheme.onBackground
+                modifier = Modifier.fillMaxWidth(),
+                fontSize = 32.sp,
+                fontWeight = FontWeight.ExtraBold,
+                textAlign = TextAlign.Start,
+                color = MaterialTheme.colorScheme.onBackground,
             )
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(12.dp))
+            Text(
+                text = stringResource(Res.string.fogot_paswd_subtitle_step0),
+                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f),
+                fontSize = 16.sp,
+                textAlign = TextAlign.Start,
+            )
+
+            Spacer(modifier = Modifier.height(32.dp))
+
             OutlinedTextField(
                 value = loginOrEmail,
                 onValueChange = onLoginOrEmailChange,
@@ -230,7 +245,7 @@ class ForgotPasswordScreen : Screen {
         }
     }
 
-    // --- Крок 1: Вибір способу ---
+    // --- Крок 2: Вибір способу ---
     @Composable
     fun Step2RecoveryMethod(selectedMethod: String, onMethodSelected: (String) -> Unit) {
         Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
@@ -312,9 +327,9 @@ class ForgotPasswordScreen : Screen {
         }
     }
 
-    // --- Крок 2: Введення OTP ---
+    // --- Крок 3: Введення OTP ---
     @Composable
-    fun Step2OutpInput(otpCode: String, onOtpCodeChange: (String) -> Unit, selectedMethod: String) {
+    fun Step3OutpInput(otpCode: String, onOtpCodeChange: (String) -> Unit, selectedMethod: String) {
         Column(
             modifier = Modifier.fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally
@@ -400,9 +415,9 @@ class ForgotPasswordScreen : Screen {
         }
     }
 
-    // --- КРОК 3: Новий пароль ---
+    // --- КРОК 4: Новий пароль ---
     @Composable
-    fun Step3NewPassword(
+    fun Step4NewPassword(
         newPassword: String,
         onNewPasswordChange: (String) -> Unit,
         confirmPassword: String,
@@ -563,7 +578,6 @@ class ForgotPasswordScreen : Screen {
                 }
             }
         }
-
     }
 }
 
