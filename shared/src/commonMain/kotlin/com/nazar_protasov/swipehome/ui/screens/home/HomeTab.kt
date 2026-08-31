@@ -211,9 +211,6 @@ internal class HomeScreen : Screen {
                                     // Додали клік
                                     PropertyCard(
                                         property = property.toUIProperty(),
-                                        onCardClick = {
-                                            rootNavigator.push(PropertyDetailsScreen(property.toUIDetailsProperty()))
-                                        }
                                     )
                                 }
                             } else {
@@ -248,6 +245,12 @@ internal class HomeScreen : Screen {
                             screenModel.onCardSwiped()
                             swipeCardState.snapToCenter()
                         }
+                    }
+                },
+                // Кнопка детальної інформації про оголошення
+                onDetailsClick = {
+                    if (properties.isNotEmpty()) {
+                        rootNavigator.push(PropertyDetailsScreen(properties.first().toUIDetailsProperty()))
                     }
                 },
                 onLikeClick = {

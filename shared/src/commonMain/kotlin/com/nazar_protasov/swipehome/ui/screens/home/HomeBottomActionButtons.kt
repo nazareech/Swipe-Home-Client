@@ -17,6 +17,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import mymultiplatformproject.shared.generated.resources.Res
 import mymultiplatformproject.shared.generated.resources.ic_dislike
+import mymultiplatformproject.shared.generated.resources.ic_double_arrow_up
 import mymultiplatformproject.shared.generated.resources.ic_heart
 import org.jetbrains.compose.resources.painterResource
 
@@ -25,6 +26,7 @@ import org.jetbrains.compose.resources.painterResource
 @Composable
 fun HomeBottomActionButtons(
     onDislikeClick: () -> Unit,
+    onDetailsClick: () -> Unit,
     onLikeClick: () -> Unit
 ) {
     Row(
@@ -47,6 +49,20 @@ fun HomeBottomActionButtons(
             elevation = ButtonDefaults.buttonElevation(4.dp)
         ) {
             Icon(painterResource(Res.drawable.ic_dislike), contentDescription = null, modifier = Modifier.size(32.dp))
+        }
+
+        // Кнопка Details (Деталі)
+        Button(
+            onClick = onDetailsClick,
+            modifier = Modifier.size(72.dp),
+            shape = CircleShape,
+            colors = ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colorScheme.tertiaryContainer,
+                contentColor = MaterialTheme.colorScheme.onTertiaryContainer
+            ),
+            elevation = ButtonDefaults.buttonElevation(4.dp)
+        ) {
+            Icon(painterResource(Res.drawable.ic_double_arrow_up), contentDescription = null, modifier = Modifier.size(32.dp))
         }
 
         // Кнопка Like (В обране)
