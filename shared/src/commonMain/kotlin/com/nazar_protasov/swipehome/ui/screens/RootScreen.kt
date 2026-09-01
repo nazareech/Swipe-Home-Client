@@ -20,6 +20,7 @@ import cafe.adriel.voyager.navigator.tab.LocalTabNavigator
 import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabNavigator
 import com.nazar_protasov.swipehome.ui.screens.home.HomeTab
+import com.nazar_protasov.swipehome.ui.screens.hub.SearchHubTab
 
 class RootScreen : Screen {
     override val key = uniqueScreenKey
@@ -27,6 +28,7 @@ class RootScreen : Screen {
     @Composable
     override fun Content() {
         val homeTab = remember { HomeTab() }
+        val searchHubTab = remember { SearchHubTab() }
 
         TabNavigator(homeTab) {
             Scaffold(
@@ -35,8 +37,8 @@ class RootScreen : Screen {
                         containerColor = MaterialTheme.colorScheme.background
                     ) {
                         TabNavigationItem(homeTab)
+                        TabNavigationItem(searchHubTab)
                         // TODO: Додамо інші вкладки, коли будуть створені
-                        // TabNavigationItem(FavoritesTab)
                         // TabNavigationItem(ChatsTab)
                         // TabNavigationItem(ProfileTab)
                     }

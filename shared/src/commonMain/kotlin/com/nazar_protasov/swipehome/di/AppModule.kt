@@ -2,6 +2,7 @@ package com.nazar_protasov.swipehome.di
 
 import com.nazar_protasov.swipehome.network.PropertyApiService
 import com.nazar_protasov.swipehome.ui.screens.home.HomeScreenModel
+import com.nazar_protasov.swipehome.ui.screens.hub.SearchHubScreenModel
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.serialization.kotlinx.json.json
@@ -24,5 +25,8 @@ val appModule: Module = module {
     }
 
     single { PropertyApiService(get()) }
+
+    // Моделі екранів (Factory, бо вони створюються заново для нових екранів)
     single { HomeScreenModel(get()) }
+    factory { SearchHubScreenModel() }
 }

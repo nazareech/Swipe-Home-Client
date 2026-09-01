@@ -10,7 +10,8 @@ data class Property(
     val location: String,
     val rooms: Int,
     val area: Double,
-    val buildingType: String
+    val buildingType: String,
+    val isNew: Boolean = false
 )
 
 data class PropertyDetails(
