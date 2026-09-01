@@ -10,6 +10,8 @@
     <string name="email_login_label">Email або Логін</string>
     <string name="password_label">Пароль</string>
     <string name="password_placeholder">Введіть ваш пароль</string>
+    <string name="btn_filter">Фільтри</string>
+    <string name="photo_description">Фото нерухомості</string>
 
     <!--    Екран Онбординг-->
     <string name="onboarding_title_1">Свайпни вправо, щоб зберегти\nбудинок своєї мрії</string>
@@ -44,7 +46,7 @@
 
     <!--    Екран реєстрації Крок 2-->
     <string name="reg_title_step2">Безпека</string>
-    <string name="reg_subtitle_step2">Створіть <надійний></надійний> облікові дані для захисту вашого акаунта.</string>
+    <string name="reg_subtitle_step2">Створіть надійні облікові дані для захисту вашого акаунта.</string>
     <string name="reg_hiden_password">Додайте щонайменше одну цифру та велику літеру</string>
     <string name="reg_password_placeholder">Створіть пароль</string>
 
@@ -55,7 +57,6 @@
     <string name="reg_profile_photo">Фото профілю</string>
     <string name="reg_name">Ім'я</string>
     <string name="reg_last_name">Прізвище</string>
-
 
     <!--    Екран реєстрації Крок 4-->
     <string name="reg_title_step4">Контакти</string>
@@ -157,5 +158,31 @@
     <string name="search_card_rooms_count">кімнати</string>
     <string name="search_card_section_area">(М²)</string>
 
+    <!-- Екран Детальної інформації -->
+    <string name="search_hub_title">Хаб пошуку</string>
+    <string name="search_hub_btn_comparison">Порівняння</string>
+    <string name="search_hub_saved">Збережені</string>
+    <string name="search_hub_rejected">Відхилені</string>
+    <string name="search_hub_saved_options">Збережені варіанти</string>
+    <string name="search_hub_rejected_options">Відхилені варіанти</string>
+    <string name="search_hub_count_objects">об'єктів</string>
+    <string name="search_hub_btn_all">Усі</string>
+    <string name="search_hub_btn_new">Нові</string>
+    <!--Статистика-->
+    <string name="search_hub_statistic_title">СТАТИСТИКА ПОШУКУ</string>
+    <string name="search_hub_statistic_views">Переглянуто</string>
+    <string name="search_hub_statistic_likes">Вподобано</string>
+    <string name="search_hub_statistic_rejected">Відхилено</string>
+
+    <string name="search_hub_btn_to_comparsion">Порівняти</string>
+
+    <!--Bottom Sheet для детального порівняння-->
+    <string name="search_hub_detailed_comparsion_table_title">ДЕТАЛЬНЕ ПОРІВНЯННЯ</string>
+    <string name="search_hub_detailed_comparsion_table_specificstion">Характеристика</string>
+    <string name="search_hub_detailed_comparsion_table_object">Об'єкт</string>
+    <string name="search_hub_detailed_comparsion_table_row_type">Тип</string>
+    <string name="search_hub_detailed_comparsion_table_row_price">Ціна</string>
+    <string name="search_hub_detailed_comparsion_table_row_localization">Локалізація</string>
+    <string name="search_hub_detailed_comparsion_table_row_area">Площа</string>
 
 </resources>

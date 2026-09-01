@@ -22,7 +22,7 @@ import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
-import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -42,7 +42,23 @@ import com.nazar_protasov.swipehome.ui.models.Property
 import mymultiplatformproject.shared.generated.resources.Res
 import mymultiplatformproject.shared.generated.resources.ic_heart
 import mymultiplatformproject.shared.generated.resources.ic_location_pin
+import mymultiplatformproject.shared.generated.resources.photo_description
+import mymultiplatformproject.shared.generated.resources.search_hub_btn_new
+import mymultiplatformproject.shared.generated.resources.search_hub_btn_to_comparsion
+import mymultiplatformproject.shared.generated.resources.search_hub_count_objects
+import mymultiplatformproject.shared.generated.resources.search_hub_detailed_comparsion_table_object
+import mymultiplatformproject.shared.generated.resources.search_hub_detailed_comparsion_table_row_area
+import mymultiplatformproject.shared.generated.resources.search_hub_detailed_comparsion_table_row_localization
+import mymultiplatformproject.shared.generated.resources.search_hub_detailed_comparsion_table_row_price
+import mymultiplatformproject.shared.generated.resources.search_hub_detailed_comparsion_table_row_type
+import mymultiplatformproject.shared.generated.resources.search_hub_detailed_comparsion_table_specificstion
+import mymultiplatformproject.shared.generated.resources.search_hub_detailed_comparsion_table_title
+import mymultiplatformproject.shared.generated.resources.search_hub_statistic_likes
+import mymultiplatformproject.shared.generated.resources.search_hub_statistic_rejected
+import mymultiplatformproject.shared.generated.resources.search_hub_statistic_title
+import mymultiplatformproject.shared.generated.resources.search_hub_statistic_views
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun StatisticsSection(){
@@ -53,14 +69,14 @@ fun StatisticsSection(){
         elevation = CardDefaults.cardElevation(2.dp)
     ){
         Column(modifier = Modifier.padding(16.dp)) {
-            Text("СТАТИСТИКА ПОШУКУ", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = Color.Gray)
+            Text(stringResource(Res.string.search_hub_statistic_title), fontSize = 12.sp, fontWeight = FontWeight.Bold, color = Color.Gray)
             Spacer(modifier = Modifier.height(12.dp))
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                StatItem("150", "Переглянуто", true, Modifier.weight(1f))
+                StatItem("150", stringResource(Res.string.search_hub_statistic_views), true, Modifier.weight(1f))
                 Spacer(modifier = Modifier.width(8.dp))
-                StatItem("12", "Вподобано", false, Modifier.weight(1f))
+                StatItem("12", stringResource(Res.string.search_hub_statistic_likes), false, Modifier.weight(1f))
                 Spacer(modifier = Modifier.width(8.dp))
-                StatItem("138", "Відхилено", false, Modifier.weight(1f))
+                StatItem("138", stringResource(Res.string.search_hub_statistic_rejected), false, Modifier.weight(1f))
             }
         }
     }
@@ -118,7 +134,7 @@ fun HubGridCard(
         Box(modifier = Modifier.fillMaxWidth()) {
             AsyncImage(
                 model = property.imagesUrl,
-                contentDescription = "Фото нерухомості",
+                contentDescription = stringResource(Res.string.photo_description),
                 contentScale = ContentScale.Crop,
                 modifier = Modifier.fillMaxWidth()
             )
@@ -133,7 +149,7 @@ fun HubGridCard(
                 )
             )
 
-            // Чекбокс і бейдж "Нове"
+            // Чек бокс і бейдж "Нове"
             Row(
                 modifier = Modifier.fillMaxWidth().padding(8.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -147,14 +163,14 @@ fun HubGridCard(
                             colors = CheckboxDefaults.colors(checkedColor = Color(0xFF00695C), uncheckedColor = Color.White)
                         )
                     }
-                    if(property.isNew == true){ // Припускаємо, що додано поле
+                    if (property.isNew) { // Припускаємо, що додано поле
                         Box(
                             modifier = Modifier
                                 .clip(RoundedCornerShape(4.dp))
                                 .background(Color.White)
                                 .padding(horizontal = 6.dp, vertical = 2.dp)
                         ){
-                            Text("Нове", color = Color(0xFF00695C), fontSize = 10.sp, fontWeight = FontWeight.Bold)
+                            Text(stringResource(Res.string.search_hub_btn_new), color = Color(0xFF00695C), fontSize = 10.sp, fontWeight = FontWeight.Bold)
                         }
                     }
                 }
@@ -207,7 +223,7 @@ fun CompareFloatingBar(
             selectedProperties.take(3).forEach { property ->
                 AsyncImage(
                     model = property.imagesUrl,
-                    contentDescription = "Фото нерухомості",
+                    contentDescription = stringResource(Res.string.photo_description),
                     modifier = Modifier.size(40.dp).clip(CircleShape).border(2.dp, Color.White, CircleShape)
                 )
             }
@@ -218,7 +234,7 @@ fun CompareFloatingBar(
             colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF00695C)),
             shape = RoundedCornerShape(8.dp),
         ){
-            Text("Порівняти ($selectedCount) об'єкти")
+            Text("${stringResource(Res.string.search_hub_btn_to_comparsion)} ($selectedCount) ${stringResource(Res.string.search_hub_count_objects)}")
         }
     }
 }
@@ -226,20 +242,20 @@ fun CompareFloatingBar(
 @Composable
 fun ComparisonTableContent(selectedProperties: List<Property>){
     Column(modifier = Modifier.fillMaxWidth().padding(16.dp)) {
-        Text("", fontSize = 14.sp, fontWeight = FontWeight.Bold, color = Color.Gray)
+        Text(stringResource(Res.string.search_hub_detailed_comparsion_table_title), fontSize = 14.sp, fontWeight = FontWeight.Bold, color = Color.Gray)
         Spacer(modifier = Modifier.height(16.dp))
 
         // Заголовок таблиці
         Row(modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)) {
             Text(
-                "Характеристика",
+                stringResource(Res.string.search_hub_detailed_comparsion_table_specificstion),
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.weight(1.5f)
             )
             selectedProperties.fastForEachIndexed { index, _ ->
                 Text(
-                    "Об'єкт ${index + 1}",
+                    "${stringResource(Res.string.search_hub_detailed_comparsion_table_object)} ${index + 1}",
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.weight(1f),
@@ -247,13 +263,13 @@ fun ComparisonTableContent(selectedProperties: List<Property>){
                 )
             }
         }
-        Divider(color = Color.LightGray)
+        HorizontalDivider(color = Color.LightGray)
 
         // Рядки таблиці
-        ComparisonRow("Тип", selectedProperties.map { it.buildingType })
-        ComparisonRow("Ціна", selectedProperties.map { it.price })
-        ComparisonRow("Локалізація", selectedProperties.map { it.location })
-        ComparisonRow("Площа", selectedProperties.map { it.area.toString() })
+        ComparisonRow(stringResource(Res.string.search_hub_detailed_comparsion_table_row_type), selectedProperties.map { it.buildingType })
+        ComparisonRow(stringResource(Res.string.search_hub_detailed_comparsion_table_row_price), selectedProperties.map { it.price })
+        ComparisonRow(stringResource(Res.string.search_hub_detailed_comparsion_table_row_localization), selectedProperties.map { it.location })
+        ComparisonRow(stringResource(Res.string.search_hub_detailed_comparsion_table_row_area), selectedProperties.map { it.area.toString() })
 
         Spacer(modifier = Modifier.height(32.dp))
     }
@@ -267,5 +283,5 @@ fun ComparisonRow(label: String, values: List<String>){
             Text(value, modifier = Modifier.weight(1f), fontSize = 14.sp, fontWeight = FontWeight.Medium)
         }
     }
-    Divider(color = Color.Gray, thickness = 0.5.dp)
+    HorizontalDivider(color = Color.Gray, thickness = 0.5.dp)
 }

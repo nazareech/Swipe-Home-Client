@@ -25,8 +25,10 @@ import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import mymultiplatformproject.shared.generated.resources.Res
+import mymultiplatformproject.shared.generated.resources.app_name
 import mymultiplatformproject.shared.generated.resources.ic_filtres_tune
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun HomeTopBar(homeScreenModel: HomeScreenModel) {
@@ -52,7 +54,7 @@ fun HomeTopBar(homeScreenModel: HomeScreenModel) {
 
         // Логотип / Заголовок
         Text(
-            text = "Swipe Home",
+            text = stringResource(Res.string.app_name),
             fontSize = 22.sp,
             fontWeight = FontWeight.ExtraBold,
             color = MaterialTheme.colorScheme.primary

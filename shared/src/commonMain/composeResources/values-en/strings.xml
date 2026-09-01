@@ -10,6 +10,8 @@
     <string name="email_login_label">Email or Login</string>
     <string name="password_label">Password</string>
     <string name="password_placeholder">Enter your password</string>
+    <string name="btn_filter">Filters</string>
+    <string name="photo_description">Real estate photos</string>
 
     <!--    Екран Онбординг-->
     <string name="onboarding_title_1">Swipe Right ti Save\nYour Dream Home</string>
@@ -63,7 +65,6 @@
     <string name="reg_rules_agree">I agree to the Terms of Use and Privacy Policy</string>
 
     <!-- Екран відновлення пароля -->
-
     <string name="fogot_paswd_subtitle_step0">Enter your email address or username so we can find your account and send you a verification code.</string>
 
     <string name="fogot_paswd_title_step1">Enter data</string>
@@ -81,7 +82,6 @@
     <string name="fogot_paswd_header_step2">Enter code</string>
     <string name="fogot_paswd_subtitle_email_step2">We've sent a code to your email address</string>
     <string name="fogot_paswd_subtitle_sms_step2">We've sent a code to your phone number</string>
-
 
     <string name="fogot_paswd_method_sms_title">Via SMS</string>
     <string name="fogot_paswd_method_sms_subtitle">We will send a code to your number</string>
@@ -157,5 +157,33 @@
 
     <string name="search_card_rooms_count">rooms</string>
     <string name="search_card_section_area">(М²)</string>
+
+    <!-- Екран Детальної інформації -->
+    <string name="search_hub_title">Search Hub</string>
+    <string name="search_hub_btn_comparison">Compare</string>
+    <string name="search_hub_saved">Saved</string>
+    <string name="search_hub_rejected">Rejected</string>
+    <string name="search_hub_saved_options">Saved Options</string>
+    <string name="search_hub_rejected_options">Rejected Options</string>
+    <string name="search_hub_count_objects">objects</string>
+    <string name="search_hub_btn_all">All</string>
+    <string name="search_hub_btn_new">New</string>
+    <!--Статистика-->
+    <string name="search_hub_statistic_title">SEARCH STATISTICS</string>
+    <string name="search_hub_statistic_views">Views</string>
+    <string name="search_hub_statistic_likes">Likes</string>
+    <string name="search_hub_statistic_rejected">Rejected</string>
+
+    <string name="search_hub_btn_to_comparsion">Compare</string>
+
+    <!--Bottom Sheet для детального порівняння-->
+    <string name="search_hub_detailed_comparsion_table_title">DETAILED COMPARISON</string>
+    <string name="search_hub_detailed_comparsion_table_specificstion">Specifications</string>
+    <string name="search_hub_detailed_comparsion_table_object">Object</string>
+    <string name="search_hub_detailed_comparsion_table_row_type">Type</string>
+    <string name="search_hub_detailed_comparsion_table_row_price">Price</string>
+    <string name="search_hub_detailed_comparsion_table_row_localization">Localization</string>
+    <string name="search_hub_detailed_comparsion_table_row_area">Area</string>
+
 
 </resources>

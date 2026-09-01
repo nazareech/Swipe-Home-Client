@@ -33,8 +33,19 @@ import com.nazar_protasov.swipehome.ui.components.ComparisonTableContent
 import com.nazar_protasov.swipehome.ui.components.HubGridCard
 import com.nazar_protasov.swipehome.ui.components.StatisticsSection
 import mymultiplatformproject.shared.generated.resources.Res
+import mymultiplatformproject.shared.generated.resources.btn_filter
 import mymultiplatformproject.shared.generated.resources.ic_filtres_tune
+import mymultiplatformproject.shared.generated.resources.search_hub_btn_all
+import mymultiplatformproject.shared.generated.resources.search_hub_btn_comparison
+import mymultiplatformproject.shared.generated.resources.search_hub_btn_new
+import mymultiplatformproject.shared.generated.resources.search_hub_count_objects
+import mymultiplatformproject.shared.generated.resources.search_hub_rejected
+import mymultiplatformproject.shared.generated.resources.search_hub_rejected_options
+import mymultiplatformproject.shared.generated.resources.search_hub_saved
+import mymultiplatformproject.shared.generated.resources.search_hub_saved_options
+import mymultiplatformproject.shared.generated.resources.search_hub_title
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
 
 class SearchHubTab : Tab {
@@ -69,7 +80,7 @@ internal object SearchHubScreen : Screen {
                 CenterAlignedTopAppBar(
                     title = {
                         Text(
-                            "Хаб пошуку",
+                            stringResource(Res.string.search_hub_title),
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.onBackground
                         )
@@ -80,7 +91,7 @@ internal object SearchHubScreen : Screen {
                         IconButton(onClick = { /*TODO: Фільтри*/ }) {
                             Icon(
                                 painterResource(Res.drawable.ic_filtres_tune),
-                                contentDescription = "Фільтри"
+                                contentDescription = stringResource(Res.string.btn_filter)
                             )
                         }
                     }
@@ -130,7 +141,7 @@ internal object SearchHubScreen : Screen {
                                 shape = RoundedCornerShape(24.dp),
                                 modifier = Modifier.height(40.dp)
                             ) {
-                                Text("Порівняння", color = Color.White)
+                                Text(stringResource(Res.string.search_hub_btn_comparison), color = Color.White)
                             }
 
                             Spacer(modifier = Modifier.height(16.dp))
@@ -151,7 +162,7 @@ internal object SearchHubScreen : Screen {
                                     onClick = { screenModel.setTabIndex(0) },
                                     text = {
                                         Text(
-                                            "Збережені",
+                                            stringResource(Res.string.search_hub_saved),
                                             fontWeight = FontWeight.Bold,
                                             color = if (selectedTab == 0) MaterialTheme.colorScheme.onBackground else MaterialTheme.colorScheme.onBackground.copy(
                                                 alpha = 0.6f
@@ -165,7 +176,7 @@ internal object SearchHubScreen : Screen {
                                     onClick = { screenModel.setTabIndex(1) },
                                     text = {
                                         Text(
-                                            "Відхилені",
+                                            stringResource(Res.string.search_hub_rejected),
                                             fontWeight = FontWeight.Bold,
                                             color = if (selectedTab == 1) MaterialTheme.colorScheme.onBackground else MaterialTheme.colorScheme.onBackground.copy(
                                                 alpha = 0.6f
@@ -187,19 +198,19 @@ internal object SearchHubScreen : Screen {
                         ) {
                             Column {
                                 Text(
-                                    if (selectedTab == 0) "Збережені варіанти" else "Відхилені варіанти",
+                                    if (selectedTab == 0) stringResource(Res.string.search_hub_saved_options) else stringResource(Res.string.search_hub_rejected_options),
                                     fontSize = 16.sp,
                                     fontWeight = FontWeight.Medium,
                                     color = MaterialTheme.colorScheme.onBackground
                                 )
                                 Text(
-                                    "${currentList.size} об'єктів",
+                                    "${currentList.size} ${stringResource(Res.string.search_hub_count_objects)}",
                                     color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f)
                                 )
                             }
                             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                                BadgeChip("Усі", true)
-                                BadgeChip("Нові", false)
+                                BadgeChip(stringResource(Res.string.search_hub_btn_all), true)
+                                BadgeChip(stringResource(Res.string.search_hub_btn_new), false)
                             }
                         }
                     }
