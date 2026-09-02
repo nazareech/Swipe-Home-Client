@@ -1,0 +1,25 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <!-- Коромисло терезів (основа для порівняння) -->
+    <path
+        android:fillColor="#FF212121"
+        android:pathData="M12,2A1,1 0,0 1,13 3V4.08A7,7 0,0 1,19 11V12H5V11A7,7 0,0 1,11 4.08V3A1,1 0,0 1,12 2Z" />
+
+    <!-- Ліва шалька: Відхилене оголошення (Картка з хрестиком) -->
+    <path
+        android:fillColor="#F44336"
+        android:pathData="M2,14H8A1,1 0,0 1,9 15V20A1,1 0,0 1,8 21H2A1,1 0,0 1,1 20V15A1,1 0,0 1,2 14ZM4,16.2L2.8,17.4L4,18.6L5.2,17.4L4,16.2ZM6.8,16.2L5.6,17.4L6.8,18.6L8,17.4L6.8,16.2Z" />
+
+    <!-- Права шалька: Збережене оголошення (Картка з сердечком) -->
+    <path
+        android:fillColor="#4CAF50"
+        android:pathData="M16,14H22A1,1 0,0 1,23 15V20A1,1 0,0 1,22 21H16A1,1 0,0 1,15 20V15A1,1 0,0 1,16,14ZM19,16.2C18.5,15.7 17.7,15.7 17.3,16.2C16.9,16.6 16.9,17.3 17.3,17.7L19,19.4L20.7,17.7C21.1,17.3 21.1,16.6 20.7,16.2C20.3,15.7 19.5,15.7 19,16.2Z" />
+
+    <!-- Нижня підставка терезів (стабільність та баланс) -->
+    <path
+        android:fillColor="#FF212121"
+        android:pathData="M11,13H13V20H18V22H6V20H11V13Z" />
+</vector>

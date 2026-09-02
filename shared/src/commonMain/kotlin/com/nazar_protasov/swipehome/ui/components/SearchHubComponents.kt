@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -24,7 +23,6 @@ import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -35,10 +33,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.compose.ui.util.fastForEachIndexed
 import coil3.compose.AsyncImage
 import com.nazar_protasov.swipehome.ui.models.Property
+import com.nazar_protasov.swipehome.ui.theme.SwipeHomeTheme
 import mymultiplatformproject.shared.generated.resources.Res
 import mymultiplatformproject.shared.generated.resources.ic_heart
 import mymultiplatformproject.shared.generated.resources.ic_location_pin
@@ -64,12 +62,17 @@ import org.jetbrains.compose.resources.stringResource
 fun StatisticsSection(){
     Card(
         modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
-        shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
+        shape = SwipeHomeTheme.shapes.mediumShape,
+        colors = CardDefaults.cardColors(containerColor = SwipeHomeTheme.colors.surface),
         elevation = CardDefaults.cardElevation(2.dp)
     ){
         Column(modifier = Modifier.padding(16.dp)) {
-            Text(stringResource(Res.string.search_hub_statistic_title), fontSize = 12.sp, fontWeight = FontWeight.Bold, color = Color.Gray)
+            Text(
+                stringResource(Res.string.search_hub_statistic_title),
+                style = SwipeHomeTheme.typography.caption,
+                fontWeight = FontWeight.Bold,
+                color = SwipeHomeTheme.colors.onSurfaceSecondary
+            )
             Spacer(modifier = Modifier.height(12.dp))
             Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
                 StatItem("150", stringResource(Res.string.search_hub_statistic_views), true, Modifier.weight(1f))
@@ -84,18 +87,18 @@ fun StatisticsSection(){
 
 @Composable
 fun StatItem(value: String, label: String, isHighlighted: Boolean, modifier: Modifier = Modifier){
-    val bgColor = if (isHighlighted) Color(0xFFB2DFDB) else Color(0xFFF5F5F5)
-    val textColor = if (isHighlighted) Color(0xFF00695C) else Color.Black
+    val bgColor = if (isHighlighted) SwipeHomeTheme.colors.primary.copy(alpha = 0.15f) else SwipeHomeTheme.colors.background
+    val textColor = if (isHighlighted) SwipeHomeTheme.colors.primary else SwipeHomeTheme.colors.onSurface
 
     Box(modifier = modifier
-        .clip(RoundedCornerShape(8.dp))
+        .clip(SwipeHomeTheme.shapes.smallShape)
         .background(bgColor)
         .padding(vertical = 12.dp),
         contentAlignment = Alignment.Center
     ){
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Text(value, color = textColor, fontSize = 20.sp, fontWeight = FontWeight.Bold)
-            Text(label, color = if(isHighlighted) textColor else Color.Gray , fontSize = 11.sp)
+            Text(value, color = textColor, style = SwipeHomeTheme.typography.subheadline, fontWeight = FontWeight.Bold)
+            Text(label, color = if(isHighlighted) textColor else SwipeHomeTheme.colors.onSurfaceSecondary, style = SwipeHomeTheme.typography.caption)
         }
     }
 }
@@ -104,11 +107,16 @@ fun StatItem(value: String, label: String, isHighlighted: Boolean, modifier: Mod
 fun BadgeChip(text: String, isSelected: Boolean) {
     Box(
         modifier = Modifier
-            .clip(RoundedCornerShape(16.dp))
-            .background(if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.secondary)
+            .clip(SwipeHomeTheme.shapes.mediumShape)
+            .background(if (isSelected) SwipeHomeTheme.colors.primary else SwipeHomeTheme.colors.surface)
             .padding(horizontal = 12.dp, vertical = 6.dp)
     ){
-        Text(text, color = if (isSelected) Color.White else Color.Black, fontSize = 12.sp, fontWeight = FontWeight.Medium)
+        Text(
+            text,
+            color = if (isSelected) SwipeHomeTheme.colors.onPrimary else SwipeHomeTheme.colors.onSurface,
+            style = SwipeHomeTheme.typography.caption,
+            fontWeight = FontWeight.Medium
+        )
     }
 }
 
@@ -126,10 +134,10 @@ fun HubGridCard(
             .clickable { onClick() }
             .border(
                 width = if (isSelected) 2.dp else 0.dp,
-                color = if (isSelected) Color(0xFF00695C) else Color.Transparent,
-                shape = RoundedCornerShape(16.dp)
+                color = if (isSelected) SwipeHomeTheme.colors.primary else Color.Transparent,
+                shape = SwipeHomeTheme.shapes.mediumShape
             ),
-        shape = RoundedCornerShape(16.dp)
+        shape = SwipeHomeTheme.shapes.mediumShape
     ) {
         Box(modifier = Modifier.fillMaxWidth()) {
             AsyncImage(
@@ -160,17 +168,25 @@ fun HubGridCard(
                         Checkbox(
                             checked = isSelected,
                             onCheckedChange = { onClick() },
-                            colors = CheckboxDefaults.colors(checkedColor = Color(0xFF00695C), uncheckedColor = Color.White)
+                            colors = CheckboxDefaults.colors(
+                                checkedColor = SwipeHomeTheme.colors.primary,
+                                uncheckedColor = Color.White
+                            )
                         )
                     }
-                    if (property.isNew) { // Припускаємо, що додано поле
+                    if (property.isNew) {
                         Box(
                             modifier = Modifier
-                                .clip(RoundedCornerShape(4.dp))
-                                .background(Color.White)
+                                .clip(SwipeHomeTheme.shapes.smallShape)
+                                .background(SwipeHomeTheme.colors.background)
                                 .padding(horizontal = 6.dp, vertical = 2.dp)
                         ){
-                            Text(stringResource(Res.string.search_hub_btn_new), color = Color(0xFF00695C), fontSize = 10.sp, fontWeight = FontWeight.Bold)
+                            Text(
+                                stringResource(Res.string.search_hub_btn_new),
+                                color = SwipeHomeTheme.colors.primary,
+                                style = SwipeHomeTheme.typography.caption,
+                                fontWeight = FontWeight.Bold
+                            )
                         }
                     }
                 }
@@ -180,10 +196,10 @@ fun HubGridCard(
                     modifier = Modifier
                         .size(28.dp)
                         .clip(CircleShape)
-                        .background(Color.White),
+                        .background(SwipeHomeTheme.colors.background),
                     contentAlignment = Alignment.Center
                 ){
-                    Icon(painterResource(Res.drawable.ic_heart), contentDescription = "Збережене", tint = Color.Red)
+                    Icon(painterResource(Res.drawable.ic_heart), contentDescription = "Збережене", tint = SwipeHomeTheme.colors.secondary)
                 }
             }
 
@@ -193,11 +209,11 @@ fun HubGridCard(
                     .align(Alignment.BottomStart)
                     .padding(12.dp)
             ){
-              Text(property.price, fontSize = 18.sp, fontWeight = FontWeight.Bold, color = Color.White)
+                Text(property.price, style = SwipeHomeTheme.typography.subheadline, fontWeight = FontWeight.Bold, color = Color.White)
                 Row(verticalAlignment = Alignment.CenterVertically){
                     Icon(painterResource(Res.drawable.ic_location_pin), contentDescription = null, modifier = Modifier.size(10.dp), tint = Color.White)
                     Spacer(modifier = Modifier.width(4.dp))
-                    Text("${ property.buildingType }, ${ property.location }", fontSize = 12.sp, color = Color.White)
+                    Text("${ property.buildingType }, ${ property.location }", style = SwipeHomeTheme.typography.caption, color = Color.White)
                 }
             }
         }
@@ -211,8 +227,8 @@ fun CompareFloatingBar(
     onCompareClick: () -> Unit
 ){
     Card(
-        shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(containerColor = Color.White),
+        shape = SwipeHomeTheme.shapes.mediumShape,
+        colors = CardDefaults.cardColors(containerColor = SwipeHomeTheme.colors.surface),
         elevation = CardDefaults.cardElevation(8.dp)
     ){
         Row(
@@ -224,17 +240,20 @@ fun CompareFloatingBar(
                 AsyncImage(
                     model = property.imagesUrl,
                     contentDescription = stringResource(Res.string.photo_description),
-                    modifier = Modifier.size(40.dp).clip(CircleShape).border(2.dp, Color.White, CircleShape)
+                    modifier = Modifier.size(40.dp).clip(CircleShape).border(2.dp, SwipeHomeTheme.colors.background, CircleShape)
                 )
             }
         }
 
         Button(
             onClick = onCompareClick,
-            colors = ButtonDefaults.buttonColors(containerColor = Color(0xFF00695C)),
-            shape = RoundedCornerShape(8.dp),
+            colors = ButtonDefaults.buttonColors(containerColor = SwipeHomeTheme.colors.primary),
+            shape = SwipeHomeTheme.shapes.smallShape,
         ){
-            Text("${stringResource(Res.string.search_hub_btn_to_comparsion)} ($selectedCount) ${stringResource(Res.string.search_hub_count_objects)}")
+            Text(
+                "${stringResource(Res.string.search_hub_btn_to_comparsion)} ($selectedCount) ${stringResource(Res.string.search_hub_count_objects)}",
+                style = SwipeHomeTheme.typography.label
+            )
         }
     }
 }
@@ -242,28 +261,34 @@ fun CompareFloatingBar(
 @Composable
 fun ComparisonTableContent(selectedProperties: List<Property>){
     Column(modifier = Modifier.fillMaxWidth().padding(16.dp)) {
-        Text(stringResource(Res.string.search_hub_detailed_comparsion_table_title), fontSize = 14.sp, fontWeight = FontWeight.Bold, color = Color.Gray)
+        Text(
+            stringResource(Res.string.search_hub_detailed_comparsion_table_title),
+            style = SwipeHomeTheme.typography.label,
+            fontWeight = FontWeight.Bold,
+            color = SwipeHomeTheme.colors.onSurfaceSecondary
+        )
         Spacer(modifier = Modifier.height(16.dp))
 
         // Заголовок таблиці
         Row(modifier = Modifier.fillMaxWidth().padding(vertical = 8.dp)) {
             Text(
                 stringResource(Res.string.search_hub_detailed_comparsion_table_specificstion),
-                fontSize = 14.sp,
+                style = SwipeHomeTheme.typography.label,
                 fontWeight = FontWeight.Bold,
+                color = SwipeHomeTheme.colors.neutral,
                 modifier = Modifier.weight(1.5f)
             )
             selectedProperties.fastForEachIndexed { index, _ ->
                 Text(
                     "${stringResource(Res.string.search_hub_detailed_comparsion_table_object)} ${index + 1}",
-                    fontSize = 14.sp,
+                    style = SwipeHomeTheme.typography.label,
                     fontWeight = FontWeight.Bold,
                     modifier = Modifier.weight(1f),
-                    color = Color(0xFF00695C)
+                    color = SwipeHomeTheme.colors.primary
                 )
             }
         }
-        HorizontalDivider(color = Color.LightGray)
+        HorizontalDivider(color = SwipeHomeTheme.colors.outline)
 
         // Рядки таблиці
         ComparisonRow(stringResource(Res.string.search_hub_detailed_comparsion_table_row_type), selectedProperties.map { it.buildingType })
@@ -278,10 +303,21 @@ fun ComparisonTableContent(selectedProperties: List<Property>){
 @Composable
 fun ComparisonRow(label: String, values: List<String>){
     Row(modifier = Modifier.fillMaxWidth().padding(vertical = 12.dp)){
-        Text(label, modifier = Modifier.weight(1.5f), color = Color.DarkGray, fontSize = 14.sp)
+        Text(
+            label,
+            modifier = Modifier.weight(1.5f),
+            color = SwipeHomeTheme.colors.onSurfaceSecondary,
+            style = SwipeHomeTheme.typography.label
+        )
         values.forEach { value ->
-            Text(value, modifier = Modifier.weight(1f), fontSize = 14.sp, fontWeight = FontWeight.Medium)
+            Text(
+                value,
+                modifier = Modifier.weight(1f),
+                color = SwipeHomeTheme.colors.neutral,
+                style = SwipeHomeTheme.typography.label,
+                fontWeight = FontWeight.Medium
+            )
         }
     }
-    HorizontalDivider(color = Color.Gray, thickness = 0.5.dp)
+    HorizontalDivider(color = SwipeHomeTheme.colors.outline, thickness = 0.5.dp)
 }

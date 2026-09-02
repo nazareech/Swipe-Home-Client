@@ -15,17 +15,16 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -54,8 +53,17 @@ import cafe.adriel.voyager.core.screen.uniqueScreenKey
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import coil3.compose.AsyncImage
+import com.nazar_protasov.swipehome.ui.theme.SwipeHomeTheme
 import com.nazar_protasov.swipehome.ui.utils.PhoneVisualTransformation
+import com.preat.peekaboo.image.picker.SelectionMode
+import com.preat.peekaboo.image.picker.rememberImagePickerLauncher
 import mymultiplatformproject.shared.generated.resources.Res
+import mymultiplatformproject.shared.generated.resources.app_name
+import mymultiplatformproject.shared.generated.resources.btn_back
+import mymultiplatformproject.shared.generated.resources.btn_next
+import mymultiplatformproject.shared.generated.resources.btn_register
+import mymultiplatformproject.shared.generated.resources.email_login_label
+import mymultiplatformproject.shared.generated.resources.fogot_paswd_strength_prefix
 import mymultiplatformproject.shared.generated.resources.ic_apple_logo
 import mymultiplatformproject.shared.generated.resources.ic_arrow_back
 import mymultiplatformproject.shared.generated.resources.ic_arrow_next
@@ -65,16 +73,6 @@ import mymultiplatformproject.shared.generated.resources.ic_eye_hidden
 import mymultiplatformproject.shared.generated.resources.ic_eye_visible
 import mymultiplatformproject.shared.generated.resources.ic_google_logo
 import mymultiplatformproject.shared.generated.resources.ic_hint
-import org.jetbrains.compose.resources.painterResource
-import kotlin.repeat
-import com.preat.peekaboo.image.picker.rememberImagePickerLauncher
-import com.preat.peekaboo.image.picker.SelectionMode
-import mymultiplatformproject.shared.generated.resources.app_name
-import mymultiplatformproject.shared.generated.resources.btn_back
-import mymultiplatformproject.shared.generated.resources.btn_next
-import mymultiplatformproject.shared.generated.resources.btn_register
-import mymultiplatformproject.shared.generated.resources.email_login_label
-import mymultiplatformproject.shared.generated.resources.fogot_paswd_strength_prefix
 import mymultiplatformproject.shared.generated.resources.or_divider
 import mymultiplatformproject.shared.generated.resources.password_label
 import mymultiplatformproject.shared.generated.resources.password_strength_medium
@@ -104,6 +102,7 @@ import mymultiplatformproject.shared.generated.resources.reg_title_step1
 import mymultiplatformproject.shared.generated.resources.reg_title_step2
 import mymultiplatformproject.shared.generated.resources.reg_title_step3
 import mymultiplatformproject.shared.generated.resources.reg_title_step4
+import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 
 class RegisterScreen: Screen {
@@ -143,7 +142,7 @@ class RegisterScreen: Screen {
             modifier = Modifier
                 .fillMaxSize()
                 .verticalScroll(scrollState)
-                .background(MaterialTheme.colorScheme.background)
+                .background(SwipeHomeTheme.colors.background)
                 .padding(horizontal = 24.dp)
                 .padding(top = 16.dp, bottom = 24.dp)
         ){
@@ -161,15 +160,14 @@ class RegisterScreen: Screen {
                     Icon(
                         painter = painterResource(Res.drawable.ic_arrow_back),
                         contentDescription = stringResource(Res.string.btn_back),
-                        tint = MaterialTheme.colorScheme.onBackground
+                        tint = SwipeHomeTheme.colors.neutral
                     )
                 }
 
                 Text(
                     text = stringResource(Res.string.app_name),
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.primary,
+                    style = SwipeHomeTheme.typography.subheadline,
+                    color = SwipeHomeTheme.colors.primary,
                     modifier = Modifier.weight(1f),
                     textAlign = TextAlign.Center
                 )
@@ -192,10 +190,10 @@ class RegisterScreen: Screen {
                             .padding(horizontal = 4.dp)
                             .height(4.dp)
                             .width(32.dp)
-                            .clip(RoundedCornerShape(2.dp))
+                            .clip(SwipeHomeTheme.shapes.smallShape)
                             .background(
-                                if (stepNumber <= currentStep) MaterialTheme.colorScheme.primary
-                                else MaterialTheme.colorScheme.onBackground.copy(alpha = 0.2f)
+                                if (stepNumber <= currentStep) SwipeHomeTheme.colors.primary
+                                else SwipeHomeTheme.colors.outline
                             )
                     )
                 }
@@ -206,13 +204,12 @@ class RegisterScreen: Screen {
                     .fillMaxWidth()
                     .padding(top = 8.dp),
                 textAlign = TextAlign.Center,
-                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f),
-                fontSize = 12.sp
+                color = SwipeHomeTheme.colors.onSurfaceSecondary,
+                style = SwipeHomeTheme.typography.caption
             )
 
             Spacer(modifier = Modifier.height(32.dp))
 
-            // --------Вміст поточного кроку--------
             when (currentStep){
                 1 -> Step1Content(email = email, onEmailChange = { email = it })
                 2 -> Step2Content(email = email, onEmailChange = { email = it }, password = password, onPasswordChange = { password = it })
@@ -244,15 +241,16 @@ class RegisterScreen: Screen {
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(56.dp),
-                    shape = RoundedCornerShape(12.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
+                    shape = SwipeHomeTheme.shapes.smallShape,
+                    colors = ButtonDefaults.buttonColors(containerColor = SwipeHomeTheme.colors.primary)
                 ) {
-                    Text(stringResource(Res.string.btn_next), fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                    Text(stringResource(Res.string.btn_next), style = SwipeHomeTheme.typography.body, fontWeight = FontWeight.Bold, color = SwipeHomeTheme.colors.onPrimary)
                     Spacer(modifier = Modifier.width(8.dp))
                     Icon(
                         painterResource(Res.drawable.ic_arrow_next),
                         contentDescription = null,
-                        modifier = Modifier.size(20.dp)
+                        modifier = Modifier.size(20.dp),
+                        tint = SwipeHomeTheme.colors.onPrimary
                     )
                 }
 
@@ -265,8 +263,8 @@ class RegisterScreen: Screen {
                 ){
                     Text(
                         text = stringResource(Res.string.reg_agree1),
-                        color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f),
-                        fontSize = 12.sp,
+                        color = SwipeHomeTheme.colors.onSurfaceSecondary,
+                        style = SwipeHomeTheme.typography.caption,
                         textAlign = TextAlign.Center
                     )
                     TextButton(onClick = { /*TODO: Посилання на політику використання*/ })
@@ -274,7 +272,7 @@ class RegisterScreen: Screen {
                         Text(
                             text = stringResource(Res.string.reg_agree2),
                             fontSize = 12.sp,
-                            color = MaterialTheme.colorScheme.primary,
+                            color = SwipeHomeTheme.colors.primary,
                             fontWeight = FontWeight.SemiBold
                         )
                     }
@@ -284,18 +282,23 @@ class RegisterScreen: Screen {
                 // Кнопки для кроків 2, 3, 4 (Далі + Назад)
                 Button(
                     onClick = {
-                        if (currentStep < 4) currentStep++ else {/*TODO: Фінальна реєстація*/}
+                        if (currentStep < 4) currentStep++ else {/*TODO: Фінальна реєстрація*/}
                     },
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(56.dp),
-                    shape = RoundedCornerShape(12.dp),
-                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
+                    shape = SwipeHomeTheme.shapes.smallShape,
+                    colors = ButtonDefaults.buttonColors(containerColor = SwipeHomeTheme.colors.primary)
                 ){
-                    Text(if (currentStep == 4) stringResource(Res.string.btn_register) else stringResource(Res.string.btn_next), fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                    Text(
+                        if (currentStep == 4) stringResource(Res.string.btn_register) else stringResource(Res.string.btn_next),
+                        style = SwipeHomeTheme.typography.body,
+                        fontWeight = FontWeight.Bold,
+                        color = SwipeHomeTheme.colors.onPrimary
+                    )
                     if (currentStep != 4){
                         Spacer(modifier = Modifier.width(8.dp))
-                        Icon(painterResource(Res.drawable.ic_arrow_next), contentDescription = null, modifier = Modifier.size(20.dp))
+                        Icon(painterResource(Res.drawable.ic_arrow_next), contentDescription = null, modifier = Modifier.size(20.dp), tint = SwipeHomeTheme.colors.onPrimary)
                     }
                 }
 
@@ -306,31 +309,29 @@ class RegisterScreen: Screen {
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(56.dp),
-                    shape = RoundedCornerShape(12.dp)
+                    shape = SwipeHomeTheme.shapes.smallShape
                 ){
-                    Text(stringResource(Res.string.btn_back), fontSize = 18.sp, color = MaterialTheme.colorScheme.primary)
+                    Text(stringResource(Res.string.btn_back), style = SwipeHomeTheme.typography.body, color = SwipeHomeTheme.colors.primary, fontWeight = FontWeight.Bold)
                 }
             }
         }
     }
 
-    //  Функція для верстки вмісту Першого кроку
     @Composable
     fun Step1Content(email: String, onEmailChange: (String) -> Unit) {
         Column(modifier = Modifier.fillMaxWidth()) {
             Text(
                 text = stringResource(Res.string.reg_title_step1),
-                fontSize = 32.sp,
-                fontWeight = FontWeight.ExtraBold,
-                color = MaterialTheme.colorScheme.onBackground
+                style = SwipeHomeTheme.typography.headline,
+                color = SwipeHomeTheme.colors.neutral
             )
 
             Spacer(modifier = Modifier.height(8.dp))
 
             Text(
                 text = stringResource(Res.string.reg_subtitle_step1),
-                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f),
-                fontSize = 16.sp
+                color = SwipeHomeTheme.colors.onSurfaceSecondary,
+                style = SwipeHomeTheme.typography.body
             )
 
             Spacer(modifier = Modifier.height(32.dp))
@@ -339,11 +340,11 @@ class RegisterScreen: Screen {
             OutlinedButton(
                 onClick = {/*TODO*/},
                 modifier = Modifier.fillMaxWidth().height(56.dp),
-                shape = RoundedCornerShape(12.dp)
+                shape = SwipeHomeTheme.shapes.smallShape
             ){
-                Icon(painterResource(Res.drawable.ic_google_logo), contentDescription = null, modifier = Modifier.size(24.dp))
+                Icon(painterResource(Res.drawable.ic_google_logo), contentDescription = null, modifier = Modifier.size(24.dp), tint = Color.Unspecified)
                 Spacer(modifier = Modifier.width(16.dp))
-                Text(stringResource(Res.string.reg_continue_google), fontSize = 16.sp, color = MaterialTheme.colorScheme.onBackground)
+                Text(stringResource(Res.string.reg_continue_google), style = SwipeHomeTheme.typography.body, color = SwipeHomeTheme.colors.neutral)
             }
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -351,11 +352,12 @@ class RegisterScreen: Screen {
             Button(
                 onClick = {/*TODO*/},
                 modifier = Modifier.fillMaxWidth().height(56.dp),
-                shape = RoundedCornerShape(12.dp)
+                shape = SwipeHomeTheme.shapes.smallShape,
+                colors = ButtonDefaults.buttonColors(containerColor = SwipeHomeTheme.colors.neutral)
             ){
-                Icon(painterResource(Res.drawable.ic_apple_logo), contentDescription = null, modifier = Modifier.size(32.dp))
+                Icon(painterResource(Res.drawable.ic_apple_logo), contentDescription = null, modifier = Modifier.size(32.dp), tint = SwipeHomeTheme.colors.background)
                 Spacer(modifier = Modifier.width(16.dp))
-                Text(stringResource(Res.string.reg_continue_apple), fontSize = 16.sp, color = MaterialTheme.colorScheme.background)
+                Text(stringResource(Res.string.reg_continue_apple), style = SwipeHomeTheme.typography.body, color = SwipeHomeTheme.colors.background)
             }
 
             Spacer(modifier = Modifier.height(32.dp))
@@ -365,23 +367,23 @@ class RegisterScreen: Screen {
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically
             ){
-                Box(modifier = Modifier.weight(1f).height(1.dp).background(MaterialTheme.colorScheme.onBackground.copy(alpha = 0.2f)))
+                Box(modifier = Modifier.weight(1f).height(1.dp).background(SwipeHomeTheme.colors.outline))
                 Text(
                     text = stringResource(Res.string.or_divider),
-                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f),
-                    fontSize = 12.sp,
+                    color = SwipeHomeTheme.colors.onSurfaceSecondary,
+                    style = SwipeHomeTheme.typography.caption,
                     fontWeight = FontWeight.Bold
                 )
-                Box(modifier = Modifier.weight(1f).height(1.dp).background(MaterialTheme.colorScheme.onBackground.copy(alpha = 0.2f)))
+                Box(modifier = Modifier.weight(1f).height(1.dp).background(SwipeHomeTheme.colors.outline))
             }
 
             Spacer(modifier = Modifier.height(32.dp))
 
             Text(
                 text = stringResource(Res.string.reg_email_label),
+                style = SwipeHomeTheme.typography.label,
                 fontWeight = FontWeight.SemiBold,
-                fontSize = 14.sp,
-                color = MaterialTheme.colorScheme.onBackground
+                color = SwipeHomeTheme.colors.neutral
             )
             Spacer(modifier = Modifier.height(8.dp))
             OutlinedTextField(
@@ -391,7 +393,7 @@ class RegisterScreen: Screen {
                 placeholder = { Text(stringResource(Res.string.reg_email_placeholder)) },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
-                shape = RoundedCornerShape(12.dp)
+                shape = SwipeHomeTheme.shapes.smallShape
             )
         }
     }
@@ -409,17 +411,16 @@ class RegisterScreen: Screen {
         Column(modifier = Modifier.fillMaxWidth()) {
             Text(
                 text = stringResource(Res.string.reg_title_step2),
-                fontSize = 32.sp,
-                fontWeight = FontWeight.ExtraBold,
-                color = MaterialTheme.colorScheme.onBackground
+                style = SwipeHomeTheme.typography.headline,
+                color = SwipeHomeTheme.colors.neutral
             )
 
             Spacer(modifier = Modifier.height(8.dp))
 
             Text(
                 text = stringResource(Res.string.reg_subtitle_step2),
-                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f),
-                fontSize = 16.sp
+                color = SwipeHomeTheme.colors.onSurfaceSecondary,
+                style = SwipeHomeTheme.typography.body
             )
 
             Spacer(modifier = Modifier.height(32.dp))
@@ -427,9 +428,9 @@ class RegisterScreen: Screen {
             // Поле Email (користувач може його змінити якщо помилився на першому кроці)
             Text(
                 text = stringResource(Res.string.email_login_label),
+                style = SwipeHomeTheme.typography.label,
                 fontWeight = FontWeight.SemiBold,
-                fontSize = 14.sp,
-                color = MaterialTheme.colorScheme.onBackground
+                color = SwipeHomeTheme.colors.neutral
             )
             Spacer(modifier = Modifier.height(8.dp))
             OutlinedTextField(
@@ -439,7 +440,7 @@ class RegisterScreen: Screen {
                 placeholder = { Text(stringResource(Res.string.reg_email_placeholder)) },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
-                shape = RoundedCornerShape(12.dp)
+                shape = SwipeHomeTheme.shapes.smallShape
             )
 
             Spacer(modifier = Modifier.height(24.dp))
@@ -447,9 +448,9 @@ class RegisterScreen: Screen {
             // Поле Пароль
             Text(
                 text = stringResource(Res.string.password_label),
+                style = SwipeHomeTheme.typography.label,
                 fontWeight = FontWeight.SemiBold,
-                fontSize = 14.sp,
-                color = MaterialTheme.colorScheme.onBackground
+                color = SwipeHomeTheme.colors.neutral
             )
 
             //region Нова логіка введення пароля
@@ -474,10 +475,10 @@ class RegisterScreen: Screen {
                 else -> ""
             }
             val strengthColor = when (strength) {
-                1 -> Color(0xFFE53935) // Червоний
-                2 -> Color(0xFFFB8C00) // Помаранчевий
-                3 -> Color(0xFF7CB342) // Світло-зелений
-                4 -> Color(0xFF43A047) // Темно-зелений
+                1 -> SwipeHomeTheme.colors.error    // Червоний
+                2 -> Color(0xFFFB8C00)              // Помаранчевий
+                3 -> Color(0xFF7CB342)              // Світло-зелений
+                4 -> SwipeHomeTheme.colors.primary  // Темно-зелений
                 else -> Color.Transparent
             }
 
@@ -490,7 +491,7 @@ class RegisterScreen: Screen {
                     placeholder = { Text(stringResource(Res.string.reg_password_placeholder)) },
                     modifier = Modifier.fillMaxWidth(),
                     singleLine = true,
-                    shape = RoundedCornerShape(12.dp),
+                    shape = SwipeHomeTheme.shapes.smallShape,
                     visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                     trailingIcon = {
                         IconButton(onClick = { passwordVisible = !passwordVisible }) {
@@ -498,7 +499,9 @@ class RegisterScreen: Screen {
                                 painterResource(
                                     if (passwordVisible) Res.drawable.ic_eye_visible else Res.drawable.ic_eye_hidden
                                 ),
-                                contentDescription = null, modifier = Modifier.size(20.dp)
+                                contentDescription = null,
+                                modifier = Modifier.size(20.dp),
+                                tint = SwipeHomeTheme.colors.onSurfaceSecondary
                             )
                         }
                     }
@@ -516,10 +519,10 @@ class RegisterScreen: Screen {
                             modifier = Modifier
                                 .weight(1f)
                                 .height(4.dp)
-                                .clip(RoundedCornerShape(2.dp))
+                                .clip(SwipeHomeTheme.shapes.smallShape)
                                 .background(
                                     if (password.isNotEmpty() && index < strength) strengthColor
-                                    else MaterialTheme.colorScheme.onBackground.copy(alpha = 0.1f)
+                                    else SwipeHomeTheme.colors.outline
                                 )
                         )
                     }
@@ -529,8 +532,8 @@ class RegisterScreen: Screen {
                     Spacer(modifier = Modifier.height(8.dp))
                     Text(
                         text = stringResource(Res.string.fogot_paswd_strength_prefix) + strengthText,
-                        color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f),
-                        fontSize = 12.sp
+                        color = SwipeHomeTheme.colors.onSurfaceSecondary,
+                        style = SwipeHomeTheme.typography.caption
                     )
                 }
             }
@@ -540,16 +543,19 @@ class RegisterScreen: Screen {
 
             // Підказка про складність пароля
             Row(verticalAlignment = Alignment.CenterVertically){
-                Icon(painterResource(Res.drawable.ic_hint), contentDescription = null, modifier = Modifier.size(12.dp))
+                Icon(
+                    painterResource(Res.drawable.ic_hint),
+                    contentDescription = null,
+                    modifier = Modifier.size(12.dp),
+                    tint = SwipeHomeTheme.colors.primary
+                )
                 Spacer(modifier = Modifier.width(6.dp))
                 Text(
                     text = stringResource(Res.string.reg_hiden_password),
-                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f),
-                    fontSize = 12.sp
+                    color = SwipeHomeTheme.colors.onSurfaceSecondary,
+                    style = SwipeHomeTheme.typography.caption
                 )
-
             }
-
         }
     }
 
@@ -567,9 +573,8 @@ class RegisterScreen: Screen {
             // Заголовок та опис
             Text(
                 text = stringResource(Res.string.reg_title_step3),
-                fontSize = 32.sp,
-                fontWeight = FontWeight.ExtraBold,
-                color = MaterialTheme.colorScheme.onBackground
+                style = SwipeHomeTheme.typography.headline,
+                color = SwipeHomeTheme.colors.neutral
             )
             Spacer(modifier = Modifier.height(16.dp))
 /*
@@ -583,7 +588,7 @@ class RegisterScreen: Screen {
             // Кнопка для додавання фотографії
             Column (
                 modifier =  Modifier.fillMaxWidth(),
-                horizontalAlignment = Alignment.CenterHorizontally // Центруємо фотографію
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Box(
                     modifier = Modifier
@@ -591,8 +596,8 @@ class RegisterScreen: Screen {
                         .clip(CircleShape)
                         // Змінюємо фон, якщо фотографія завантажена
                         .background(
-                            if (photoData != null) MaterialTheme.colorScheme.primary.copy(alpha = 0.2f)
-                            else MaterialTheme.colorScheme.secondary.copy(alpha = 0.3f)
+                            if (photoData != null) SwipeHomeTheme.colors.primary.copy(alpha = 0.2f)
+                            else SwipeHomeTheme.colors.surface
                         )
                         .clickable{ onPhotoClick() },
                     contentAlignment = Alignment.Center
@@ -603,15 +608,16 @@ class RegisterScreen: Screen {
                             Icon(
                                 painterResource(Res.drawable.ic_camera),
                                 contentDescription = null,
-                                modifier = Modifier.size(32.dp)
+                                modifier = Modifier.size(32.dp),
+                                tint = SwipeHomeTheme.colors.primary
                             )
                             Spacer(modifier = Modifier.height(4.dp))
                             Text(
                                 text = stringResource(Res.string.reg_photo_upload),
-                                fontSize = 12.sp,
+                                style = SwipeHomeTheme.typography.caption,
                                 fontWeight = FontWeight.Bold,
                                 textAlign = TextAlign.Center,
-                                color = MaterialTheme.colorScheme.primary
+                                color = SwipeHomeTheme.colors.primary
                             )
                         }
                     } else {
@@ -632,9 +638,9 @@ class RegisterScreen: Screen {
 
             Text(
                 text = stringResource(Res.string.reg_name),
+                style = SwipeHomeTheme.typography.label,
                 fontWeight = FontWeight.SemiBold,
-                fontSize = 14.sp,
-                color = MaterialTheme.colorScheme.onBackground
+                color = SwipeHomeTheme.colors.neutral
             )
             OutlinedTextField(
                 value = firstName,
@@ -643,15 +649,15 @@ class RegisterScreen: Screen {
                 placeholder = { Text(stringResource(Res.string.reg_name)) },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
-                shape = RoundedCornerShape(12.dp)
+                shape = SwipeHomeTheme.shapes.smallShape
             )
             Spacer(modifier = Modifier.height(16.dp))
 
             Text(
                 text = stringResource(Res.string.reg_last_name),
+                style = SwipeHomeTheme.typography.label,
                 fontWeight = FontWeight.SemiBold,
-                fontSize = 14.sp,
-                color = MaterialTheme.colorScheme.onBackground
+                color = SwipeHomeTheme.colors.neutral
             )
             OutlinedTextField(
                 value = lastName,
@@ -660,7 +666,7 @@ class RegisterScreen: Screen {
                 placeholder = { Text(stringResource(Res.string.reg_last_name)) },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
-                shape = RoundedCornerShape(12.dp)
+                shape = SwipeHomeTheme.shapes.smallShape
             )
         }
     }
@@ -697,17 +703,16 @@ class RegisterScreen: Screen {
         Column(modifier = Modifier.fillMaxWidth()) {
             Text(
                 text = stringResource(Res.string.reg_title_step4),
-                fontSize = 32.sp,
-                fontWeight = FontWeight.ExtraBold,
-                color = MaterialTheme.colorScheme.onBackground
+                style = SwipeHomeTheme.typography.headline,
+                color = SwipeHomeTheme.colors.neutral
             )
 
             Spacer(modifier = Modifier.height(8.dp))
 
             Text(
                 text = stringResource(Res.string.reg_subtitle_step4),
-                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f),
-                fontSize = 16.sp
+                color = SwipeHomeTheme.colors.onSurfaceSecondary,
+                style = SwipeHomeTheme.typography.body
             )
 
             Spacer(modifier = Modifier.height(32.dp))
@@ -715,9 +720,9 @@ class RegisterScreen: Screen {
             // Поле для номера телефону
             Text(
                 text = stringResource(Res.string.reg_phone_number),
+                style = SwipeHomeTheme.typography.label,
                 fontWeight = FontWeight.SemiBold,
-                fontSize = 14.sp,
-                color = MaterialTheme.colorScheme.onBackground
+                color = SwipeHomeTheme.colors.neutral
             )
             Spacer(modifier = Modifier.height(8.dp))
 
@@ -732,10 +737,8 @@ class RegisterScreen: Screen {
                 placeholder = { Text(currentMask) },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
-                shape = RoundedCornerShape(12.dp),
-                keyboardOptions = KeyboardOptions(
-                    keyboardType = KeyboardType.Phone
-                ),
+                shape = SwipeHomeTheme.shapes.smallShape,
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
                 // Підключаємо кастомне трансформування для форматування пробілів для номера
                 visualTransformation = PhoneVisualTransformation(currentMask),
                 // Додаємо красивий дизайн префікса країни з випадаючим списком
@@ -748,29 +751,35 @@ class RegisterScreen: Screen {
                     ){
                         Text(
                             text = countryCode,
+                            style = SwipeHomeTheme.typography.label,
                             fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.onBackground
+                            color = SwipeHomeTheme.colors.neutral
                         )
                         Spacer(modifier = Modifier.width(4.dp))
-                        Icon(painterResource(Res.drawable.ic_arrow_triangle_down), contentDescription = null, modifier = Modifier.size(10.dp))
+                        Icon(
+                            painterResource(Res.drawable.ic_arrow_triangle_down),
+                            contentDescription = null,
+                            modifier = Modifier.size(10.dp),
+                            tint = SwipeHomeTheme.colors.onSurfaceSecondary
+                        )
                         Spacer(modifier = Modifier.width(12.dp))
 
                         Box(
                             modifier = Modifier
                                 .width(1.dp)
                                 .height(24.dp)
-                                .background(MaterialTheme.colorScheme.onBackground.copy(alpha = 0.2f))
+                                .background(SwipeHomeTheme.colors.outline)
                         )
 
                         // Саме меню вибору
                         DropdownMenu(
                             expanded = isDropdownExpanded,
                             onDismissRequest = { isDropdownExpanded = false },
-                            modifier = Modifier.background(MaterialTheme.colorScheme.background)
+                            modifier = Modifier.background(SwipeHomeTheme.colors.surface)
                         ){
                             availableCountryCodes.forEach { code ->
                                 DropdownMenuItem(
-                                    text = { Text(text = code) },
+                                    text = { Text(text = code, color = SwipeHomeTheme.colors.onSurface) },
                                     onClick = {
                                         // При зміні країни очищаємо введений номер
                                         if(code != countryCode) onPhoneChange("")
@@ -790,8 +799,8 @@ class RegisterScreen: Screen {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clip(RoundedCornerShape(12.dp))
-                    .background(MaterialTheme.colorScheme.secondary.copy(alpha = 0.5f))
+                    .clip(SwipeHomeTheme.shapes.smallShape)
+                    .background(SwipeHomeTheme.colors.surface)
                     .padding(16.dp)
             ){
                 Row(
@@ -800,12 +809,16 @@ class RegisterScreen: Screen {
                     Checkbox(
                         checked = termsAccepted,
                         onCheckedChange = { termsAccepted = it },
+                        colors = CheckboxDefaults.colors(
+                            checkedColor = SwipeHomeTheme.colors.primary,
+                            uncheckedColor = SwipeHomeTheme.colors.onSurfaceSecondary
+                        )
                     )
                     Spacer(modifier = Modifier.width(8.dp))
                     Text(
                         text = stringResource(Res.string.reg_rules_agree),
-                        fontSize = 14.sp,
-                        color = MaterialTheme.colorScheme.onBackground,
+                        style = SwipeHomeTheme.typography.label,
+                        color = SwipeHomeTheme.colors.neutral,
                         lineHeight = 20.sp
                     )
                 }

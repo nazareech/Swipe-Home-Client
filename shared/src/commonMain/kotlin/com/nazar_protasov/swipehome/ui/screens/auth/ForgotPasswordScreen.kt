@@ -25,7 +25,6 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.RadioButtonDefaults
@@ -53,10 +52,10 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.uniqueScreenKey
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import com.nazar_protasov.swipehome.ui.theme.SwipeHomeTheme
 import mymultiplatformproject.shared.generated.resources.Res
 import mymultiplatformproject.shared.generated.resources.btn_accept_code
 import mymultiplatformproject.shared.generated.resources.btn_back
-import mymultiplatformproject.shared.generated.resources.btn_choice_method
 import mymultiplatformproject.shared.generated.resources.btn_next
 import mymultiplatformproject.shared.generated.resources.btn_resend_code
 import mymultiplatformproject.shared.generated.resources.btn_reset_paswd
@@ -106,10 +105,9 @@ class ForgotPasswordScreen : Screen {
         val navigator = LocalNavigator.currentOrThrow
         val scrollState = rememberScrollState()
 
-        // Стани екрана
         var currentStep by rememberSaveable { mutableStateOf(1) }
-        var loginOrEmail by rememberSaveable { mutableStateOf("") } // "login" або "email"
-        var recoveryMethod by rememberSaveable { mutableStateOf("sms") } // "sms" або "email"
+        var loginOrEmail by rememberSaveable { mutableStateOf("") }
+        var recoveryMethod by rememberSaveable { mutableStateOf("sms") }
         var otpCode by rememberSaveable { mutableStateOf("") }
         var newPassword by rememberSaveable { mutableStateOf("") }
         var confirmPassword by rememberSaveable { mutableStateOf("") }
@@ -117,7 +115,7 @@ class ForgotPasswordScreen : Screen {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .background(MaterialTheme.colorScheme.background)
+                .background(SwipeHomeTheme.colors.background)
                 .padding(horizontal = 24.dp)
                 .padding(top = 16.dp, bottom = 24.dp)
                 .verticalScroll(scrollState)
@@ -135,7 +133,7 @@ class ForgotPasswordScreen : Screen {
                     Icon(
                         painter = painterResource(Res.drawable.ic_arrow_back),
                         contentDescription = stringResource(Res.string.btn_back),
-                        tint = MaterialTheme.colorScheme.onBackground
+                        tint = SwipeHomeTheme.colors.neutral
                     )
                 }
 
@@ -146,16 +144,14 @@ class ForgotPasswordScreen : Screen {
                         3 -> stringResource(Res.string.fogot_paswd_title_step3)
                         else -> stringResource(Res.string.fogot_paswd_title_step4)
                     },
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.primary,
+                    style = SwipeHomeTheme.typography.subheadline,
+                    color = SwipeHomeTheme.colors.primary,
                     modifier = Modifier.weight(1f),
                     textAlign = TextAlign.Center
                 )
-                // Порожній блок для балансу заголовка по центру
                 Spacer(modifier = Modifier.size(48.dp))
             }
-                Spacer(modifier = Modifier.height(24.dp))
+            Spacer(modifier = Modifier.height(24.dp))
 
             // --- ВМІСТ КРОКІВ ---
             when(currentStep){
@@ -179,19 +175,19 @@ class ForgotPasswordScreen : Screen {
                     onConfirmPasswordChange = { confirmPassword = it }
                 )
             }
-            Spacer(modifier = Modifier.weight(1f)) // Висота для залишку
+            Spacer(modifier = Modifier.weight(1f))
             Spacer(modifier = Modifier.height(32.dp))
 
             // --- НИЖНЯ КНОПКА ---
             Button(
                 onClick = {
-                    if (currentStep < 3) currentStep++ else {/*TODO: Оновлення пароля*/}
+                    if (currentStep < 4) currentStep++ else {/*TODO: Оновлення пароля*/}
                 },
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(56.dp),
-                shape = RoundedCornerShape(12.dp),
-                colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
+                shape = SwipeHomeTheme.shapes.smallShape,
+                colors = ButtonDefaults.buttonColors(containerColor = SwipeHomeTheme.colors.primary)
             ){
                 Text(
                     text = when (currentStep){
@@ -200,8 +196,9 @@ class ForgotPasswordScreen : Screen {
                         3 -> stringResource(Res.string.btn_accept_code)
                         else -> stringResource(Res.string.btn_reset_paswd)
                     },
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold
+                    style = SwipeHomeTheme.typography.body,
+                    fontWeight = FontWeight.Bold,
+                    color = SwipeHomeTheme.colors.onPrimary
                 )
             }
         }
@@ -214,16 +211,15 @@ class ForgotPasswordScreen : Screen {
             Text(
                 text = stringResource(Res.string.email_login_label),
                 modifier = Modifier.fillMaxWidth(),
-                fontSize = 32.sp,
-                fontWeight = FontWeight.ExtraBold,
-                textAlign = TextAlign.Start,
-                color = MaterialTheme.colorScheme.onBackground,
+                style = SwipeHomeTheme.typography.headline,
+                textAlign = TextAlign.Center,
+                color = SwipeHomeTheme.colors.neutral,
             )
             Spacer(modifier = Modifier.height(12.dp))
             Text(
                 text = stringResource(Res.string.fogot_paswd_subtitle_step0),
-                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f),
-                fontSize = 16.sp,
+                color = SwipeHomeTheme.colors.onSurfaceSecondary,
+                style = SwipeHomeTheme.typography.body,
                 textAlign = TextAlign.Start,
             )
 
@@ -236,12 +232,10 @@ class ForgotPasswordScreen : Screen {
                 placeholder = { Text(stringResource(Res.string.reg_email_placeholder)) },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
-                shape = RoundedCornerShape(12.dp)
+                shape = SwipeHomeTheme.shapes.smallShape
             )
 
             Spacer(modifier = Modifier.height(24.dp))
-
-
         }
     }
 
@@ -249,26 +243,23 @@ class ForgotPasswordScreen : Screen {
     @Composable
     fun Step2RecoveryMethod(selectedMethod: String, onMethodSelected: (String) -> Unit) {
         Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
-
             Text(
                 text = stringResource(Res.string.fogot_paswd_header_step1),
-                fontSize = 24.sp,
-                fontWeight = FontWeight.Bold,
+                style = SwipeHomeTheme.typography.headline,
                 textAlign = TextAlign.Start,
-                color = MaterialTheme.colorScheme.onBackground,
+                color = SwipeHomeTheme.colors.neutral,
             )
             Spacer(modifier = Modifier.height(12.dp))
             Text(
                 text = stringResource(Res.string.fogot_paswd_subtitle_step1),
-                fontSize = 14.sp,
-                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f),
+                style = SwipeHomeTheme.typography.label,
+                color = SwipeHomeTheme.colors.onSurfaceSecondary,
                 textAlign = TextAlign.Start,
                 lineHeight = 20.sp
             )
 
             Spacer(modifier = Modifier.height(32.dp))
 
-            // Картка SMS
             RecoveryMethodCard(
                 icon = painterResource(Res.drawable.ic_sms),
                 title = stringResource(Res.string.fogot_paswd_method_sms_title),
@@ -279,7 +270,6 @@ class ForgotPasswordScreen : Screen {
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Картка Email
             RecoveryMethodCard(
                 icon = painterResource(Res.drawable.ic_email),
                 title = stringResource(Res.string.fogot_paswd_method_email_title),
@@ -292,15 +282,15 @@ class ForgotPasswordScreen : Screen {
 
     @Composable
     fun RecoveryMethodCard(icon: Painter, title: String, subtitle: String, isSelected: Boolean, onClick: () -> Unit) {
-        val borderColor = if (isSelected) MaterialTheme.colorScheme.primary else Color.Transparent
-        val bgColor = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.05f)
+        val borderColor = if (isSelected) SwipeHomeTheme.colors.primary else SwipeHomeTheme.colors.outline
+        val bgColor = SwipeHomeTheme.colors.surface
 
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .clip(RoundedCornerShape(16.dp))
+                .clip(SwipeHomeTheme.shapes.mediumShape)
                 .background(bgColor)
-                .border(BorderStroke(2.dp, borderColor), RoundedCornerShape(16.dp))
+                .border(BorderStroke(2.dp, borderColor), SwipeHomeTheme.shapes.mediumShape)
                 .clickable { onClick() }
                 .padding(16.dp),
             verticalAlignment = Alignment.CenterVertically
@@ -308,21 +298,29 @@ class ForgotPasswordScreen : Screen {
             Box(
                 modifier = Modifier
                     .size(48.dp)
-                    .clip(RoundedCornerShape(12.dp))
-                    .background(MaterialTheme.colorScheme.background),
+                    .clip(SwipeHomeTheme.shapes.smallShape)
+                    .background(SwipeHomeTheme.colors.primary.copy(alpha = 0.15f)),
                 contentAlignment = Alignment.Center
             ) {
-                Icon(icon, contentDescription = null, modifier = Modifier.size(24.dp))
+                Icon(
+                    icon,
+                    contentDescription = null,
+                    modifier = Modifier.size(24.dp),
+                    tint = SwipeHomeTheme.colors.primary
+                )
             }
             Spacer(modifier = Modifier.width(16.dp))
             Column(modifier = Modifier.weight(1f)){
-                Text(title, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onBackground)
-                Text(subtitle, color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f), fontSize = 14.sp)
+                Text(title, style = SwipeHomeTheme.typography.body, fontWeight = FontWeight.Bold, color = SwipeHomeTheme.colors.neutral)
+                Text(subtitle, color = SwipeHomeTheme.colors.onSurfaceSecondary, style = SwipeHomeTheme.typography.caption)
             }
             RadioButton(
                 selected = isSelected,
                 onClick = onClick,
-                colors = RadioButtonDefaults.colors(selectedColor = MaterialTheme.colorScheme.primary)
+                colors = RadioButtonDefaults.colors(
+                    selectedColor = SwipeHomeTheme.colors.primary,
+                    unselectedColor = SwipeHomeTheme.colors.onSurfaceSecondary
+                )
             )
         }
     }
@@ -337,28 +335,24 @@ class ForgotPasswordScreen : Screen {
             Text(
                 text = stringResource(Res.string.fogot_paswd_header_step2),
                 modifier = Modifier.fillMaxWidth(),
-                fontSize = 32.sp,
-                fontWeight = FontWeight.ExtraBold,
-                textAlign = TextAlign.Start,
-                color = MaterialTheme.colorScheme.onBackground,
+                style = SwipeHomeTheme.typography.headline,
+                textAlign = TextAlign.Center,
+                color = SwipeHomeTheme.colors.neutral,
             )
             Spacer(modifier = Modifier.height(12.dp))
             Text(
                 text = if (selectedMethod == "sms") stringResource(Res.string.fogot_paswd_subtitle_sms_step2) else if (selectedMethod == "email") stringResource(Res.string.fogot_paswd_subtitle_email_step2) else "",
-                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f),
-                fontSize = 16.sp,
+                color = SwipeHomeTheme.colors.onSurfaceSecondary,
+                style = SwipeHomeTheme.typography.body,
                 textAlign = TextAlign.Start,
             )
 
             Spacer(modifier = Modifier.height(48.dp))
 
-            // Кастомне поле для OTP
             BasicTextField(
                 value = otpCode,
                 onValueChange = { input ->
-                    // Фільтруємо текст, залишаючи тільки цифри
                     val digitsOnly = input.filter { it.isDigit() }
-                    // Перевіряємо довжину відфільтрованого тексту
                     if (digitsOnly.length <= 6) onOtpCodeChange(digitsOnly)
                 },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
@@ -373,27 +367,24 @@ class ForgotPasswordScreen : Screen {
                                 index >= otpCode.length -> ""
                                 else -> otpCode[index].toString()
                             }
-                            // Візуальний квадрат для кожної цифри
                             val isFocused = otpCode.length == index
                             Box(
                                 modifier = Modifier
                                     .weight(1f)
                                     .aspectRatio(1f)
-                                    .clip(RoundedCornerShape(12.dp))
-                                    .background(MaterialTheme.colorScheme.onBackground.copy(alpha = 0.05f))
+                                    .clip(SwipeHomeTheme.shapes.smallShape)
+                                    .background(SwipeHomeTheme.colors.surface)
                                     .border(
                                         2.dp,
-                                        if (isFocused) MaterialTheme.colorScheme.primary else Color.Transparent,
-                                        RoundedCornerShape(12.dp)
+                                        if (isFocused) SwipeHomeTheme.colors.primary else SwipeHomeTheme.colors.outline,
+                                        SwipeHomeTheme.shapes.smallShape
                                     ),
                                 contentAlignment = Alignment.Center
                             ) {
-                                // Якщо символ є, показуємо його або крапку
                                 Text(
                                     text = char.ifEmpty { "-" },
-                                    fontSize = 32.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = MaterialTheme.colorScheme.primary
+                                    style = SwipeHomeTheme.typography.headline,
+                                    color = SwipeHomeTheme.colors.primary
                                 )
                             }
                         }
@@ -407,9 +398,9 @@ class ForgotPasswordScreen : Screen {
                 onClick = {/*TODO: Отримати новий код*/}) {
                 Text(
                     text = stringResource(Res.string.btn_resend_code),
-                    color = MaterialTheme.colorScheme.primary,
-                    fontWeight = FontWeight.SemiBold,
-                    fontSize = 14.sp
+                    color = SwipeHomeTheme.colors.primary,
+                    style = SwipeHomeTheme.typography.label,
+                    fontWeight = FontWeight.SemiBold
                 )
             }
         }
@@ -425,7 +416,6 @@ class ForgotPasswordScreen : Screen {
         var newPasswordVisible by remember { mutableStateOf(false) }
         var confirmPasswordVisible by remember { mutableStateOf(false) }
 
-        // Логіка визначення надійності пароля (від 0 до 4)
         val strength = remember(newPassword) {
             var score = 0
             if (newPassword.isNotEmpty()) {
@@ -437,7 +427,6 @@ class ForgotPasswordScreen : Screen {
             score
         }
 
-        // Визначаємо текст та колір залежно від рівня надійності
         val strengthText = when (strength) {
             1 -> stringResource(Res.string.password_strength_weak)
             2 -> stringResource(Res.string.password_strength_medium)
@@ -446,34 +435,33 @@ class ForgotPasswordScreen : Screen {
             else -> ""
         }
         val strengthColor = when (strength) {
-            1 -> Color(0xFFE53935) // Червоний
-            2 -> Color(0xFFFB8C00) // Помаранчевий
-            3 -> Color(0xFF7CB342) // Світло-зелений
-            4 -> Color(0xFF43A047) // Темно-зелений
+            1 -> SwipeHomeTheme.colors.error
+            2 -> Color(0xFFFB8C00)
+            3 -> Color(0xFF7CB342)
+            4 -> SwipeHomeTheme.colors.primary
             else -> Color.Transparent
         }
 
         Column(modifier = Modifier.fillMaxWidth()) {
             Text(
                 text = stringResource(Res.string.fogot_paswd_header_step3),
-                fontSize = 32.sp,
-                fontWeight = FontWeight.ExtraBold,
-                color = MaterialTheme.colorScheme.onBackground
+                style = SwipeHomeTheme.typography.headline,
+                color = SwipeHomeTheme.colors.neutral
             )
             Spacer(modifier = Modifier.height(12.dp))
             Text(
                 text = stringResource(Res.string.fogot_paswd_subtitle_step3),
-                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f),
-                fontSize = 16.sp
+                color = SwipeHomeTheme.colors.onSurfaceSecondary,
+                style = SwipeHomeTheme.typography.body
             )
             Spacer(modifier = Modifier.height(32.dp))
 
             // Поле "Новий пароль"
             Text(
                 text = stringResource(Res.string.fogot_paswd_new_password_label),
+                style = SwipeHomeTheme.typography.label,
                 fontWeight = FontWeight.SemiBold,
-                fontSize = 14.sp,
-                color = MaterialTheme.colorScheme.onBackground
+                color = SwipeHomeTheme.colors.neutral
             )
             Spacer(modifier = Modifier.height(8.dp))
             OutlinedTextField(
@@ -482,15 +470,17 @@ class ForgotPasswordScreen : Screen {
                 placeholder = { Text(stringResource(Res.string.fogot_paswd_new_password_placeholder)) },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
-                shape = RoundedCornerShape(12.dp),
+                shape = SwipeHomeTheme.shapes.smallShape,
                 visualTransformation = if (newPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                 trailingIcon = {
                     IconButton(onClick = { newPasswordVisible = !newPasswordVisible }) {
                         Icon(
                             painterResource(
-                                if (newPasswordVisible) Res.drawable.ic_eye_visible else  Res.drawable.ic_eye_hidden
+                                if (newPasswordVisible) Res.drawable.ic_eye_visible else Res.drawable.ic_eye_hidden
                             ),
-                            contentDescription = null, modifier = Modifier.size(20.dp)
+                            contentDescription = null,
+                            modifier = Modifier.size(20.dp),
+                            tint = SwipeHomeTheme.colors.onSurfaceSecondary
                         )
                     }
                 }
@@ -511,7 +501,7 @@ class ForgotPasswordScreen : Screen {
                             .clip(RoundedCornerShape(2.dp))
                             .background(
                                 if (newPassword.isNotEmpty() && index < strength) strengthColor
-                                else MaterialTheme.colorScheme.onBackground.copy(alpha = 0.1f)
+                                else SwipeHomeTheme.colors.outline
                             )
                     )
                 }
@@ -521,8 +511,8 @@ class ForgotPasswordScreen : Screen {
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
                     text = stringResource(Res.string.fogot_paswd_strength_prefix) + strengthText,
-                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f),
-                    fontSize = 12.sp
+                    color = SwipeHomeTheme.colors.onSurfaceSecondary,
+                    style = SwipeHomeTheme.typography.caption
                 )
             }
 
@@ -531,9 +521,9 @@ class ForgotPasswordScreen : Screen {
             // Поле "Підтвердити пароль"
             Text(
                 text = stringResource(Res.string.fogot_paswd_confirm_password_label),
+                style = SwipeHomeTheme.typography.label,
                 fontWeight = FontWeight.SemiBold,
-                fontSize = 14.sp,
-                color = MaterialTheme.colorScheme.onBackground
+                color = SwipeHomeTheme.colors.neutral
             )
             Spacer(modifier = Modifier.height(8.dp))
             OutlinedTextField(
@@ -542,15 +532,17 @@ class ForgotPasswordScreen : Screen {
                 placeholder = { Text(stringResource(Res.string.fogot_paswd_confirm_password_placeholder)) },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
-                shape = RoundedCornerShape(12.dp),
+                shape = SwipeHomeTheme.shapes.smallShape,
                 visualTransformation = if (confirmPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                 trailingIcon = {
-                    IconButton(onClick = { newPasswordVisible = !newPasswordVisible }) {
+                    IconButton(onClick = { confirmPasswordVisible = !confirmPasswordVisible }) {
                         Icon(
                             painterResource(
-                                if (newPasswordVisible) Res.drawable.ic_eye_visible else  Res.drawable.ic_eye_hidden
+                                if (confirmPasswordVisible) Res.drawable.ic_eye_visible else Res.drawable.ic_eye_hidden
                             ),
-                            contentDescription = null, modifier = Modifier.size(20.dp)
+                            contentDescription = null,
+                            modifier = Modifier.size(20.dp),
+                            tint = SwipeHomeTheme.colors.onSurfaceSecondary
                         )
                     }
                 }
@@ -562,17 +554,21 @@ class ForgotPasswordScreen : Screen {
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clip(RoundedCornerShape(12.dp))
-                    .background(MaterialTheme.colorScheme.onBackground.copy(alpha = 0.05f))
+                    .clip(SwipeHomeTheme.shapes.smallShape)
+                    .background(SwipeHomeTheme.colors.surface)
                     .padding(16.dp),
             ){
                 Row{
-                    Icon(painterResource(Res.drawable.ic_hint), contentDescription = null, tint = MaterialTheme.colorScheme.primary)
+                    Icon(
+                        painterResource(Res.drawable.ic_hint),
+                        contentDescription = null,
+                        tint = SwipeHomeTheme.colors.primary
+                    )
                     Spacer(modifier = Modifier.width(12.dp))
                     Text(
                         text = stringResource(Res.string.fogot_paswd_hint),
-                        fontSize = 14.sp,
-                        color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f),
+                        style = SwipeHomeTheme.typography.label,
+                        color = SwipeHomeTheme.colors.onSurfaceSecondary,
                         lineHeight = 20.sp
                     )
                 }
@@ -580,4 +576,3 @@ class ForgotPasswordScreen : Screen {
         }
     }
 }
-

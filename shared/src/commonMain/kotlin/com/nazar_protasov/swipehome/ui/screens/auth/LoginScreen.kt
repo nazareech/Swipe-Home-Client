@@ -13,14 +13,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -32,31 +30,32 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.uniqueScreenKey
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.nazar_protasov.swipehome.ui.screens.RootScreen
+import com.nazar_protasov.swipehome.ui.theme.SwipeHomeTheme
 import mymultiplatformproject.shared.generated.resources.Res
 import mymultiplatformproject.shared.generated.resources.btn_register
+import mymultiplatformproject.shared.generated.resources.email_login_label
 import mymultiplatformproject.shared.generated.resources.ic_apple_logo
 import mymultiplatformproject.shared.generated.resources.ic_eye_hidden
 import mymultiplatformproject.shared.generated.resources.ic_eye_visible
 import mymultiplatformproject.shared.generated.resources.ic_google_logo
 import mymultiplatformproject.shared.generated.resources.login_btn_enter
 import mymultiplatformproject.shared.generated.resources.login_create_account
-import mymultiplatformproject.shared.generated.resources.email_login_label
 import mymultiplatformproject.shared.generated.resources.login_enter_with
 import mymultiplatformproject.shared.generated.resources.login_fogot_password
-import mymultiplatformproject.shared.generated.resources.password_label
 import mymultiplatformproject.shared.generated.resources.login_subtitle
 import mymultiplatformproject.shared.generated.resources.login_title
+import mymultiplatformproject.shared.generated.resources.password_label
 import mymultiplatformproject.shared.generated.resources.reg_continue_apple
 import mymultiplatformproject.shared.generated.resources.reg_continue_google
 import org.jetbrains.compose.resources.painterResource
@@ -83,23 +82,22 @@ class LoginScreen: Screen {
             modifier = Modifier
                 .fillMaxSize()
                 .verticalScroll(scrollState)
-                .background(MaterialTheme.colorScheme.background)
-                .padding(horizontal = 24.dp), // Відступи з боків
+                .background(SwipeHomeTheme.colors.background)
+                .padding(horizontal = 24.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center // Центруємо весь контент по вертикалі
+            verticalArrangement = Arrangement.Center
         ){
             // Заголовок
             Text(
                 text = stringResource(Res.string.login_title),
-                fontSize = 32.sp,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.primary
+                style = SwipeHomeTheme.typography.headline,
+                color = SwipeHomeTheme.colors.primary
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(
                 text = stringResource(Res.string.login_subtitle),
-                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f),
-                fontSize = 16.sp
+                color = SwipeHomeTheme.colors.onSurfaceSecondary,
+                style = SwipeHomeTheme.typography.body
             )
 
             Spacer(modifier = Modifier.height(32.dp))
@@ -112,7 +110,7 @@ class LoginScreen: Screen {
                 modifier = Modifier.fillMaxWidth(),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
                 singleLine = true,
-                shape = RoundedCornerShape(12.dp)
+                shape = SwipeHomeTheme.shapes.smallShape
             )
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -124,7 +122,7 @@ class LoginScreen: Screen {
                 label = { Text(stringResource(Res.string.password_label)) },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
-                shape = RoundedCornerShape(12.dp),
+                shape = SwipeHomeTheme.shapes.smallShape,
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                 // Маскуємо пароль крапочками, якщо passwordVisible == false
                 visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
@@ -135,9 +133,11 @@ class LoginScreen: Screen {
                     ) {
                         Icon(
                             painterResource(
-                                if (passwordVisible) Res.drawable.ic_eye_visible else  Res.drawable.ic_eye_hidden
+                                if (passwordVisible) Res.drawable.ic_eye_visible else Res.drawable.ic_eye_hidden
                             ),
-                            contentDescription = null, modifier = Modifier.size(20.dp)
+                            contentDescription = null,
+                            modifier = Modifier.size(20.dp),
+                            tint = SwipeHomeTheme.colors.onSurfaceSecondary
                         )
                     }
                 }
@@ -150,8 +150,8 @@ class LoginScreen: Screen {
                 TextButton(onClick = { navigator.push(ForgotPasswordScreen()) }) {
                     Text(
                         text = stringResource(Res.string.login_fogot_password),
-                        color = MaterialTheme.colorScheme.primary,
-                        fontWeight = FontWeight.SemiBold
+                        color = SwipeHomeTheme.colors.primary,
+                        style = SwipeHomeTheme.typography.subheadline
                     )
                 }
             }
@@ -171,12 +171,17 @@ class LoginScreen: Screen {
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(56.dp),
-                shape = RoundedCornerShape(12.dp),
+                shape = SwipeHomeTheme.shapes.smallShape,
                 colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.primary
+                    containerColor = SwipeHomeTheme.colors.primary
                 )
             ){
-                Text(stringResource(Res.string.login_btn_enter), fontSize = 18.sp, fontWeight = FontWeight.Bold)
+                Text(
+                    stringResource(Res.string.login_btn_enter),
+                    style = SwipeHomeTheme.typography.body,
+                    fontWeight = FontWeight.Bold,
+                    color = SwipeHomeTheme.colors.onPrimary
+                )
             }
 
             Spacer(modifier = Modifier.height(32.dp))
@@ -186,14 +191,14 @@ class LoginScreen: Screen {
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically
             ){
-                Box(modifier = Modifier.weight(1f).height(1.dp).background(MaterialTheme.colorScheme.onBackground.copy(alpha = 0.2f)))
+                Box(modifier = Modifier.weight(1f).height(1.dp).background(SwipeHomeTheme.colors.outline))
                 Text(
                     text = stringResource(Res.string.login_enter_with),
-                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f),
-                    fontSize = 14.sp,
+                    color = SwipeHomeTheme.colors.onSurfaceSecondary,
+                    style = SwipeHomeTheme.typography.caption,
                     fontWeight = FontWeight.Bold
                 )
-                Box(modifier = Modifier.weight(1f).height(1.dp).background(MaterialTheme.colorScheme.onBackground.copy(alpha = 0.2f)))
+                Box(modifier = Modifier.weight(1f).height(1.dp).background(SwipeHomeTheme.colors.outline))
             }
 
             Spacer(modifier = Modifier.height(16.dp))
@@ -208,22 +213,33 @@ class LoginScreen: Screen {
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(56.dp),
-                    shape = RoundedCornerShape(12.dp)
+                    shape = SwipeHomeTheme.shapes.smallShape
                 ){
-                    Icon(painterResource(Res.drawable.ic_google_logo), contentDescription = null, modifier = Modifier.size(24.dp))
+                    Icon(painterResource(Res.drawable.ic_google_logo), contentDescription = null, modifier = Modifier.size(24.dp), tint = Color.Unspecified)
                     Spacer(modifier = Modifier.width(16.dp))
-                    Text(stringResource(Res.string.reg_continue_google), fontSize = 18.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onBackground)
+                    Text(
+                        stringResource(Res.string.reg_continue_google),
+                        style = SwipeHomeTheme.typography.body,
+                        fontWeight = FontWeight.Bold,
+                        color = SwipeHomeTheme.colors.neutral
+                    )
                 }
                 Button(
                     onClick = { /*TODO: Логіка авторизації Apple*/ },
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(56.dp),
-                    shape = RoundedCornerShape(12.dp)
+                    shape = SwipeHomeTheme.shapes.smallShape,
+                    colors = ButtonDefaults.buttonColors(containerColor = SwipeHomeTheme.colors.neutral)
                 ){
-                    Icon(painterResource(Res.drawable.ic_apple_logo), contentDescription = null, modifier = Modifier.size(32.dp))
+                    Icon(painterResource(Res.drawable.ic_apple_logo), contentDescription = null, modifier = Modifier.size(32.dp), tint = SwipeHomeTheme.colors.background)
                     Spacer(modifier = Modifier.width(16.dp))
-                    Text(stringResource(Res.string.reg_continue_apple), fontSize = 18.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.background)
+                    Text(
+                        stringResource(Res.string.reg_continue_apple),
+                        style = SwipeHomeTheme.typography.body,
+                        fontWeight = FontWeight.Bold,
+                        color = SwipeHomeTheme.colors.background
+                    )
                 }
             }
 
@@ -231,18 +247,20 @@ class LoginScreen: Screen {
 
             // Посилання на реєстрацію
             Row(
-                modifier = Modifier.padding(bottom = 16.dp),
+                modifier = Modifier.padding(top = 24.dp, bottom = 16.dp),
                 verticalAlignment = Alignment.CenterVertically
             ){
                 Text(
                     text = stringResource(Res.string.login_create_account),
-                    color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f)
+                    color = SwipeHomeTheme.colors.onSurfaceSecondary,
+                    style = SwipeHomeTheme.typography.label
                 )
                 TextButton(onClick = { navigator.push(RegisterScreen()) })
                 {
                     Text(
                         text = stringResource(Res.string.btn_register),
-                        color = MaterialTheme.colorScheme.primary,
+                        color = SwipeHomeTheme.colors.primary,
+                        style = SwipeHomeTheme.typography.label,
                         fontWeight = FontWeight.SemiBold
                     )
                 }

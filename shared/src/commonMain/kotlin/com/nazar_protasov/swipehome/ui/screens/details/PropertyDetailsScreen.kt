@@ -21,15 +21,14 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -46,13 +45,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.IntOffset
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import cafe.adriel.voyager.core.screen.Screen
@@ -60,15 +60,37 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import coil3.compose.AsyncImage
 import com.nazar_protasov.swipehome.ui.models.PropertyDetails
+import com.nazar_protasov.swipehome.ui.theme.SwipeHomeTheme
 import kotlinx.coroutines.launch
 import mymultiplatformproject.shared.generated.resources.Res
 import mymultiplatformproject.shared.generated.resources.Res.string
 import mymultiplatformproject.shared.generated.resources.btn_back
 import mymultiplatformproject.shared.generated.resources.btn_share
+import mymultiplatformproject.shared.generated.resources.details_screen_description
+import mymultiplatformproject.shared.generated.resources.details_screen_description_show_les
+import mymultiplatformproject.shared.generated.resources.details_screen_description_show_more
+import mymultiplatformproject.shared.generated.resources.details_screen_feauter_grid_area
+import mymultiplatformproject.shared.generated.resources.details_screen_feauter_grid_floor
+import mymultiplatformproject.shared.generated.resources.details_screen_feauter_grid_parking
+import mymultiplatformproject.shared.generated.resources.details_screen_feauter_grid_rooms
+import mymultiplatformproject.shared.generated.resources.details_screen_map_title
+import mymultiplatformproject.shared.generated.resources.details_screen_owner_contact_section_call
+import mymultiplatformproject.shared.generated.resources.details_screen_owner_contact_section_owner_phone_number
+import mymultiplatformproject.shared.generated.resources.details_screen_owner_contact_section_title
+import mymultiplatformproject.shared.generated.resources.details_screen_owner_contact_section_write
+import mymultiplatformproject.shared.generated.resources.ic_apartment_floor
 import mymultiplatformproject.shared.generated.resources.ic_arrow_back
 import mymultiplatformproject.shared.generated.resources.ic_arrow_next
+import mymultiplatformproject.shared.generated.resources.ic_arrow_single_down
+import mymultiplatformproject.shared.generated.resources.ic_arrow_single_up
+import mymultiplatformproject.shared.generated.resources.ic_bedroom
 import mymultiplatformproject.shared.generated.resources.ic_close
+import mymultiplatformproject.shared.generated.resources.ic_home_area
+import mymultiplatformproject.shared.generated.resources.ic_location_pin
+import mymultiplatformproject.shared.generated.resources.ic_parking
 import mymultiplatformproject.shared.generated.resources.ic_share
+import mymultiplatformproject.shared.generated.resources.owner_description
+import mymultiplatformproject.shared.generated.resources.search_card_section_area
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import kotlin.math.abs
@@ -89,24 +111,36 @@ data class PropertyDetailsScreen(val property: PropertyDetails) : Screen {
             topBar = {
                 TopAppBar(
                     title = {
-                        Text(property.localization, fontSize = 18.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)
+                        Text(
+                            property.localization,
+                            style = SwipeHomeTheme.typography.subheadline,
+                            color = SwipeHomeTheme.colors.neutral
+                        )
                     },
                     navigationIcon = {
                         IconButton(onClick = { navigator.pop() }) {
-                            Icon(painterResource(Res.drawable.ic_arrow_back), contentDescription = stringResource(string.btn_back))
+                            Icon(
+                                painterResource(Res.drawable.ic_arrow_back),
+                                contentDescription = stringResource(string.btn_back),
+                                tint = SwipeHomeTheme.colors.neutral
+                            )
                         }
                     },
                     actions = {
                         IconButton(onClick = {/*TODO: Share*/}){
-                            Icon(painterResource(Res.drawable.ic_share), contentDescription = stringResource(string.btn_share))
+                            Icon(
+                                painterResource(Res.drawable.ic_share),
+                                contentDescription = stringResource(string.btn_share),
+                                tint = SwipeHomeTheme.colors.neutral
+                            )
                         }
                     },
                     colors = TopAppBarDefaults.topAppBarColors(
-                        containerColor = MaterialTheme.colorScheme.background
+                        containerColor = SwipeHomeTheme.colors.background
                     )
                 )
             },
-            containerColor = MaterialTheme.colorScheme.background
+            containerColor = SwipeHomeTheme.colors.background
         ){ paddingValues ->
             Column(
                 modifier = Modifier
@@ -194,7 +228,6 @@ data class PropertyDetailsScreen(val property: PropertyDetails) : Screen {
 
             // Стрілки вліво/вправо (тільки якщо фоток більше ніж 1)
             if(imagesCount > 1) {
-                //
                 if(pagerState.currentPage > 0){
                     IconButton(
                         onClick = {
@@ -241,7 +274,7 @@ data class PropertyDetailsScreen(val property: PropertyDetails) : Screen {
                         modifier = Modifier
                             .weight(1f)
                             .height(4.dp)
-                            .clip(RoundedCornerShape(50))
+                            .clip(SwipeHomeTheme.shapes.smallShape)
                             .background(
                                 if (i == pagerState.currentPage) Color.White
                                 else Color.White.copy(alpha = 0.4f)
@@ -250,16 +283,15 @@ data class PropertyDetailsScreen(val property: PropertyDetails) : Screen {
                 }
             }
 
-
             // Картка, що наїжджає на фото
             Card(
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp),
-                shape = RoundedCornerShape(24.dp),
+                shape = SwipeHomeTheme.shapes.largeShape,
                 elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+                colors = CardDefaults.cardColors(containerColor = SwipeHomeTheme.colors.surface)
             ) {
                 Column(
                     modifier = Modifier.padding(20.dp)
@@ -272,25 +304,49 @@ data class PropertyDetailsScreen(val property: PropertyDetails) : Screen {
                         // Бейдж "Новобудова"
                         Box(
                             modifier = Modifier
-                                .background(Color(0xFF64FFDA).copy(alpha = 0.3f), RoundedCornerShape(8.dp))
+                                .background(SwipeHomeTheme.colors.primary.copy(alpha = 0.15f), SwipeHomeTheme.shapes.smallShape)
                                 .padding(horizontal = 12.dp, vertical = 6.dp)
                         ) {
-                            Text(property.building_type, color = Color(0xFF00796B), fontWeight = FontWeight.Bold, fontSize = 14.sp)
+                            Text(
+                                property.building_type,
+                                color = SwipeHomeTheme.colors.primary,
+                                style = SwipeHomeTheme.typography.caption,
+                                fontWeight = FontWeight.Bold
+                            )
                         }
 
-                        Text(property.price, fontSize = 24.sp, fontWeight = FontWeight.ExtraBold, color = MaterialTheme.colorScheme.primary)
+                        Text(
+                            property.price,
+                            style = SwipeHomeTheme.typography.headline,
+                            fontWeight = FontWeight.ExtraBold,
+                            color = SwipeHomeTheme.colors.primary
+                        )
                     }
 
                     Spacer(modifier = Modifier.height(12.dp))
 
-                    Text(property.title, fontSize = 20.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
+                    Text(
+                        property.title,
+                        style = SwipeHomeTheme.typography.subheadline,
+                        fontWeight = FontWeight.Bold,
+                        color = SwipeHomeTheme.colors.neutral
+                    )
 
                     Spacer(modifier = Modifier.height(8.dp))
 
                     Row(verticalAlignment = Alignment.CenterVertically) {
-                        Text("📍", fontSize = 16.sp)
+                        Icon(
+                            painterResource(Res.drawable.ic_location_pin),
+                            contentDescription = null,
+                            tint = SwipeHomeTheme.colors.onSurfaceSecondary,
+                            modifier = Modifier.size(16.dp)
+                        )
                         Spacer(modifier = Modifier.width(4.dp))
-                        Text(property.localization, fontSize = 14.sp, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f))
+                        Text(
+                            property.localization,
+                            style = SwipeHomeTheme.typography.label,
+                            color = SwipeHomeTheme.colors.onSurfaceSecondary
+                        )
                     }
                 }
             }
@@ -398,7 +454,7 @@ data class PropertyDetailsScreen(val property: PropertyDetails) : Screen {
                         modifier = Modifier
                             .align(Alignment.BottomCenter)
                             .padding(32.dp),
-                        fontSize = 16.sp,
+                        style = SwipeHomeTheme.typography.body,
                         fontWeight = FontWeight.Bold
                     )
 
@@ -425,48 +481,63 @@ data class PropertyDetailsScreen(val property: PropertyDetails) : Screen {
         ) {
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 FeatureItem(
-                    icon = "🛏️",
+                    icon = painterResource(Res.drawable.ic_bedroom),
                     value = property.rooms,
-                    label = "Кімнати",
+                    label = stringResource(string.details_screen_feauter_grid_rooms),
                     modifier = Modifier.weight(1f)
                 )
                 FeatureItem(
-                    icon = "📐",
-                    value = property.area + "м²",
-                    label = "Загальна площа",
+                    icon = painterResource(Res.drawable.ic_home_area),
+                    value = property.area + stringResource(string.search_card_section_area),
+                    label = stringResource(string.details_screen_feauter_grid_area),
                     modifier = Modifier.weight(1f)
                 )
             }
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                 FeatureItem(
-                    icon = "🏢",
+                    icon = painterResource(Res.drawable.ic_apartment_floor),
                     value = "14/24",
-                    label = "Поверх",
+                    label = stringResource(string.details_screen_feauter_grid_floor),
                     modifier = Modifier.weight(1f)
                 )
                 FeatureItem(
-                    icon = "🅿️",
+                    icon = painterResource(Res.drawable.ic_parking),
                     value = property.parking,
-                    label = "Паркінг",
+                    label = stringResource(string.details_screen_feauter_grid_parking),
                     modifier = Modifier.weight(1f)
                 )
             }
         }
     }
+
     @Composable
-    fun FeatureItem(icon: String, value: String, label: String, modifier: Modifier = Modifier) {
+    fun FeatureItem(icon: Painter, value: String, label: String, modifier: Modifier = Modifier) {
         Box(
             modifier = modifier
-                .clip(RoundedCornerShape(16.dp))
-                .background(MaterialTheme.colorScheme.onSurface.copy(alpha = 0.05f))
+                .clip(SwipeHomeTheme.shapes.mediumShape)
+                .background(SwipeHomeTheme.colors.surface)
                 .padding(16.dp),
             contentAlignment = Alignment.Center
         ) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                Text(icon, fontSize = 24.sp)
+                Icon(
+                    icon,
+                    contentDescription = null,
+                    tint = SwipeHomeTheme.colors.primary,
+                    modifier = Modifier.size(24.dp)
+                )
                 Spacer(modifier = Modifier.height(4.dp))
-                Text(value, fontSize = 18.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface)
-                Text(label, fontSize = 12.sp, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f))
+                Text(
+                    value,
+                    style = SwipeHomeTheme.typography.subheadline,
+                    fontWeight = FontWeight.Bold,
+                    color = SwipeHomeTheme.colors.neutral
+                )
+                Text(
+                    label,
+                    style = SwipeHomeTheme.typography.caption,
+                    color = SwipeHomeTheme.colors.onSurfaceSecondary
+                )
             }
         }
     }
@@ -477,17 +548,17 @@ data class PropertyDetailsScreen(val property: PropertyDetails) : Screen {
 
         Column(modifier = Modifier.padding(horizontal = 16.dp)){
             Text(
-                text = "Опис об'єкту",
-                fontSize = 20.sp,
+                text = stringResource(string.details_screen_description),
+                style = SwipeHomeTheme.typography.subheadline,
                 fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onSurface,
+                color = SwipeHomeTheme.colors.neutral,
             )
             Spacer(modifier = Modifier.height(12.dp))
 
             Text(
                 text = property.description,
-                fontSize = 15.sp,
-                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.8f),
+                style = SwipeHomeTheme.typography.body,
+                color = SwipeHomeTheme.colors.onSurfaceSecondary,
                 lineHeight = 22.sp,
                 maxLines = if (isExpanded) Int.MAX_VALUE else 5,
                 overflow = TextOverflow.Ellipsis
@@ -495,12 +566,35 @@ data class PropertyDetailsScreen(val property: PropertyDetails) : Screen {
 
             Spacer(modifier = Modifier.height(8.dp))
 
-            Text(
-                text = if(isExpanded) "Згорнути ^" else "Читати далі ⌄",
-                color = MaterialTheme.colorScheme.primary,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.clickable { isExpanded = !isExpanded },
-            )
+            Row(verticalAlignment = Alignment.CenterVertically) {
+                Text(
+                    text = if (isExpanded) {
+                        stringResource(string.details_screen_description_show_les)
+                    } else {
+                        stringResource(string.details_screen_description_show_more)
+                    },
+                    color = SwipeHomeTheme.colors.primary,
+                    style = SwipeHomeTheme.typography.label,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.clickable { isExpanded = !isExpanded },
+                )
+                Spacer(modifier = Modifier.width(4.dp))
+                if (isExpanded) {
+                    Icon(
+                        painterResource(Res.drawable.ic_arrow_single_up),
+                        contentDescription = null,
+                        tint = SwipeHomeTheme.colors.primary,
+                        modifier = Modifier.size(16.dp)
+                    )
+                } else {
+                    Icon(
+                        painterResource(Res.drawable.ic_arrow_single_down),
+                        contentDescription = null,
+                        tint = SwipeHomeTheme.colors.primary,
+                        modifier = Modifier.size(16.dp)
+                    )
+                }
+            }
         }
     }
 
@@ -514,13 +608,15 @@ data class PropertyDetailsScreen(val property: PropertyDetails) : Screen {
             ) {
                 Text(
                     text = property.localization,
+                    style = SwipeHomeTheme.typography.subheadline,
                     fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onSurface
+                    color = SwipeHomeTheme.colors.neutral
                 )
                 Text(
-                    text = "Переглянути все",
+                    text = stringResource(string.details_screen_map_title),
+                    style = SwipeHomeTheme.typography.label,
                     fontWeight = FontWeight.SemiBold,
-                    color = MaterialTheme.colorScheme.primary
+                    color = SwipeHomeTheme.colors.primary
                 )
             }
 
@@ -531,11 +627,15 @@ data class PropertyDetailsScreen(val property: PropertyDetails) : Screen {
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(180.dp)
-                    .clip(RoundedCornerShape(16.dp))
-                    .background(Color.LightGray),
+                    .clip(SwipeHomeTheme.shapes.mediumShape)
+                    .background(SwipeHomeTheme.colors.surface),
                 contentAlignment = Alignment.Center
             ){
-                Text("Карта ", fontSize = 24.sp)
+                Text(
+                    "Карта",
+                    style = SwipeHomeTheme.typography.headline,
+                    color = SwipeHomeTheme.colors.onSurfaceSecondary
+                )
             }
         }
     }
@@ -546,12 +646,17 @@ data class PropertyDetailsScreen(val property: PropertyDetails) : Screen {
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp),
-            shape = RoundedCornerShape(16.dp),
-            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.05f)),
+            shape = SwipeHomeTheme.shapes.mediumShape,
+            colors = CardDefaults.cardColors(containerColor = SwipeHomeTheme.colors.surface),
             elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
         ) {
             Column(modifier = Modifier.padding(16.dp)){
-                Text("КОНТАКТИ ВЛАСНИКА", fontSize = 12.sp, fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f))
+                Text(
+                    stringResource(string.details_screen_owner_contact_section_title),
+                    style = SwipeHomeTheme.typography.caption,
+                    fontWeight = FontWeight.Bold,
+                    color = SwipeHomeTheme.colors.onSurfaceSecondary
+                )
 
                 Spacer(modifier = Modifier.height(16.dp))
 
@@ -560,7 +665,7 @@ data class PropertyDetailsScreen(val property: PropertyDetails) : Screen {
                     Box{
                         AsyncImage(
                             model = "",
-                            contentDescription = "Власник",
+                            contentDescription = stringResource(string.owner_description),
                             modifier = Modifier
                                 .size(56.dp)
                                 .clip(CircleShape)
@@ -571,16 +676,25 @@ data class PropertyDetailsScreen(val property: PropertyDetails) : Screen {
                                 .align(Alignment.BottomEnd)
                                 .offset(x = (-2).dp, y = (-2).dp)
                                 .clip(CircleShape)
-                                .background(Color.Green)
-                                .border(2.dp, MaterialTheme.colorScheme.onSurface, CircleShape)
+                                .background(Color(0xFF4CAF50))
+                                .border(2.dp, SwipeHomeTheme.colors.surface, CircleShape)
                         )
                     }
 
                     Spacer(modifier = Modifier.width(16.dp))
 
                     Column {
-                        Text("Петро Мафіознік", fontSize = 18.sp, fontWeight = FontWeight.Bold)
-                        Text("Номер телефону власника", fontSize = 14.sp, color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f))
+                        Text(
+                            "Петро Мафіознік",
+                            style = SwipeHomeTheme.typography.subheadline,
+                            fontWeight = FontWeight.Bold,
+                            color = SwipeHomeTheme.colors.neutral
+                        )
+                        Text(
+                            stringResource(string.details_screen_owner_contact_section_owner_phone_number),
+                            style = SwipeHomeTheme.typography.caption,
+                            color = SwipeHomeTheme.colors.onSurfaceSecondary
+                        )
                     }
                 }
 
@@ -590,17 +704,28 @@ data class PropertyDetailsScreen(val property: PropertyDetails) : Screen {
                     Button(
                         onClick = { /*TODO*/ },
                         modifier = Modifier.weight(1f).height(48.dp),
-                        shape = RoundedCornerShape(12.dp)
+                        shape = SwipeHomeTheme.shapes.smallShape,
+                        colors = ButtonDefaults.buttonColors(containerColor = SwipeHomeTheme.colors.primary)
                     ){
-                        Text("Написати")
+                        Text(
+                            stringResource(string.details_screen_owner_contact_section_write),
+                            style = SwipeHomeTheme.typography.label,
+                            fontWeight = FontWeight.Bold,
+                            color = SwipeHomeTheme.colors.onPrimary
+                        )
                     }
 
                     OutlinedButton(
                         onClick = { /*TODO*/ },
                         modifier = Modifier.weight(1f).height(48.dp),
-                        shape = RoundedCornerShape(12.dp)
+                        shape = SwipeHomeTheme.shapes.smallShape,
+                        colors = ButtonDefaults.outlinedButtonColors(contentColor = SwipeHomeTheme.colors.primary)
                     ){
-                        Text("Зателефонувати")
+                        Text(
+                            stringResource(string.details_screen_owner_contact_section_call),
+                            style = SwipeHomeTheme.typography.label,
+                            fontWeight = FontWeight.Bold
+                        )
                     }
                 }
             }

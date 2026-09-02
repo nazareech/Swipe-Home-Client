@@ -1,0 +1,14 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <!-- Контур будинку та шари поверхів -->
+    <path
+        android:fillColor="#FF212121"
+        android:pathData="M19,2H9C7.9,2 7,2.9 7,4v18h14V4C21,2.9 20.1,2 19,2zM19,4v3h-4V4H19zM13,4v3H9V4H13zM9,9h4v3H9V9zM13,14h-4v3h4V14zM9,19h4v2H9v-2zM19,21h-4v-2h4V21zM19,17h-4v-3h4V17zM19,12h-4V9h4V12z" />
+    <!-- Акцентна стрілка, що вказує на поверх (висоту) -->
+    <path
+        android:fillColor="#4285F4"
+        android:pathData="M4,11h2v6H4zM5,6L2,10h6z" />
+</vector>

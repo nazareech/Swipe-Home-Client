@@ -43,10 +43,6 @@ import mymultiplatformproject.shared.generated.resources.ic_search_cards
 import mymultiplatformproject.shared.generated.resources.main_bottom_nav_search
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
-
-import coil3.ImageLoader
-import coil3.compose.setSingletonImageLoaderFactory
-import coil3.network.ktor3.KtorNetworkFetcherFactory
 import com.nazar_protasov.swipehome.network.toUIDetailsProperty
 import com.nazar_protasov.swipehome.ui.components.rememberSwipeCardState
 import com.nazar_protasov.swipehome.ui.screens.details.PropertyDetailsScreen
@@ -106,15 +102,6 @@ internal class HomeScreen : Screen {
         // Спостерігаємо за станами (дані для сервера)
         val properties by screenModel.properties.collectAsState()
         val isLoading by screenModel.isLoading.collectAsState()
-
-        // --- Налаштування Coil
-        setSingletonImageLoaderFactory { context ->
-            ImageLoader.Builder(context)
-                .components {
-                    add(KtorNetworkFetcherFactory())
-                }
-                .build()
-        }
 
         Column(
             modifier = Modifier

@@ -14,6 +14,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.unit.IntOffset
 import cafe.adriel.voyager.core.stack.StackEvent
 import cafe.adriel.voyager.navigator.Navigator
+import coil3.ImageLoader
+import coil3.compose.setSingletonImageLoaderFactory
+import coil3.network.ktor3.KtorNetworkFetcherFactory
 import com.nazar_protasov.swipehome.di.appModule
 import com.nazar_protasov.swipehome.ui.screens.OnboardingScreen
 import com.nazar_protasov.swipehome.ui.screens.SplashScreen
@@ -24,6 +27,14 @@ import org.koin.compose.KoinApplication
 
 @Composable
 fun App() {
+    setSingletonImageLoaderFactory { context ->
+        ImageLoader.Builder(context)
+            .components {
+                add(KtorNetworkFetcherFactory())
+            }
+            .build()
+    }
+
     KoinApplication(application = {
             modules(appModule)
     }) {

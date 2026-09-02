@@ -15,38 +15,37 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import cafe.adriel.voyager.core.screen.Screen
-import cafe.adriel.voyager.core.screen.uniqueScreenKey
-import cafe.adriel.voyager.navigator.LocalNavigator
-import cafe.adriel.voyager.navigator.currentOrThrow
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import cafe.adriel.voyager.core.screen.Screen
+import cafe.adriel.voyager.core.screen.uniqueScreenKey
+import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.currentOrThrow
 import com.nazar_protasov.swipehome.ui.screens.auth.LoginScreen
+import com.nazar_protasov.swipehome.ui.theme.SwipeHomeTheme
 import kotlinx.coroutines.launch
 import mymultiplatformproject.shared.generated.resources.Res
 import mymultiplatformproject.shared.generated.resources.btn_next
 import mymultiplatformproject.shared.generated.resources.onboarding_btn_get_started
+import mymultiplatformproject.shared.generated.resources.onboarding_btn_skip
 import mymultiplatformproject.shared.generated.resources.onboarding_description_1
 import mymultiplatformproject.shared.generated.resources.onboarding_description_2
 import mymultiplatformproject.shared.generated.resources.onboarding_description_3
 import mymultiplatformproject.shared.generated.resources.onboarding_title_1
 import mymultiplatformproject.shared.generated.resources.onboarding_title_2
 import mymultiplatformproject.shared.generated.resources.onboarding_title_3
-import mymultiplatformproject.shared.generated.resources.onboarding_btn_skip
 import org.jetbrains.compose.resources.stringResource
 
 // Модель даних для слайда
@@ -55,6 +54,7 @@ class OnboardingPage(
     val description: String,
     val iconEmoji: String
 )
+
 class OnboardingScreen : Screen {
     override val key = uniqueScreenKey
 
@@ -85,10 +85,11 @@ class OnboardingScreen : Screen {
         )
 
         val pagerState = rememberPagerState(pageCount = { pages.size })
+
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(MaterialTheme.colorScheme.background), // Додаємо фон з нашої теми
+                .background(SwipeHomeTheme.colors.background),
         ) {
             // Головна колонка екрана
             Column(
@@ -106,20 +107,20 @@ class OnboardingScreen : Screen {
 
                 Spacer(modifier = Modifier.height(32.dp))
 
-                // Індикатор сторінки
+                // Індикатор сторінок
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.Center
                 ) {
                     repeat(pages.size) { iteration ->
                         val color = if (pagerState.currentPage == iteration)
-                            MaterialTheme.colorScheme.primary
+                            SwipeHomeTheme.colors.primary
                         else
-                            MaterialTheme.colorScheme.onBackground.copy(alpha = 0.2f)
+                            SwipeHomeTheme.colors.outline
 
                         Box(
                             modifier = Modifier
-                                .padding(2.dp)
+                                .padding(3.dp)
                                 .clip(CircleShape)
                                 .background(color)
                                 .size(if (pagerState.currentPage == iteration) 12.dp else 8.dp)
@@ -129,7 +130,7 @@ class OnboardingScreen : Screen {
 
                 Spacer(modifier = Modifier.weight(1f))
 
-                // Кнопка навігації
+                // Кнопка переходу
                 Button(
                     onClick = {
                         if (pagerState.currentPage < pages.size - 1) {
@@ -144,20 +145,24 @@ class OnboardingScreen : Screen {
                         .fillMaxWidth()
                         .padding(horizontal = 24.dp, vertical = 32.dp)
                         .height(56.dp),
-                    shape = RoundedCornerShape(12.dp),
+                    shape = SwipeHomeTheme.shapes.smallShape,
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.primary,
+                        containerColor = SwipeHomeTheme.colors.primary,
                     )
                 ) {
                     Text(
-                        text = if (pagerState.currentPage == pages.size - 1) stringResource(Res.string.onboarding_btn_get_started) else stringResource(Res.string.btn_next),
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Bold
+                        text = if (pagerState.currentPage == pages.size - 1)
+                            stringResource(Res.string.onboarding_btn_get_started)
+                        else
+                            stringResource(Res.string.btn_next),
+                        style = SwipeHomeTheme.typography.subheadline,
+                        fontWeight = FontWeight.Bold,
+                        color = SwipeHomeTheme.colors.onPrimary
                     )
                 }
             }
 
-            // Кнопка Skip, щоб вона малювалась поверх колонки
+            // Кнопка Skip
             TextButton(
                 onClick = { navigator.replace(LoginScreen()) },
                 modifier = Modifier
@@ -166,13 +171,13 @@ class OnboardingScreen : Screen {
             ) {
                 Text(
                     text = stringResource(Res.string.onboarding_btn_skip),
-                    color = MaterialTheme.colorScheme.primary,
+                    color = SwipeHomeTheme.colors.primary,
+                    style = SwipeHomeTheme.typography.label,
                     fontWeight = FontWeight.Bold
                 )
             }
         }
     }
-
 
     @Composable
     fun PagerScreen(page: OnboardingPage) {
@@ -188,25 +193,22 @@ class OnboardingScreen : Screen {
             Box(
                 modifier = Modifier
                     .size(160.dp)
-                    .clip(RoundedCornerShape(24.dp))
-                    .background(MaterialTheme.colorScheme.secondary),
+                    .clip(SwipeHomeTheme.shapes.largeShape)
+                    .background(SwipeHomeTheme.colors.primary.copy(alpha = 0.15f)),
                 contentAlignment = Alignment.Center
-            )
-            {
+            ) {
                 Text(
                     text = page.iconEmoji,
                     fontSize = 60.sp
                 )
             }
 
-
             Spacer(modifier = Modifier.height(32.dp))
 
             Text(
                 text = page.title,
-                color = MaterialTheme.colorScheme.onBackground,
-                fontSize = 28.sp,
-                fontWeight = FontWeight.Bold,
+                color = SwipeHomeTheme.colors.neutral,
+                style = SwipeHomeTheme.typography.headline,
                 textAlign = TextAlign.Center,
                 lineHeight = 34.sp
             )
@@ -215,8 +217,8 @@ class OnboardingScreen : Screen {
 
             Text(
                 text = page.description,
-                color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.7f),
-                fontSize = 16.sp,
+                color = SwipeHomeTheme.colors.onSurfaceSecondary,
+                style = SwipeHomeTheme.typography.body,
                 textAlign = TextAlign.Center,
                 lineHeight = 24.sp
             )

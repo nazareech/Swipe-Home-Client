@@ -18,7 +18,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -33,7 +32,6 @@ import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
@@ -60,14 +58,7 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.uniqueScreenKey
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import com.nazar_protasov.swipehome.ui.theme.BackgroundLight
-import com.nazar_protasov.swipehome.ui.theme.ErrorRed
-import com.nazar_protasov.swipehome.ui.theme.PrimaryGreen
-import com.nazar_protasov.swipehome.ui.theme.SecondaryGreen
-import com.nazar_protasov.swipehome.ui.theme.SurfaceGray
-import com.nazar_protasov.swipehome.ui.theme.SurfaceWhite
-import com.nazar_protasov.swipehome.ui.theme.TextPrimary
-import com.nazar_protasov.swipehome.ui.theme.TextSecondary
+import com.nazar_protasov.swipehome.ui.theme.SwipeHomeTheme
 import mymultiplatformproject.shared.generated.resources.*
 import mymultiplatformproject.shared.generated.resources.Res.string
 import org.jetbrains.compose.resources.painterResource
@@ -97,78 +88,61 @@ class FilterScreen(private val homeScreenModel: HomeScreenModel) : Screen {
         val activeFilters = homeScreenModel.currentFilters.value
 
         // --- Стани фільтрів ---
-        
-        // Мапінг категорій
-        val categoryToLabel = mapOf(
-            FilterRequestDTO.CATEGORY_APARTMENT to apartmentStr,
-            FilterRequestDTO.CATEGORY_HOUSE to houseStr,
-            FilterRequestDTO.CATEGORY_ROOM to roomsStr
-        )
-        val labelToCategory = categoryToLabel.entries.associate { it.value to it.key }
-        
-        var selectedCategoryLabel by remember(apartmentStr) { 
-            mutableStateOf(categoryToLabel[activeFilters.category] ?: apartmentStr) 
-        }
-
-        // Мапінг типів угоди
-        val dealToLabel = mapOf(
-            null to allStr,
-            FilterRequestDTO.DEAL_RENT to rentStr,
-            FilterRequestDTO.DEAL_SALE to saleStr
-        )
-        val labelToDeal = dealToLabel.entries.associate { it.value to it.key }
-        
-        var selectedDealLabel by remember(allStr) { 
-            mutableStateOf(dealToLabel[activeFilters.subcategory] ?: allStr) 
-        }
+        var selectedCategoryLabel by remember { mutableStateOf(apartmentStr) }
+        var selectedDealLabel by remember { mutableStateOf(allStr) }
 
         var minPrice by remember { mutableStateOf(activeFilters.priceMin?.toInt()?.toString() ?: "") }
         var maxPrice by remember { mutableStateOf(activeFilters.priceMax?.toInt()?.toString() ?: "") }
+
         var minArea by remember { mutableStateOf(activeFilters.areaMin?.toInt()?.toString() ?: "") }
         var maxArea by remember { mutableStateOf(activeFilters.areaMax?.toInt()?.toString() ?: "") }
-        
-        var selectedRooms by remember(studioStr) {
-            mutableStateOf(
-                if (activeFilters.rooms == null && activeFilters.category != null) studioStr else activeFilters.rooms?.toString() ?: "1"
-            )
-        }
 
-        // Стани для випадаючих списків
+        var selectedRooms by remember { mutableStateOf(activeFilters.rooms?.toString() ?: "1") }
+
         var buildingTypeExpanded by remember { mutableStateOf(false) }
-        var selectedTypeExpanded by remember(allTypesStr) { mutableStateOf(activeFilters.buildingType ?: allTypesStr) }
+        var selectedTypeExpanded by remember { mutableStateOf(activeFilters.buildingType ?: allTypesStr) }
 
         var floorExpanded by remember { mutableStateOf(false) }
-        var selectedFloor by remember(anyFloorStr) { mutableStateOf(activeFilters.floor ?: anyFloorStr) }
+        var selectedFloor by remember { mutableStateOf(activeFilters.floor ?: anyFloorStr) }
 
-        var selectedParking by remember(allStr) { mutableStateOf(activeFilters.parking ?: allStr) }
+        var selectedParking by remember { mutableStateOf(activeFilters.parking ?: allStr) }
 
-        // Світчі
+        // Зручності
         var petsAllowed by remember { mutableStateOf(activeFilters.petsAllowed ?: false) }
-        var withFurniture by remember { mutableStateOf(activeFilters.furniture ?: false) }
         var hasElevator by remember { mutableStateOf(activeFilters.elevator ?: false) }
+        var withFurniture by remember { mutableStateOf(activeFilters.furniture ?: false) }
         var hasBalcony by remember { mutableStateOf(activeFilters.balcony ?: false) }
+
+        // Мапінг текстових назв категорій
+        val labelToCategory = mapOf(
+            apartmentStr to "APARTMENT",
+            houseStr to "HOUSE",
+            roomsStr to "ROOM"
+        )
+
+        val labelToDeal = mapOf(
+            rentStr to "RENT",
+            saleStr to "SALE"
+        )
 
         Scaffold(
             topBar = {
                 CenterAlignedTopAppBar(
                     title = {
-                        // --- Великий заголовок ---
                         Row(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.Bottom
                         ){
-                          Text(
+                            Text(
                                 text = stringResource(string.filter_screen_title),
-                                fontSize = 24.sp,
-                                fontWeight = FontWeight.ExtraBold,
-                                color = TextPrimary // Колір для заголовка
+                                style = SwipeHomeTheme.typography.headline,
+                                color = SwipeHomeTheme.colors.neutral
                             )
                             Text(
                                 text = stringResource(string.filter_clear),
-                                fontSize = 14.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = ErrorRed, // Колір для очищення
+                                style = SwipeHomeTheme.typography.label,
+                                color = SwipeHomeTheme.colors.error,
                                 modifier = Modifier
                                     .clickable {
                                         selectedCategoryLabel = apartmentStr
@@ -191,14 +165,14 @@ class FilterScreen(private val homeScreenModel: HomeScreenModel) : Screen {
                         }
                     },
                     colors = TopAppBarDefaults.topAppBarColors(
-                      containerColor = BackgroundLight // Колір фону для фону
+                        containerColor = SwipeHomeTheme.colors.background
                     )
                 )
             },
             bottomBar = {
                 Row(modifier = Modifier
                     .fillMaxWidth()
-                    .background(BackgroundLight)
+                    .background(SwipeHomeTheme.colors.background)
                     .padding(16.dp)
                     .navigationBarsPadding(),
                     horizontalArrangement = Arrangement.spacedBy(12.dp)
@@ -206,28 +180,27 @@ class FilterScreen(private val homeScreenModel: HomeScreenModel) : Screen {
                     OutlinedButton(
                         onClick = { navigator.pop() },
                         modifier = Modifier.weight(1.5f).height(56.dp),
-                        shape = RoundedCornerShape(12.dp)
+                        shape = SwipeHomeTheme.shapes.smallShape
                     ){
-                        Text(stringResource(string.filter_cancel), fontSize = 16.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
+                        Text(
+                            stringResource(string.filter_cancel),
+                            style = SwipeHomeTheme.typography.body,
+                            fontWeight = FontWeight.Bold,
+                            textAlign = TextAlign.Center
+                        )
                     }
                     Button(
                         onClick = {
-                            // Збираємо актуальні дані з UI й створюємо новий DTO
                             val request = FilterRequestDTO(
                                 limit = 10,
                                 offset = 0,
-                                // Базові фільтри
                                 category = labelToCategory[selectedCategoryLabel],
                                 subcategory = labelToDeal[selectedDealLabel],
                                 localization = null,
-
-                                // Діапазони
                                 priceMin = minPrice.toDoubleOrNull(),
                                 priceMax = maxPrice.toDoubleOrNull(),
                                 areaMin = minArea.toDoubleOrNull(),
                                 areaMax = maxArea.toDoubleOrNull(),
-
-                                // Специфічні фільтри
                                 rooms = if (selectedRooms == studioStr) null else selectedRooms.toIntOrNull(),
                                 floor = if (selectedFloor == anyFloorStr) null else selectedFloor,
                                 parking = if (selectedParking == allStr) null else selectedParking,
@@ -237,19 +210,23 @@ class FilterScreen(private val homeScreenModel: HomeScreenModel) : Screen {
                                 balcony = hasBalcony,
                                 buildingType = if (selectedTypeExpanded == allTypesStr) null else selectedTypeExpanded,
                             )
-                        // TODO: Зібрати всі дані, оновити глобальний стан і закрити екран
                             homeScreenModel.updateFilters(request)
                             navigator.pop()
                         },
                         modifier = Modifier.weight(1.5f).height(56.dp),
-                        shape = RoundedCornerShape(12.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = PrimaryGreen)
+                        shape = SwipeHomeTheme.shapes.smallShape,
+                        colors = ButtonDefaults.buttonColors(containerColor = SwipeHomeTheme.colors.primary)
                     ){
-                        Text(stringResource(string.filter_apply), fontSize = 16.sp, fontWeight = FontWeight.Bold, textAlign = TextAlign.Center)
+                        Text(
+                            stringResource(string.filter_apply),
+                            style = SwipeHomeTheme.typography.body,
+                            fontWeight = FontWeight.Bold,
+                            textAlign = TextAlign.Center
+                        )
                     }
                 }
             },
-            containerColor = BackgroundLight // Загальний фон
+            containerColor = SwipeHomeTheme.colors.background
         ){ paddingValues ->
             Column(
                 modifier = Modifier
@@ -384,45 +361,45 @@ class FilterScreen(private val homeScreenModel: HomeScreenModel) : Screen {
                 }
 
                 // --- Зручності (Світчі) ---
-               Card(
-                   shape = RoundedCornerShape(12.dp),
-                   colors = CardDefaults.cardColors(containerColor = SurfaceWhite),
-                   elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-                   modifier = Modifier.fillMaxWidth()
-               ){
-                   Column(modifier = Modifier.padding(16.dp)) {
-                       SwitchRowExpanded(
-                           title = stringResource(string.filter_amenities_pets),
-                           subtitle = stringResource(string.filter_amenities_pets_desc),
-                           icon = painterResource(Res.drawable.ic_pets_allowed),
-                           checked = petsAllowed, onCheckedChange = { petsAllowed = it}
-                       )
-                       HorizontalDivider(color = SurfaceGray, modifier = Modifier.padding(vertical = 12.dp))
+                Card(
+                    shape = SwipeHomeTheme.shapes.smallShape,
+                    colors = CardDefaults.cardColors(containerColor = SwipeHomeTheme.colors.surface),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+                    modifier = Modifier.fillMaxWidth()
+                ){
+                    Column(modifier = Modifier.padding(16.dp)) {
+                        SwitchRowExpanded(
+                            title = stringResource(string.filter_amenities_pets),
+                            subtitle = stringResource(string.filter_amenities_pets_desc),
+                            icon = painterResource(Res.drawable.ic_pets_allowed),
+                            checked = petsAllowed, onCheckedChange = { petsAllowed = it}
+                        )
+                        HorizontalDivider(color = SwipeHomeTheme.colors.outline, modifier = Modifier.padding(vertical = 12.dp))
 
-                       SwitchRowExpanded(
-                           title = stringResource(string.filter_amenities_elevator),
-                           subtitle = stringResource(string.filter_amenities_elevator_desc),
-                           icon = painterResource(Res.drawable.ic_elevator),
-                           checked = hasElevator, onCheckedChange = { hasElevator = it}
-                       )
-                       HorizontalDivider(color = SurfaceGray, modifier = Modifier.padding(vertical = 12.dp))
+                        SwitchRowExpanded(
+                            title = stringResource(string.filter_amenities_elevator),
+                            subtitle = stringResource(string.filter_amenities_elevator_desc),
+                            icon = painterResource(Res.drawable.ic_elevator),
+                            checked = hasElevator, onCheckedChange = { hasElevator = it}
+                        )
+                        HorizontalDivider(color = SwipeHomeTheme.colors.outline, modifier = Modifier.padding(vertical = 12.dp))
 
-                       SwitchRowExpanded(
-                           title = stringResource(string.filter_amenities_furniture),
-                           subtitle = stringResource(string.filter_amenities_furniture_desc),
-                           icon = painterResource(Res.drawable.ic_sofa),
-                           checked = withFurniture, onCheckedChange = { withFurniture = it}
-                       )
-                       HorizontalDivider(color = SurfaceGray, modifier = Modifier.padding(vertical = 12.dp))
+                        SwitchRowExpanded(
+                            title = stringResource(string.filter_amenities_furniture),
+                            subtitle = stringResource(string.filter_amenities_furniture_desc),
+                            icon = painterResource(Res.drawable.ic_sofa),
+                            checked = withFurniture, onCheckedChange = { withFurniture = it}
+                        )
+                        HorizontalDivider(color = SwipeHomeTheme.colors.outline, modifier = Modifier.padding(vertical = 12.dp))
 
-                       SwitchRowExpanded(
-                           title = stringResource(string.filter_amenities_balcony),
-                           subtitle = stringResource(string.filter_amenities_balcony_desc),
-                           icon = painterResource(Res.drawable.ic_balcony),
-                           checked = hasBalcony, onCheckedChange = { hasBalcony = it}
-                       )
-                   }
-               }
+                        SwitchRowExpanded(
+                            title = stringResource(string.filter_amenities_balcony),
+                            subtitle = stringResource(string.filter_amenities_balcony_desc),
+                            icon = painterResource(Res.drawable.ic_balcony),
+                            checked = hasBalcony, onCheckedChange = { hasBalcony = it}
+                        )
+                    }
+                }
                 Spacer(modifier = Modifier.height(32.dp))
             }
         }
@@ -435,29 +412,30 @@ fun FilterSection(title: String, content: @Composable () -> Unit){
     Column {
         Text(
             text = title,
-            fontSize = 12.sp,
+            style = SwipeHomeTheme.typography.caption,
             fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colorScheme.onBackground, // Колір для підписів
+            color = SwipeHomeTheme.colors.neutral,
             letterSpacing = 1.sp
         )
         Spacer(modifier = Modifier.height(12.dp))
         content()
     }
 }
+
 @Composable
 fun CustomChip(text: String, isSelected: Boolean, onClick: () -> Unit, modifier: Modifier = Modifier){
-    val bdColor = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface
-    val textColor = if (isSelected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface
+    val bdColor = if (isSelected) SwipeHomeTheme.colors.primary else SwipeHomeTheme.colors.surface
+    val textColor = if (isSelected) SwipeHomeTheme.colors.onPrimary else SwipeHomeTheme.colors.onSurface
 
     Box(
         modifier = modifier
-            .clip(RoundedCornerShape(12.dp))
+            .clip(SwipeHomeTheme.shapes.smallShape)
             .background(bdColor)
             .clickable { onClick() }
             .padding(horizontal = 16.dp, vertical = 12.dp),
         contentAlignment = Alignment.Center
     ){
-        Text(text = text, fontSize = 14.sp, fontWeight = FontWeight.Medium, color = textColor)
+        Text(text = text, style = SwipeHomeTheme.typography.label, color = textColor)
     }
 }
 
@@ -468,10 +446,10 @@ fun RangeInputRow(
 ){
     Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
         CustomTextField(
-            value = minValue, onMinChange,
+            value = minValue, onValueChange = onMinChange,
             label = stringResource(string.filter_price_from), placeholder = minPlaceholder, modifier = Modifier.weight(1f)
         )
-        Text("-", color = TextSecondary)
+        Text("-", color = SwipeHomeTheme.colors.onSurfaceSecondary)
         CustomTextField(
             value = maxValue, onValueChange = onMaxChange,
             label = stringResource(string.filter_price_to), placeholder = maxPlaceholder, modifier = Modifier.weight(1f)
@@ -485,13 +463,13 @@ fun CustomTextField(value: String, onValueChange: (String) -> Unit, label: Strin
     TextField(
         value = value,
         onValueChange = { if (it.all { char -> char.isDigit() }) onValueChange(it) },
-        label = { Text(label, color = TextSecondary) },
-        placeholder = { Text(placeholder, color = TextSecondary) },
+        label = { Text(label, color = SwipeHomeTheme.colors.onSurfaceSecondary) },
+        placeholder = { Text(placeholder, color = SwipeHomeTheme.colors.onSurfaceSecondary) },
         modifier = modifier.height(64.dp),
-        shape = RoundedCornerShape(12.dp),
+        shape = SwipeHomeTheme.shapes.smallShape,
         colors = TextFieldDefaults.colors(
-            focusedContainerColor = SurfaceGray,
-            unfocusedContainerColor = SurfaceGray,
+            focusedContainerColor = SwipeHomeTheme.colors.surface,
+            unfocusedContainerColor = SwipeHomeTheme.colors.surface,
             focusedIndicatorColor = Color.Transparent,
             unfocusedIndicatorColor = Color.Transparent,
         ),
@@ -522,10 +500,10 @@ fun CustomDropdown(
                 .menuAnchor(type = ExposedDropdownMenuAnchorType.PrimaryNotEditable, enabled = true)
                 .fillMaxWidth()
                 .height(56.dp),
-            shape = RoundedCornerShape(12.dp),
+            shape = SwipeHomeTheme.shapes.smallShape,
             colors = TextFieldDefaults.colors(
-                focusedContainerColor = SurfaceGray,
-                unfocusedContainerColor = SurfaceGray,
+                focusedContainerColor = SwipeHomeTheme.colors.surface,
+                unfocusedContainerColor = SwipeHomeTheme.colors.surface,
                 focusedIndicatorColor = Color.Transparent,
                 unfocusedIndicatorColor = Color.Transparent,
             )
@@ -533,11 +511,11 @@ fun CustomDropdown(
         ExposedDropdownMenu(
             expanded = expanded,
             onDismissRequest = { onExpandedChange(false) },
-            modifier = Modifier.background(SurfaceGray)
+            modifier = Modifier.background(SwipeHomeTheme.colors.surface)
         ){
             options.forEach { option ->
                 DropdownMenuItem(
-                    text = { Text(option, color = TextPrimary) },
+                    text = { Text(option, color = SwipeHomeTheme.colors.onSurface) },
                     onClick = { onValueSelected(option) }
                 )
             }
@@ -552,22 +530,26 @@ fun SwitchRowExpanded(title: String, icon: Painter, subtitle: String, checked: B
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Icon(icon, contentDescription = null, modifier = Modifier
-            .size(24.dp)
-            .background(SecondaryGreen, RoundedCornerShape(4.dp))) // SecondaryGreen для фону іконок
+        Icon(
+            icon,
+            contentDescription = null,
+            modifier = Modifier
+                .size(24.dp)
+                .background(SwipeHomeTheme.colors.primary, SwipeHomeTheme.shapes.verySmallShape)
+        )
         Spacer(modifier = Modifier.width(12.dp))
 
         Column(modifier = Modifier.weight(1f)) {
-            Text(title, fontSize = 16.sp, fontWeight = FontWeight.Bold, color = TextPrimary)
-            Text(subtitle, fontSize = 12.sp, color = TextSecondary)
+            Text(title, style = SwipeHomeTheme.typography.body, fontWeight = FontWeight.Bold, color = SwipeHomeTheme.colors.onSurface)
+            Text(subtitle, style = SwipeHomeTheme.typography.caption, color = SwipeHomeTheme.colors.onSurfaceSecondary)
         }
 
         Switch(
             checked = checked,
             onCheckedChange = onCheckedChange,
             colors = SwitchDefaults.colors(
-                checkedThumbColor = MaterialTheme.colorScheme.primary,
-                checkedTrackColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f),
+                checkedThumbColor = SwipeHomeTheme.colors.primary,
+                checkedTrackColor = SwipeHomeTheme.colors.primary.copy(alpha = 0.5f),
             )
         )
     }

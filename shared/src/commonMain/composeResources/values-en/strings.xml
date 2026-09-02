@@ -159,6 +159,7 @@
     <string name="search_card_section_area">(М²)</string>
 
     <!-- Екран Детальної інформації -->
+    <string name="search_hub_name">Hub</string>
     <string name="search_hub_title">Search Hub</string>
     <string name="search_hub_btn_comparison">Compare</string>
     <string name="search_hub_saved">Saved</string>
@@ -185,5 +186,21 @@
     <string name="search_hub_detailed_comparsion_table_row_localization">Localization</string>
     <string name="search_hub_detailed_comparsion_table_row_area">Area</string>
 
+    <!-- Екран Детальної інформації -->
+    <string name="details_screen_feauter_grid_rooms">Rooms</string>
+    <string name="details_screen_feauter_grid_area">Total Area</string>
+    <string name="details_screen_feauter_grid_floor">Floor</string>
+    <string name="details_screen_feauter_grid_parking">Parking</string>
+    <string name="details_screen_description">Property Description</string>
+    <string name="details_screen_description_show_les">Collapse</string>
+    <string name="details_screen_description_show_more">Read more</string>
+
+    <string name="details_screen_map_title">View all</string>
+
+    <string name="details_screen_owner_contact_section_title">OWNER CONTACT INFORMATION</string>
+    <string name="owner_description">Owner</string>
+    <string name="details_screen_owner_contact_section_owner_phone_number">Owner's Phone Number</string>
+    <string name="details_screen_owner_contact_section_write">Write</string>
+    <string name="details_screen_owner_contact_section_call">Call</string>
 
 </resources>

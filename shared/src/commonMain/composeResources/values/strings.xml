@@ -159,6 +159,7 @@
     <string name="search_card_section_area">(М²)</string>
 
     <!-- Екран Детальної інформації -->
+    <string name="search_hub_name">Хаб</string>
     <string name="search_hub_title">Хаб пошуку</string>
     <string name="search_hub_btn_comparison">Порівняння</string>
     <string name="search_hub_saved">Збережені</string>
@@ -184,5 +185,22 @@
     <string name="search_hub_detailed_comparsion_table_row_price">Ціна</string>
     <string name="search_hub_detailed_comparsion_table_row_localization">Локалізація</string>
     <string name="search_hub_detailed_comparsion_table_row_area">Площа</string>
+
+    <!-- Екран Детальної інформації -->
+    <string name="details_screen_feauter_grid_rooms">Кімнати</string>
+    <string name="details_screen_feauter_grid_area">Загальна площа</string>
+    <string name="details_screen_feauter_grid_floor">Поверх</string>
+    <string name="details_screen_feauter_grid_parking">Паркінг</string>
+    <string name="details_screen_description">Опис об'єкту</string>
+    <string name="details_screen_description_show_les">Згорнути</string>
+    <string name="details_screen_description_show_more">Читати далі</string>
+
+    <string name="details_screen_map_title">Переглянути все</string>
+
+    <string name="details_screen_owner_contact_section_title">КОНТАКТИ ВЛАСНИКА</string>
+    <string name="owner_description">Власник</string>
+    <string name="details_screen_owner_contact_section_owner_phone_number">Номер телефону власника</string>
+    <string name="details_screen_owner_contact_section_write">Написати</string>
+    <string name="details_screen_owner_contact_section_call">Зателефонувати</string>
 
 </resources>
