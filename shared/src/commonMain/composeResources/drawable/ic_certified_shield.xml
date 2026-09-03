@@ -1,0 +1,10 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <!-- Геометрія безпечного щита та внутрішня галочка успішної сертифікації -->
+    <path
+        android:fillColor="#FF212121"
+        android:pathData="M12,2L4,5v6.09c0,5.05 3.41,9.76 8,10.91c4.59,-1.15 8,-5.86 8,-10.91V5L12,2zM12,19.91c-3.44,-0.99 -6,-4.81 -6,-8.82V6.3l6,-2.25l6,2.25v4.79c0,4.01 -2.56,7.83 -6,8.82zM10.41,13.17l-2.58,-2.59L6.41,12l4,4l8,-8l-1.41,-1.42l-6.59,6.59z" />
+</vector>

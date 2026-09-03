@@ -1,0 +1,14 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <!-- Велике залите бірюзово-зелене коло -->
+    <path
+        android:fillColor="#005B41"
+        android:pathData="M12,2C6.48,2 2,6.48 2,12s4.48,10 10,10 10,-4.48 10,-10S17.52,2 12,2z" />
+    <!-- Білий контурний олівець, нахилений праворуч -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M14.06,9.19l1.25,1.25L8.44,17.31H7.19v-1.25L14.06,9.19z M16.56,6.69c-0.13,0 -0.26,0.05 -0.35,0.15l-1.15,1.15l1.25,1.25l1.15,-1.15c0.2,-0.2 0.2,-0.51 0,-0.71l-0.54,-0.54C16.82,6.74 16.69,6.69 16.56,6.69z" />
+</vector>

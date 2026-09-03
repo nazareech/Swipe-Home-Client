@@ -1,0 +1,10 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <!-- Корпус сміттєвого бака, кришка та символ Х всередині -->
+    <path
+        android:fillColor="#FF000000"
+        android:pathData="M19,4h-3.5l-1,-1h-5l-1,1H5v2h14V4z M6,19c0,1.1 0.9,2 2,2h8c1.1,0 2,-0.9 2,-2V7H6V19z M15.59,10L17,11.41L13.41,15L17,18.59L15.59,20L12,16.41L8.41,20L7,18.59L10.59,15L7,11.41L8.41,10L12,13.59L15.59,10z" />
+</vector>

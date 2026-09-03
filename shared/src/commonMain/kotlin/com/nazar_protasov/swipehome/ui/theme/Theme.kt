@@ -9,6 +9,11 @@ import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.ReadOnlyComposable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.staticCompositionLocalOf
 
 // Об'єкт доступу
 object SwipeHomeTheme {
@@ -28,19 +33,31 @@ object SwipeHomeTheme {
         get() = LocalSwipeHomeShapes.current
 }
 
+// Ключ для читання стану теми
+val LocalThemeIsDark = staticCompositionLocalOf<Boolean> {
+    error("No ThemeIsDark provided")
+}
+// Ключ для зміни теми
+val LocalThemeToggle = staticCompositionLocalOf<()-> Unit> {
+    error("No ThemeToggle provided")
+}
+
 // Головна обгортка
 @Composable
 fun SwipeHomeTheme(
     // Параметр який буде визначенням світлової теми
-    useDarkTheme: Boolean = isSystemInDarkTheme(),
+    systemIsDark: Boolean = isSystemInDarkTheme(),
     typography: SwipeHomeTypography = AppTypography,
     shapes: SwipeHomeShapes = AppShapes,
     content: @Composable () -> Unit
 ) {
-    // Визначаємо яку палітру використовувати
-    val colors = if (useDarkTheme) DarkColors else LightColors
+    // Стан який може змінюватись
+    var isDarkTheme by remember { mutableStateOf(systemIsDark) }
 
-    val materialColorScheme = if (useDarkTheme) {
+    // Визначаємо яку палітру використовувати
+    val colors = if (isDarkTheme) DarkColors else LightColors
+
+    val materialColorScheme = if (isDarkTheme) {
         darkColorScheme(
             primary = colors.primary,
             onPrimary = colors.onPrimary,
@@ -90,7 +107,11 @@ fun SwipeHomeTheme(
     CompositionLocalProvider(
         LocalSwipeHomeColors provides colors,
         LocalSwipeHomeTypography provides typography,
-        LocalSwipeHomeShapes provides shapes
+        LocalSwipeHomeShapes provides shapes,
+
+        // Передаємо стан та функцію перемикання вниз по дереву
+        LocalThemeIsDark provides isDarkTheme,
+        LocalThemeToggle provides { isDarkTheme = !isDarkTheme },
     ) {
         MaterialTheme(
             colorScheme = materialColorScheme,

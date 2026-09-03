@@ -1,0 +1,10 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <!-- Дверний отвір (дужка ліворуч) та стрілка виходу праворуч -->
+    <path
+        android:fillColor="#FF000000"
+        android:pathData="M10,17v-2H5V9h5V7H3v10H10z M21,12l-4,-4v3H9v2h8v3L21,12z" />
+</vector>

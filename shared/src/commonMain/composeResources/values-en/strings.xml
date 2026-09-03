@@ -132,7 +132,7 @@
     <string name="filter_section_building_type">BUILDING TYPE</string>
     <string name="filter_building_all">All types</string>
     <string name="filter_building_new">New building</string>
-    <string name="filter_building_khrushchovka">Khrushchovka</string>
+    <string name="filter_building_khrushchovka">Khrushchev</string>
     <string name="filter_building_house">House</string>
     <string name="filter_building_apartment">Apartment</string>
     <string name="filter_building_room">Room</string>
@@ -202,5 +202,29 @@
     <string name="details_screen_owner_contact_section_owner_phone_number">Owner's Phone Number</string>
     <string name="details_screen_owner_contact_section_write">Write</string>
     <string name="details_screen_owner_contact_section_call">Call</string>
+
+    <!-- Екран Налаштування профілю -->
+    <string name="profile_tab_name">Profile</string>
+    <string name="profile_tab_toggle_theme_description_dark">Change Theme, Dark</string>
+    <string name="profile_tab_toggle_theme_description_light">Change Theme, Ligh</string>
+    <string name="profile_tab_settings_description">Settings</string>
+    <string name="profile_tab_subscription_management">Subscription Management</string>
+    <string name="profile_tab_photo_avatar_description">Avatar</string>
+    <string name="profile_tab_edit_photo_description">Edit</string>
+    <string name="profile_tab_verified_description">Verification</string>
+    <string name="profile_tab_logout">Log Out</string>
+    <string name="profile_tab_delete_account">Delete Account</string>
+
+    <!-- Головне меню -->
+    <string name="profile_tab_edit_info">Edit Information</string>
+    <string name="profile_tab_verify_account">Account Verification</string>
+    <string name="profile_tab_my_list_properties">My Listings</string>
+    <string name="profile_tab_settings_notifications">Notification Settings</string>
+    <string name="profile_tab_settings_language">Language</string>
+
+    <string name="profile_tab_settings_support">SUPPORT INFORMATION</string>
+    <string name="profile_tab_support">Support</string>
+    <string name="profile_tab_conditions_of_use">Terms of Use</string>
+    <string name="profile_tab_policity_description">Usage Policy</string>
 
 </resources>

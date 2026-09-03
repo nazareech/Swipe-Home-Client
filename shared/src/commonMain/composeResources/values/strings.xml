@@ -203,4 +203,28 @@
     <string name="details_screen_owner_contact_section_write">Написати</string>
     <string name="details_screen_owner_contact_section_call">Зателефонувати</string>
 
+    <!-- Екран Налаштування профілю -->
+    <string name="profile_tab_name">Профіль</string>
+    <string name="profile_tab_toggle_theme_description_dark">Зміна теми, темна</string>
+    <string name="profile_tab_toggle_theme_description_light">Зміна теми, світла</string>
+    <string name="profile_tab_settings_description">Налаштування</string>
+    <string name="profile_tab_subscription_management">Керування підпискою</string>
+    <string name="profile_tab_photo_avatar_description">Аватарка</string>
+    <string name="profile_tab_edit_photo_description">Редагувати</string>
+    <string name="profile_tab_verified_description">Верифікація</string>
+    <string name="profile_tab_logout">Вийти з акаунту</string>
+    <string name="profile_tab_delete_account">Видалити акаунт</string>
+
+    <!-- Головне меню -->
+    <string name="profile_tab_edit_info">Змінити інформацію</string>
+    <string name="profile_tab_verify_account">Верифікація акаунта</string>
+    <string name="profile_tab_my_list_properties">Мої оголошення</string>
+    <string name="profile_tab_settings_notifications">Налаштування сповіщень</string>
+    <string name="profile_tab_settings_language">Мова застосунку</string>
+
+    <string name="profile_tab_settings_support">ПІДТРИМКА ІНФОРМАЦІЇ</string>
+    <string name="profile_tab_support">Служба підтримки</string>
+    <string name="profile_tab_conditions_of_use">Умови використання</string>
+    <string name="profile_tab_policity_description">Умови використання</string>
+
 </resources>
