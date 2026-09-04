@@ -14,7 +14,9 @@ data class SwipeHomeShapes(
     val verySmallShape: CornerBasedShape = RoundedCornerShape(4.dp),
     val smallShape: CornerBasedShape = RoundedCornerShape(8.dp),
     val mediumShape: CornerBasedShape = RoundedCornerShape(16.dp),
-    val largeShape: CornerBasedShape = RoundedCornerShape(24.dp)
+    val largeShape: CornerBasedShape = RoundedCornerShape(24.dp),
+    val bubbleOut: CornerBasedShape = RoundedCornerShape(16.dp, 16.dp, 4.dp, 16.dp),
+    val bubbleIn: CornerBasedShape = RoundedCornerShape(16.dp, 16.dp, 16.dp, 4.dp)
 )
 
 val AppShapes = SwipeHomeShapes()

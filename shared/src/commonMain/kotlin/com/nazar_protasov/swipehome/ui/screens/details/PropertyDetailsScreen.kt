@@ -57,9 +57,11 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
+import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import coil3.compose.AsyncImage
 import com.nazar_protasov.swipehome.ui.models.PropertyDetails
+import com.nazar_protasov.swipehome.ui.screens.chat.ChatScreen
 import com.nazar_protasov.swipehome.ui.theme.SwipeHomeTheme
 import kotlinx.coroutines.launch
 import mymultiplatformproject.shared.generated.resources.Res
@@ -164,7 +166,7 @@ data class PropertyDetailsScreen(val property: PropertyDetails) : Screen {
 
                 Spacer(modifier = Modifier.height(24.dp))
 
-                OwnerContactSection()
+                OwnerContactSection(navigator)
 
                 Spacer(modifier = Modifier.height(32.dp))
             }
@@ -641,7 +643,7 @@ data class PropertyDetailsScreen(val property: PropertyDetails) : Screen {
     }
 
     @Composable
-    fun OwnerContactSection() {
+    fun OwnerContactSection(navigator: Navigator) {
         Card(
             modifier = Modifier
                 .fillMaxWidth()
@@ -702,7 +704,7 @@ data class PropertyDetailsScreen(val property: PropertyDetails) : Screen {
 
                 Row(horizontalArrangement = Arrangement.spacedBy(12.dp)){
                     Button(
-                        onClick = { /*TODO*/ },
+                        onClick = { navigator.push(ChatScreen()) },
                         modifier = Modifier.weight(1f).height(48.dp),
                         shape = SwipeHomeTheme.shapes.smallShape,
                         colors = ButtonDefaults.buttonColors(containerColor = SwipeHomeTheme.colors.primary)

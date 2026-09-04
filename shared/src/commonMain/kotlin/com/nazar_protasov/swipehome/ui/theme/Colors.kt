@@ -16,6 +16,8 @@ val OutlineLight = Color(0xFFE4E4E7)
 val OutlineDark = Color(0xFF27272A)
 val TextSecondaryLight = Color(0xFF757575)
 val TextSecondaryDark = Color(0xFFA1A1AA)
+val OnBackgroundDark = Color(0xFFF4F4F5)
+val OnBackgroundLight = Color(0xFFF4F4F5)
 
 // Структура кольорів теми SwipeHome
 data class SwipeHomeColors(
@@ -29,7 +31,8 @@ data class SwipeHomeColors(
     val onSurface: Color,
     val error: Color,
     val onSurfaceSecondary: Color,
-    val outline: Color
+    val outline: Color,
+    val onBackground: Color
 )
 
 // Світла палітра
@@ -44,7 +47,8 @@ val LightColors = SwipeHomeColors(
     onSurface = NeutralDark,
     error = ErrorRedLight,
     onSurfaceSecondary = TextSecondaryLight,
-    outline = OutlineLight
+    outline = OutlineLight,
+    onBackground = OnBackgroundLight
 )
 
 val DarkColors = SwipeHomeColors(
@@ -58,7 +62,8 @@ val DarkColors = SwipeHomeColors(
     onSurface = NeutralLight,
     error = ErrorRedDark,
     onSurfaceSecondary = TextSecondaryDark,
-    outline = OutlineDark
+    outline = OutlineDark,
+    onBackground = OnBackgroundDark
 )
 
 val LocalSwipeHomeColors = staticCompositionLocalOf<SwipeHomeColors> {
