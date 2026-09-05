@@ -1,4 +1,4 @@
-package com.nazar_protasov.swipehome.ui.screens.profile
+package com.nazar_protasov.swipehome.ui.screens.settings
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
@@ -15,7 +15,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.uniqueScreenKey
+import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.Navigator
+import cafe.adriel.voyager.navigator.currentOrThrow
 import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabOptions
 import com.nazar_protasov.swipehome.ui.components.MenuItemData
@@ -73,6 +75,7 @@ internal object ProfileScreen : Screen {
     @Composable
     override fun Content() {
         val scrollState = rememberScrollState()
+        val navigator = LocalNavigator.currentOrThrow
 
         Column(
             modifier = Modifier
@@ -88,11 +91,11 @@ internal object ProfileScreen : Screen {
 
             ProfileMenuCard(
                 items = listOf(
-                    MenuItemData(painterResource(Res.drawable.ic_profile), stringResource(Res.string.profile_tab_edit_info)),
-                    MenuItemData(painterResource(Res.drawable.ic_certified_shield), stringResource(Res.string.profile_tab_verify_account)),
-                    MenuItemData(painterResource(Res.drawable.ic_list), stringResource(Res.string.profile_tab_my_list_properties), badgeCount = 12),
-                    MenuItemData(painterResource(Res.drawable.ic_notifications_bell), stringResource(Res.string.profile_tab_settings_notifications)),
-                    MenuItemData(painterResource(Res.drawable.ic_language), stringResource(Res.string.profile_tab_settings_language)),
+                    MenuItemData(painterResource(Res.drawable.ic_profile), stringResource(Res.string.profile_tab_edit_info), onClick = {/*TODO: Edit info*/}),
+                    MenuItemData(painterResource(Res.drawable.ic_certified_shield), stringResource(Res.string.profile_tab_verify_account), onClick = {/*TODO: Verify account*/}),
+                    MenuItemData(painterResource(Res.drawable.ic_list), stringResource(Res.string.profile_tab_my_list_properties), badgeCount = 12, onClick = {navigator.push(MyListingsScreen())} ),
+                    MenuItemData(painterResource(Res.drawable.ic_notifications_bell), stringResource(Res.string.profile_tab_settings_notifications), onClick = {/*TODO: Notifications*/}),
+                    MenuItemData(painterResource(Res.drawable.ic_language), stringResource(Res.string.profile_tab_settings_language), onClick = {/*TODO: Language*/}),
                 )
             )
 
@@ -107,9 +110,9 @@ internal object ProfileScreen : Screen {
             Spacer(modifier = Modifier.height(8.dp))
             ProfileMenuCard(
                 items = listOf(
-                    MenuItemData(painterResource(Res.drawable.ic_support), stringResource(Res.string.profile_tab_support)),
-                    MenuItemData(painterResource(Res.drawable.ic_politics), stringResource(Res.string.profile_tab_conditions_of_use)),
-                    MenuItemData(painterResource(Res.drawable.ic_security), stringResource(Res.string.profile_tab_policity_description))
+                    MenuItemData(painterResource(Res.drawable.ic_support), stringResource(Res.string.profile_tab_support), onClick = {/*TODO: Support*/}),
+                    MenuItemData(painterResource(Res.drawable.ic_politics), stringResource(Res.string.profile_tab_conditions_of_use, ), onClick = {/*TODO: Conditions of use*/}),
+                    MenuItemData(painterResource(Res.drawable.ic_security), stringResource(Res.string.profile_tab_policity_description), onClick = {/*TODO: Privacy policy*/})
                 )
             )
 

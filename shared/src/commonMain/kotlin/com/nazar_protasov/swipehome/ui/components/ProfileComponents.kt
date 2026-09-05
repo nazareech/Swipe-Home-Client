@@ -59,7 +59,8 @@ import org.jetbrains.compose.resources.stringResource
 data class MenuItemData(
     val icon: Painter,
     val title: String,
-    val badgeCount: Int? = null
+    val badgeCount: Int? = null,
+    val onClick: () -> Unit // Обробник натискання
 )
 
 @Composable
@@ -171,7 +172,7 @@ fun ProfileMenuCard(items: List<MenuItemData>){
             items.forEachIndexed { index, item ->
                 ProfileMenuItem(
                     item = item,
-                    onClick = { /*TODO: Обрати пункт меню*/ }
+                    onClick = { item.onClick() } // Викликаємо обробник натискання
                 )
 
                 // Додаємо роздільник між пунктами меню, крім останнього

@@ -21,7 +21,7 @@ import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabNavigator
 import com.nazar_protasov.swipehome.ui.screens.home.HomeTab
 import com.nazar_protasov.swipehome.ui.screens.hub.SearchHubTab
-import com.nazar_protasov.swipehome.ui.screens.profile.ProfileTab
+import com.nazar_protasov.swipehome.ui.screens.settings.ProfileTab
 
 class RootScreen : Screen {
     override val key = uniqueScreenKey
