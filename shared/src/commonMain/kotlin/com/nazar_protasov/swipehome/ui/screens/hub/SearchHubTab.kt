@@ -29,6 +29,7 @@ import com.nazar_protasov.swipehome.ui.components.BadgeChip
 import com.nazar_protasov.swipehome.ui.components.CompareFloatingBar
 import com.nazar_protasov.swipehome.ui.components.ComparisonTableContent
 import com.nazar_protasov.swipehome.ui.components.HubGridCard
+import com.nazar_protasov.swipehome.ui.components.SearchHubTopBar
 import com.nazar_protasov.swipehome.ui.components.StatisticsSection
 import com.nazar_protasov.swipehome.ui.theme.SwipeHomeTheme
 import mymultiplatformproject.shared.generated.resources.Res
@@ -77,26 +78,7 @@ internal object SearchHubScreen : Screen {
         var showComparisonSheet by remember { mutableStateOf(false) }
 
         Scaffold(
-            topBar = {
-                CenterAlignedTopAppBar(
-                    title = {
-                        Text(
-                            stringResource(Res.string.search_hub_title),
-                            style = SwipeHomeTheme.typography.headline,
-                            color = SwipeHomeTheme.colors.neutral
-                        )
-                    },
-                    windowInsets = WindowInsets(0.dp),
-                    actions = {
-                        IconButton(onClick = { /*TODO: Фільтри*/ }) {
-                            Icon(
-                                painterResource(Res.drawable.ic_filtres_tune),
-                                contentDescription = stringResource(Res.string.btn_filter)
-                            )
-                        }
-                    }
-                )
-            },
+            topBar = {SearchHubTopBar() },
             containerColor = SwipeHomeTheme.colors.background
         ) { paddingValues ->
             Box(

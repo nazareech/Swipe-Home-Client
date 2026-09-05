@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -25,13 +24,17 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import cafe.adriel.voyager.navigator.Navigator
 import coil3.compose.AsyncImage
 import com.nazar_protasov.swipehome.ui.theme.SwipeHomeTheme
 import mymultiplatformproject.shared.generated.resources.Res
-import mymultiplatformproject.shared.generated.resources.ic_close
+import mymultiplatformproject.shared.generated.resources.ic_add_circle
+import mymultiplatformproject.shared.generated.resources.ic_arrow_back
 import mymultiplatformproject.shared.generated.resources.ic_edit_pencil
+import mymultiplatformproject.shared.generated.resources.ic_eye_visible
+import mymultiplatformproject.shared.generated.resources.ic_filtres_tune
 import mymultiplatformproject.shared.generated.resources.ic_heart
-import mymultiplatformproject.shared.generated.resources.ic_list
+import mymultiplatformproject.shared.generated.resources.ic_location_pin
 import org.jetbrains.compose.resources.painterResource
 
 // Модель даних для оголошення
@@ -48,11 +51,12 @@ data class ListingItem(
     val imagesUrl: List<String>,
     val status: ListingStaus,
     val views: String,
-    val likes: String
+    val likes: String,
+    val onClick: () -> Unit // Обробник натискання
 )
 
 @Composable
-fun ListingsTopBar() {
+fun ListingsTopBar(navigator: Navigator) {
     Row(
        modifier = Modifier
            .fillMaxWidth()
@@ -61,8 +65,13 @@ fun ListingsTopBar() {
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ){
-        IconButton(onClick = {/*TOD: Menu*/}){
-            Icon(painterResource(Res.drawable.ic_list), contentDescription = "Menu", tint = SwipeHomeTheme.colors.neutral)
+        IconButton(
+            onClick = { navigator.pop() }
+        ) {
+            Icon(
+                painterResource(Res.drawable.ic_arrow_back),
+                contentDescription = "Back"
+            )
         }
 
         Text(
@@ -79,7 +88,7 @@ fun ListingsTopBar() {
                 .clickable { /*TODO: Додати нове оголошення */ },
             contentAlignment = Alignment.Center
         ){
-            Icon(painterResource(Res.drawable.ic_close), contentDescription = "Add", tint = SwipeHomeTheme.colors.neutral)
+            Icon(painterResource(Res.drawable.ic_add_circle), contentDescription = "Add", tint = SwipeHomeTheme.colors.neutral)
         }
     }
 }
@@ -106,17 +115,17 @@ fun ListingsHeader(count: Int){
                 color = SwipeHomeTheme.colors.neutral
             )
 
-            // Кнопка фільтрації/сортування
-            Box(
-                modifier = Modifier
-                    .size(36.dp)
-                    .clip(CircleShape)
-                    .background(SwipeHomeTheme.colors.background)
-                    .clickable{/*TODO: Сортування*/},
-                contentAlignment = Alignment.Center
-            ){
-                Text("=", style = SwipeHomeTheme.typography.subheadline, color = SwipeHomeTheme.colors.neutral, modifier = Modifier.offset(y = (-2).dp))
-            }
+        }
+        // Кнопка фільтрації/сортування
+        Box(
+            modifier = Modifier
+                .size(36.dp)
+                .clip(CircleShape)
+                .background(SwipeHomeTheme.colors.background)
+                .clickable{/*TODO: Сортування*/},
+            contentAlignment = Alignment.Center
+        ){
+            Icon(painterResource(Res.drawable.ic_filtres_tune), contentDescription = "Filter", tint = SwipeHomeTheme.colors.neutral)
         }
     }
 }
@@ -127,7 +136,8 @@ fun ListingCard (listing: ListingItem){
         modifier = Modifier.fillMaxWidth(),
         shape = SwipeHomeTheme.shapes.mediumShape,
         colors = CardDefaults.cardColors(containerColor = SwipeHomeTheme.colors.surface),
-        elevation = CardDefaults.cardElevation(2.dp)
+        elevation = CardDefaults.cardElevation(2.dp),
+        onClick = { listing.onClick() } // Викликаємо обробник натискання
     ){
         Row(
             modifier = Modifier.fillMaxWidth().padding(12.dp),
@@ -158,26 +168,26 @@ fun ListingCard (listing: ListingItem){
                     Text(
                         text = listing.title,
                         style = SwipeHomeTheme.typography.body,
-                        color = SwipeHomeTheme.colors.neutral,
+                        color = SwipeHomeTheme.colors.onSurfaceSecondary,
                         maxLines = 2,
                         overflow = TextOverflow.Ellipsis,
-                        modifier = Modifier.fillMaxWidth(1f)
+                        modifier = Modifier.weight(1f)
                     )
 
-                    Icon(
-                        painter = painterResource(Res.drawable.ic_edit_pencil),
-                        contentDescription = "Edit",
-                        tint = SwipeHomeTheme.colors.neutral,
-                        modifier = Modifier
-                            .size(20.dp)
-                            .clickable {/*TODO: Редагувати*/ }
-                    )
+                    IconButton(onClick = {/*TODO: Редагувати*/ }){
+                        Icon(
+                            painterResource(Res.drawable.ic_edit_pencil),
+                            contentDescription = "Edit",
+                            tint = SwipeHomeTheme.colors.primary,
+                            modifier = Modifier.size(20.dp)
+                        )
+                    }
                 }
 
                 Spacer(modifier = Modifier.size(4.dp))
 
                 Row(verticalAlignment = Alignment.CenterVertically){
-                    Icon(painter = painterResource(Res.drawable.ic_list), contentDescription = null, tint = SwipeHomeTheme.colors.neutral, modifier = Modifier.size(14.dp))
+                    Icon(painter = painterResource(Res.drawable.ic_location_pin), contentDescription = "localization", tint = SwipeHomeTheme.colors.neutral, modifier = Modifier.size(14.dp))
                     Spacer(modifier = Modifier.size(4.dp))
 
                     Text(
@@ -200,7 +210,7 @@ fun ListingCard (listing: ListingItem){
                     Row(horizontalArrangement = Arrangement.spacedBy(12.dp), verticalAlignment = Alignment.CenterVertically){
                         // Перегляди
                         Row(verticalAlignment = Alignment.CenterVertically){
-                            Icon(painter = painterResource(Res.drawable.ic_list), contentDescription = "Views", tint = SwipeHomeTheme.colors.neutral, modifier = Modifier.size(14.dp))
+                            Icon(painter = painterResource(Res.drawable.ic_eye_visible), contentDescription = "Views", tint = SwipeHomeTheme.colors.neutral, modifier = Modifier.size(14.dp))
                             Spacer(modifier = Modifier.width(4.dp))
                             Text(
                                 text = listing.views,
@@ -210,7 +220,7 @@ fun ListingCard (listing: ListingItem){
                         }
                         // Лайки
                         Row(verticalAlignment = Alignment.CenterVertically){
-                            Icon(painter = painterResource(Res.drawable.ic_heart), contentDescription = "Likes", tint = SwipeHomeTheme.colors.neutral, modifier = Modifier.size(14.dp))
+                            Icon(painter = painterResource(Res.drawable.ic_heart), contentDescription = "Likes ", tint = SwipeHomeTheme.colors.neutral, modifier = Modifier.size(14.dp))
                             Spacer(modifier = Modifier.width(4.dp))
                             Text(
                                 text = listing.likes,

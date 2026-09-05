@@ -23,6 +23,7 @@ import androidx.compose.material3.Checkbox
 import androidx.compose.material3.CheckboxDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -38,6 +39,8 @@ import coil3.compose.AsyncImage
 import com.nazar_protasov.swipehome.ui.models.Property
 import com.nazar_protasov.swipehome.ui.theme.SwipeHomeTheme
 import mymultiplatformproject.shared.generated.resources.Res
+import mymultiplatformproject.shared.generated.resources.btn_filter
+import mymultiplatformproject.shared.generated.resources.ic_filtres_tune
 import mymultiplatformproject.shared.generated.resources.ic_heart
 import mymultiplatformproject.shared.generated.resources.ic_location_pin
 import mymultiplatformproject.shared.generated.resources.photo_description
@@ -55,8 +58,35 @@ import mymultiplatformproject.shared.generated.resources.search_hub_statistic_li
 import mymultiplatformproject.shared.generated.resources.search_hub_statistic_rejected
 import mymultiplatformproject.shared.generated.resources.search_hub_statistic_title
 import mymultiplatformproject.shared.generated.resources.search_hub_statistic_views
+import mymultiplatformproject.shared.generated.resources.search_hub_title
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
+
+@Composable
+fun SearchHubTopBar(){
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(SwipeHomeTheme.colors.background)
+            .padding(horizontal = 16.dp, vertical = 12.dp),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Spacer(Modifier.width(36.dp))
+
+        Text(
+            stringResource(Res.string.search_hub_title),
+            style = SwipeHomeTheme.typography.headline,
+            color = SwipeHomeTheme.colors.neutral
+        )
+        IconButton(onClick = { /*TODO: Фільтри*/ }) {
+            Icon(
+                painterResource(Res.drawable.ic_filtres_tune),
+                contentDescription = stringResource(Res.string.btn_filter)
+            )
+        }
+    }
+}
 
 @Composable
 fun StatisticsSection(){

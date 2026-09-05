@@ -72,26 +72,22 @@ fun ProfileTopBar(){
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ){
+        Spacer(Modifier.width(36.dp))
+
         Text(stringResource(string.profile_tab_name), style = SwipeHomeTheme.typography.headline)
 
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)){
-            IconButton(onClick = LocalThemeToggle.current) {
-
-                if (LocalThemeIsDark.current) {
-                    Icon(
-                        painterResource(Res.drawable.ic_theme_dark),
-                        contentDescription = stringResource(string.profile_tab_toggle_theme_description_dark)
-                    )
-                }else {
-                    Icon(
-                        painterResource(Res.drawable.ic_theme_light),
-                        contentDescription = stringResource(string.profile_tab_toggle_theme_description_light)
-                    )
-                }
+        IconButton(onClick = LocalThemeToggle.current) {
+            if (LocalThemeIsDark.current) {
+                Icon(
+                    painterResource(Res.drawable.ic_theme_dark),
+                    contentDescription = stringResource(string.profile_tab_toggle_theme_description_dark)
+                )
+            }else {
+                Icon(
+                    painterResource(Res.drawable.ic_theme_light),
+                    contentDescription = stringResource(string.profile_tab_toggle_theme_description_light)
+                )
             }
-//            IconButton(onClick = { /*TODO: Налаштування*/ }) {
-//                Icon(painterResource(Res.drawable.ic_filtres_tune), contentDescription = stringResource(string.profile_tab_settings_description))
-//            }
         }
     }
 }

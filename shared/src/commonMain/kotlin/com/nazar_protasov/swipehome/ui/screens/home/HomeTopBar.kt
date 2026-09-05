@@ -44,8 +44,8 @@ fun HomeTopBar(homeScreenModel: HomeScreenModel) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 24.dp, vertical = 16.dp)
-            .statusBarsPadding(), // Відступ від статус-бару системи
+            .padding(horizontal = 16.dp, vertical = 12.dp),
+//            .statusBarsPadding(), // Відступ від статус-бару системи
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {

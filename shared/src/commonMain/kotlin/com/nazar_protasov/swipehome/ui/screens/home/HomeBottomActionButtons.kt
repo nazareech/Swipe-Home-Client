@@ -32,7 +32,7 @@ fun HomeBottomActionButtons(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(bottom = 32.dp, top = 16.dp)
+            .padding(horizontal = 16.dp, vertical = 12.dp)
             .navigationBarsPadding(),
         horizontalArrangement = Arrangement.SpaceEvenly,
         verticalAlignment = Alignment.CenterVertically
