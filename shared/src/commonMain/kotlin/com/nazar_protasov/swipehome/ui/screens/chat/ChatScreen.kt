@@ -5,9 +5,9 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import cafe.adriel.voyager.core.screen.Screen
-import com.nazar_protasov.swipehome.ui.components.ChatInputBar
-import com.nazar_protasov.swipehome.ui.components.ChatMessageList
-import com.nazar_protasov.swipehome.ui.components.ChatTopBar
+import com.nazar_protasov.swipehome.ui.screens.chat.components.ChatInputBar
+import com.nazar_protasov.swipehome.ui.screens.chat.components.ChatMessageList
+import com.nazar_protasov.swipehome.ui.screens.chat.components.ChatTopBar
 import com.nazar_protasov.swipehome.ui.theme.SwipeHomeTheme
 
 data class ChatMessage(

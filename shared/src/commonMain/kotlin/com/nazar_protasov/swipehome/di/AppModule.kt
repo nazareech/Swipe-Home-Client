@@ -1,7 +1,7 @@
 package com.nazar_protasov.swipehome.di
 
 import com.nazar_protasov.swipehome.network.PropertyApiService
-import com.nazar_protasov.swipehome.ui.screens.home.HomeScreenModel
+import com.nazar_protasov.swipehome.ui.screens.home.main.HomeScreenModel
 import com.nazar_protasov.swipehome.ui.screens.hub.SearchHubScreenModel
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation

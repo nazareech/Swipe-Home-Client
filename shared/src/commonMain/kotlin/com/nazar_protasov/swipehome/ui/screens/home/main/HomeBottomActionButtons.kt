@@ -1,4 +1,4 @@
-package com.nazar_protasov.swipehome.ui.screens.home
+package com.nazar_protasov.swipehome.ui.screens.home.main
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row

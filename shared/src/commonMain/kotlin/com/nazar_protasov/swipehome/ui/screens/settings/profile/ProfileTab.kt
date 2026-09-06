@@ -1,4 +1,4 @@
-package com.nazar_protasov.swipehome.ui.screens.settings
+package com.nazar_protasov.swipehome.ui.screens.settings.profile
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
@@ -20,11 +20,12 @@ import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabOptions
-import com.nazar_protasov.swipehome.ui.components.MenuItemData
-import com.nazar_protasov.swipehome.ui.components.ProfileActions
-import com.nazar_protasov.swipehome.ui.components.ProfileHeader
-import com.nazar_protasov.swipehome.ui.components.ProfileMenuCard
-import com.nazar_protasov.swipehome.ui.components.ProfileTopBar
+import com.nazar_protasov.swipehome.ui.screens.settings.profile.components.MenuItemData
+import com.nazar_protasov.swipehome.ui.screens.settings.profile.components.ProfileActions
+import com.nazar_protasov.swipehome.ui.screens.settings.profile.components.ProfileHeader
+import com.nazar_protasov.swipehome.ui.screens.settings.profile.components.ProfileMenuCard
+import com.nazar_protasov.swipehome.ui.screens.settings.profile.components.ProfileTopBar
+import com.nazar_protasov.swipehome.ui.screens.settings.listing.MyListingsScreen
 import com.nazar_protasov.swipehome.ui.theme.SwipeHomeTheme
 import mymultiplatformproject.shared.generated.resources.Res
 import mymultiplatformproject.shared.generated.resources.ic_certified_shield
@@ -93,7 +94,9 @@ internal object ProfileScreen : Screen {
                 items = listOf(
                     MenuItemData(painterResource(Res.drawable.ic_profile), stringResource(Res.string.profile_tab_edit_info), onClick = {/*TODO: Edit info*/}),
                     MenuItemData(painterResource(Res.drawable.ic_certified_shield), stringResource(Res.string.profile_tab_verify_account), onClick = {/*TODO: Verify account*/}),
-                    MenuItemData(painterResource(Res.drawable.ic_list), stringResource(Res.string.profile_tab_my_list_properties), badgeCount = 12, onClick = {navigator.push(MyListingsScreen())} ),
+                    MenuItemData(painterResource(Res.drawable.ic_list), stringResource(Res.string.profile_tab_my_list_properties), badgeCount = 12, onClick = {navigator.push(
+                        MyListingsScreen()
+                    )} ),
                     MenuItemData(painterResource(Res.drawable.ic_notifications_bell), stringResource(Res.string.profile_tab_settings_notifications), onClick = {/*TODO: Notifications*/}),
                     MenuItemData(painterResource(Res.drawable.ic_language), stringResource(Res.string.profile_tab_settings_language), onClick = {/*TODO: Language*/}),
                 )

@@ -1,4 +1,4 @@
-package com.nazar_protasov.swipehome.ui.screens.home
+package com.nazar_protasov.swipehome.ui.screens.home.main.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -36,17 +36,20 @@ import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabOptions
-import com.nazar_protasov.swipehome.ui.components.PropertyCard
-import com.nazar_protasov.swipehome.ui.components.SwipeableCard
+import com.nazar_protasov.swipehome.ui.screens.home.card.PropertyCard
+import com.nazar_protasov.swipehome.ui.screens.home.card.SwipeableCard
 import mymultiplatformproject.shared.generated.resources.Res
 import mymultiplatformproject.shared.generated.resources.ic_search_cards
 import mymultiplatformproject.shared.generated.resources.main_bottom_nav_search
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import com.nazar_protasov.swipehome.network.toUIDetailsProperty
-import com.nazar_protasov.swipehome.ui.components.rememberSwipeCardState
+import com.nazar_protasov.swipehome.ui.screens.home.card.rememberSwipeCardState
 import com.nazar_protasov.swipehome.ui.screens.details.PropertyDetailsScreen
 import com.nazar_protasov.swipehome.network.toUIProperty
+import com.nazar_protasov.swipehome.ui.screens.home.main.HomeBottomActionButtons
+import com.nazar_protasov.swipehome.ui.screens.home.main.HomeScreenModel
+import com.nazar_protasov.swipehome.ui.screens.home.filter.FilterScreen
 import kotlinx.coroutines.launch
 import mymultiplatformproject.shared.generated.resources.ic_refresh
 import org.koin.compose.koinInject
@@ -239,7 +242,11 @@ internal class HomeScreen : Screen {
                 // Кнопка детальної інформації про оголошення
                 onDetailsClick = {
                     if (properties.isNotEmpty()) {
-                        rootNavigator.push(PropertyDetailsScreen(properties.first().toUIDetailsProperty()))
+                        rootNavigator.push(
+                            PropertyDetailsScreen(
+                                properties.first().toUIDetailsProperty()
+                            )
+                        )
                     }
                 },
                 onLikeClick = {

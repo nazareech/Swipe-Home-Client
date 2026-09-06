@@ -1,4 +1,4 @@
-package com.nazar_protasov.swipehome.ui.screens.settings
+package com.nazar_protasov.swipehome.ui.screens.settings.listing
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.PaddingValues
@@ -13,11 +13,11 @@ import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import com.nazar_protasov.swipehome.ui.components.ListingCard
-import com.nazar_protasov.swipehome.ui.components.ListingItem
-import com.nazar_protasov.swipehome.ui.components.ListingStaus
-import com.nazar_protasov.swipehome.ui.components.ListingsHeader
-import com.nazar_protasov.swipehome.ui.components.ListingsTopBar
+import com.nazar_protasov.swipehome.ui.screens.settings.listing.components.ListingCard
+import com.nazar_protasov.swipehome.ui.screens.settings.listing.components.ListingItem
+import com.nazar_protasov.swipehome.ui.screens.settings.listing.components.ListingStaus
+import com.nazar_protasov.swipehome.ui.screens.settings.listing.components.ListingsHeader
+import com.nazar_protasov.swipehome.ui.screens.settings.listing.components.ListingsTopBar
 import com.nazar_protasov.swipehome.ui.screens.settings.analystics.AnalyticsScreen
 import com.nazar_protasov.swipehome.ui.theme.SwipeHomeTheme
 

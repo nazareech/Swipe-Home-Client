@@ -1,4 +1,4 @@
-package com.nazar_protasov.swipehome.ui.components
+package com.nazar_protasov.swipehome.ui.screens.home.card
 
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.tween

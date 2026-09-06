@@ -1,4 +1,4 @@
-package com.nazar_protasov.swipehome.ui.screens.home
+package com.nazar_protasov.swipehome.ui.screens.home.main.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
@@ -24,6 +23,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import com.nazar_protasov.swipehome.ui.screens.home.main.HomeScreenModel
+import com.nazar_protasov.swipehome.ui.screens.home.filter.FilterScreen
 import mymultiplatformproject.shared.generated.resources.Res
 import mymultiplatformproject.shared.generated.resources.app_name
 import mymultiplatformproject.shared.generated.resources.ic_filtres_tune

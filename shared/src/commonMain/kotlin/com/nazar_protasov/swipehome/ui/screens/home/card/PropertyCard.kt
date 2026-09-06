@@ -1,4 +1,4 @@
-package com.nazar_protasov.swipehome.ui.components
+package com.nazar_protasov.swipehome.ui.screens.home.card
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable

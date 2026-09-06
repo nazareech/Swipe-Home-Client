@@ -1,10 +1,10 @@
-package com.nazar_protasov.swipehome.ui.screens.home
+package com.nazar_protasov.swipehome.ui.screens.home.main
 
-import com.nazar_protasov.swipehome.network.dto.FilterRequestDTO
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import com.nazar_protasov.swipehome.network.PropertyApiService
 import com.nazar_protasov.swipehome.network.PropertyDTO
+import com.nazar_protasov.swipehome.network.dto.FilterRequestDTO
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
