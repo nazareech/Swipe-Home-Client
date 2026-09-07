@@ -104,7 +104,8 @@ fun PropertyDTO.toUIDetailsProperty(): PropertyDetails {
 
 class PropertyApiService(private val client: io.ktor.client.HttpClient){
     companion object {
-        const val BASE_URL = "http://192.168.0.78:8080"
+//        const val BASE_URL = "http://192.168.0.78:8080"
+        const val BASE_URL = "http://10.250.156.242:8080"
     }
 
     suspend fun fetchProperties(

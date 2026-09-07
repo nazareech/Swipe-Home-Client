@@ -69,7 +69,7 @@ fun AnalyticsTopBar(navigator: Navigator){
         Text(
             "Аналітика",
             style = SwipeHomeTheme.typography.headline,
-            color = SwipeHomeTheme.colors.primary
+            color = SwipeHomeTheme.colors.neutral
         )
 
         Spacer(Modifier.width(36.dp))

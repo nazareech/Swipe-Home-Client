@@ -1,0 +1,21 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <!-- Контур конверта з вирізом під галочку та внутрішній клапан листа -->
+    <path
+        android:strokeColor="#005B41"
+        android:strokeWidth="2"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:pathData="M15,19H4c-1.1,0 -2,-0.9 -2,-2V7c0,-1.1 0.9,-2 2,-2h16c1.1,0 2,0.9 2,2v6.5 M2,7l10,6.5L22,7" />
+
+    <!-- Галочка у нижньому правому кутку -->
+    <path
+        android:strokeColor="#005B41"
+        android:strokeWidth="2"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:pathData="M15.5,16.5l2,2l4.5,-4.5" />
+</vector>

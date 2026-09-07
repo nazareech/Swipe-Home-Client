@@ -41,7 +41,7 @@ import mymultiplatformproject.shared.generated.resources.btn_next
 import mymultiplatformproject.shared.generated.resources.ic_arrow_next
 import mymultiplatformproject.shared.generated.resources.ic_edit_pencil
 import mymultiplatformproject.shared.generated.resources.ic_logout
-import mymultiplatformproject.shared.generated.resources.ic_theme_dark
+import mymultiplatformproject.shared.generated.resources.ic_moon_outline
 import mymultiplatformproject.shared.generated.resources.ic_theme_light
 import mymultiplatformproject.shared.generated.resources.ic_trash_can
 import mymultiplatformproject.shared.generated.resources.ic_user_verified
@@ -79,7 +79,7 @@ fun ProfileTopBar(){
         IconButton(onClick = LocalThemeToggle.current) {
             if (LocalThemeIsDark.current) {
                 Icon(
-                    painterResource(Res.drawable.ic_theme_dark),
+                    painterResource(Res.drawable.ic_moon_outline),
                     contentDescription = stringResource(string.profile_tab_toggle_theme_description_dark)
                 )
             }else {

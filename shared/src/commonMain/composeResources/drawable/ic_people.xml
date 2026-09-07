@@ -1,0 +1,37 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <!-- Передня головна фігура (ліворуч) -->
+    <!-- Голова (ідеальне коло) -->
+    <path
+        android:strokeColor="#005B41"
+        android:strokeWidth="2"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:pathData="M9,9 m-3,0 a3,3 0,1,0 6,0 a3,3 0,1,0 -6,0" />
+    <!-- Плечі (правильна закруглена дуга) -->
+    <path
+        android:strokeColor="#005B41"
+        android:strokeWidth="2"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:pathData="M2,20 c0,-3.3 2.7,-6 6,-6 h2c3.3,0 6,2.7 6,6" />
+
+    <!-- Задня фігура (праворуч, симетрично зміщена вгору та вбік) -->
+    <!-- Голова задньої фігури -->
+    <path
+        android:strokeColor="#005B41"
+        android:strokeWidth="2"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:pathData="M15,6 m-3,0 a3,3 0,1,0 6,0 a3,3 0,1,0 -6,0" />
+    <!-- Плечі задньої фігури (лінії не заходять під передню фігуру) -->
+    <path
+        android:strokeColor="#005B41"
+        android:strokeWidth="2"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:pathData="M16,14 h1c3.3,0 5,2.7 5,6" />
+</vector>

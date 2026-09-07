@@ -1,0 +1,21 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <!-- Силует будинку з чотирма віконцями на задньому плані -->
+    <path
+        android:strokeColor="#005B41"
+        android:strokeWidth="2"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:pathData="M11,13V8.5L16.5,4L22,8.5V13 M14,7.5h1v1h-1z M17,7.5h1v1h-1z M14,9.5h1v1h-1z M17,9.5h1v1h-1z" />
+
+    <!-- Рука / Долоня на передньому плані, яка підтримує будинок -->
+    <path
+        android:strokeColor="#005B41"
+        android:strokeWidth="2"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:pathData="M2,13h4v6H2z M6,15h7.5c1.2,0 2,0.8 2,1.8v0.4c0,1,-0.8,1.8,-2,1.8H6 M6,13h10c1.5,0 2.5,1 2.5,2.5v0c0,1.5 -1,2.5 -2.5,2.5" />
+</vector>

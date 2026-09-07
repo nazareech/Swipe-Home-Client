@@ -1,0 +1,22 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+
+    <!-- Головне лінзове кільце лупи та ручка, нахилена праворуч донизу -->
+    <path
+        android:strokeColor="#005B41"
+        android:strokeWidth="2"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:pathData="M10,10m-6,0a6,6 0,1 1,12 0a6,6 0,1 1,-12 0 M14.5,14.5L20,20" />
+
+    <!-- Маленька симетрична зірочка точно по центру лупи -->
+    <path
+        android:strokeColor="#005B41"
+        android:strokeWidth="2"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:pathData="M10,6.5l1,2h2.2l-1.7,1.3l0.6,2.2l-2.1,-1.5l-2.1,1.5l0.6,-2.2l-1.7,-1.3h2.2z" />
+</vector>
