@@ -21,6 +21,7 @@ import cafe.adriel.voyager.navigator.currentOrThrow
 import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabOptions
 import com.nazar_protasov.swipehome.ui.screens.settings.editProfile.EditProfileScreen
+import com.nazar_protasov.swipehome.ui.screens.settings.language.LanguageScreen
 import com.nazar_protasov.swipehome.ui.screens.settings.profile.components.MenuItemData
 import com.nazar_protasov.swipehome.ui.screens.settings.profile.components.ProfileActions
 import com.nazar_protasov.swipehome.ui.screens.settings.profile.components.ProfileHeader
@@ -99,7 +100,7 @@ internal object ProfileScreen : Screen {
                     MenuItemData(painterResource(Res.drawable.ic_certified_shield), stringResource(Res.string.profile_tab_verify_account), onClick = {/*TODO: Verify account*/}),
                     MenuItemData(painterResource(Res.drawable.ic_list), stringResource(Res.string.profile_tab_my_list_properties), badgeCount = 12, onClick = {navigator.push(MyListingsScreen())} ),
                     MenuItemData(painterResource(Res.drawable.ic_notifications_bell), stringResource(Res.string.profile_tab_settings_notifications), onClick = {navigator.push(NotificationsScreen())}),
-                    MenuItemData(painterResource(Res.drawable.ic_language), stringResource(Res.string.profile_tab_settings_language), onClick = {/*TODO: Language*/}),
+                    MenuItemData(painterResource(Res.drawable.ic_language), stringResource(Res.string.profile_tab_settings_language), onClick = {navigator.push(LanguageScreen())}),
                 )
             )
 
