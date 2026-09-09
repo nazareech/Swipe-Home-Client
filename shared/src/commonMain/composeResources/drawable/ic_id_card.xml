@@ -1,0 +1,29 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <!-- Основна рамка картки бейджа та верхнє кріплення (кліпса) -->
+    <path
+        android:strokeColor="#005B41"
+        android:strokeWidth="2"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:pathData="M5,8h14c1.1,0 2,0.9 2,2v9c0,1.1 -0.9,2 -2,2H5c-1.1,0 -2,-0.9 -2,-2v-9C3,8.9 3.9,8 5,8z M10,8V5c0,-0.55 0.45,-1 1,-1h2c0.55,0 1,0.45 1,1v3" />
+
+    <!-- Силует людини ліворуч всередині бейджа (голова та плечі) -->
+    <path
+        android:strokeColor="#005B41"
+        android:strokeWidth="2"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:pathData="M7,12m-1,0a1,1 0,1 1,2 0a1,1 0,1 1,-2 0 M4.5,17c0,-1.4 1.1,-2.5 2.5,-2.5h0c1.4,0 2.5,1.1 2.5,2.5" />
+
+    <!-- Дві горизонтальні плашки інформації (тексту) праворуч -->
+    <path
+        android:strokeColor="#005B41"
+        android:strokeWidth="2"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round"
+        android:pathData="M13,12h5 M13,16h3" />
+</vector>

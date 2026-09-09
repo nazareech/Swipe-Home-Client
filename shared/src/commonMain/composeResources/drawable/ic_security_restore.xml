@@ -1,0 +1,21 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+android:width="24dp"
+android:height="24dp"
+android:viewportWidth="24"
+android:viewportHeight="24">
+<!-- Кругла стрілка, що закручується ліворуч (проти годинникової стрілки) -->
+<path
+    android:strokeColor="#005B41"
+    android:strokeWidth="2"
+    android:strokeLineCap="round"
+    android:strokeLineJoin="round"
+    android:pathData="M12.5,4 A8,8 0,1,1 6,7.5 M6,3.5v4h4" />
+
+<!-- Маленький закритий замок точно по центру композиції -->
+<path
+    android:strokeColor="#005B41"
+    android:strokeWidth="2"
+    android:strokeLineCap="round"
+    android:strokeLineJoin="round"
+    android:pathData="M9,13h6v4H9z M10.5,13v-1.5c0,-0.83 0.67,-1.5 1.5,-1.5c0.83,0 1.5,0.67 1.5,1.5V13" />
+</vector>

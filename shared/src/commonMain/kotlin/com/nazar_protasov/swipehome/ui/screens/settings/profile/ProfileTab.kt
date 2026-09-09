@@ -20,6 +20,7 @@ import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabOptions
+import com.nazar_protasov.swipehome.ui.screens.settings.editProfile.EditProfileScreen
 import com.nazar_protasov.swipehome.ui.screens.settings.profile.components.MenuItemData
 import com.nazar_protasov.swipehome.ui.screens.settings.profile.components.ProfileActions
 import com.nazar_protasov.swipehome.ui.screens.settings.profile.components.ProfileHeader
@@ -93,7 +94,8 @@ internal object ProfileScreen : Screen {
 
             ProfileMenuCard(
                 items = listOf(
-                    MenuItemData(painterResource(Res.drawable.ic_profile), stringResource(Res.string.profile_tab_edit_info), onClick = {/*TODO: Edit info*/}),
+                    MenuItemData(painterResource(Res.drawable.ic_profile), stringResource(Res.string.profile_tab_edit_info), onClick = {navigator.push(EditProfileScreen()
+                    )}),
                     MenuItemData(painterResource(Res.drawable.ic_certified_shield), stringResource(Res.string.profile_tab_verify_account), onClick = {/*TODO: Verify account*/}),
                     MenuItemData(painterResource(Res.drawable.ic_list), stringResource(Res.string.profile_tab_my_list_properties), badgeCount = 12, onClick = {navigator.push(MyListingsScreen())} ),
                     MenuItemData(painterResource(Res.drawable.ic_notifications_bell), stringResource(Res.string.profile_tab_settings_notifications), onClick = {navigator.push(NotificationsScreen())}),

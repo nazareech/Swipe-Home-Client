@@ -54,6 +54,7 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import coil3.compose.AsyncImage
 import com.nazar_protasov.swipehome.ui.theme.SwipeHomeTheme
+import com.nazar_protasov.swipehome.ui.utils.CountryPhoneCode
 import com.nazar_protasov.swipehome.ui.utils.PhoneVisualTransformation
 import com.preat.peekaboo.image.picker.SelectionMode
 import com.preat.peekaboo.image.picker.rememberImagePickerLauncher
@@ -682,20 +683,11 @@ class RegisterScreen: Screen {
         var termsAccepted by remember { mutableStateOf(false) }
         // Стан для відображення меню вибору країни
         var isDropdownExpanded by remember { mutableStateOf(false) }
-        // Список доступних кодів
-        val availableCountryCodes = listOf("+380", "+48", "+1", "+44", "+49")
-
-        // Словник масок для кожної країни
-        val phoneMasks = mapOf(
-            "+380" to "00 000 0000",// Україна
-            "+48" to "000 000 000", // Польща
-            "+1" to "000 000 0000", // США/Канада
-            "+44" to "0000 000000", // Британія
-            "+49" to "000 0000000"  // Німеччина
-        )
+        // Список доступних кодів з ENUM
+        val availableCountryCodes = CountryPhoneCode.getAllCodes()
 
         // Визначаємо поточну маску на основі обраного коду (з дефолтним значенням)
-        val currentMask = phoneMasks[countryCode] ?: "00 000 0000"
+        val currentMask = CountryPhoneCode.getMaskByCode(countryCode)
 
         // Рахуємо, скільки цифр дозволено вводити для цієї країни
         val maxDigits = currentMask.count { it == '0' }

@@ -113,25 +113,6 @@ fun ProfileHeader(){
                         shape = CircleShape
                     )
             )
-
-            // Кнопка редагування (олівець)
-            Box(
-                modifier = Modifier
-                    .offset(x = (-4).dp, y = (-4).dp)
-                    .size(28.dp)
-                    .clip(CircleShape)
-                    .background(SwipeHomeTheme.colors.background)
-                    .border(2.dp, SwipeHomeTheme.colors.primary, CircleShape)
-                    .clickable { /*TODO Змінити фото*/ },
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    painterResource(Res.drawable.ic_edit_pencil),
-                    contentDescription = stringResource(string.profile_tab_photo_avatar_description),
-                    tint = SwipeHomeTheme.colors.primary,
-                    modifier = Modifier.size(16.dp)
-                )
-            }
         }
 
         Spacer(modifier = Modifier.height(16.dp))
