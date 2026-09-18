@@ -149,7 +149,8 @@ class RegisterScreen: Screen {
         ){
             //--------Верхня частина екран--------
             Row(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth()
+                    .padding(top = 18.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 IconButton(

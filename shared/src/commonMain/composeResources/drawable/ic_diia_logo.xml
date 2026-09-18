@@ -1,0 +1,47 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="150dp"
+    android:height="60dp"
+    android:viewportWidth="150"
+    android:viewportHeight="60">
+
+    <!-- Літера "д" -->
+    <!-- Верхній контур / купол -->
+    <path
+        android:fillColor="#000000"
+        android:pathData="M 22,22 C 22,14 36,14 36,22 L 36,40 L 22,40 Z" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M 27,24 C 27,19 31,19 31,24 L 31,40 L 27,40 Z" />
+    <!-- Нижня планка та ніжки -->
+    <path
+        android:fillColor="#000000"
+        android:pathData="M 14,40 L 44,40 L 44,45 L 39,45 L 39,52 L 34,52 L 34,45 L 24,45 L 24,52 L 19,52 L 19,45 L 14,45 Z" />
+
+    <!-- Літера "і" -->
+    <!-- Крапка -->
+    <path
+        android:fillColor="#000000"
+        android:pathData="M 58,16 A 3.5,3.5 0 1,0 65,16 A 3.5,3.5 0 1,0 58,16 Z" />
+    <!-- Вертикальний стовпчик -->
+    <path
+        android:fillColor="#000000"
+        android:pathData="M 58.5,24 L 64.5,24 L 64.5,45 L 58.5,45 Z" />
+
+    <!-- Літера "я" -->
+    <!-- Вертикальна права стійка -->
+    <path
+        android:fillColor="#000000"
+        android:pathData="M 96,16 L 102,16 L 102,45 L 96,45 Z" />
+    <!-- Овальна ліва частина -->
+    <path
+        android:fillColor="#000000"
+        android:pathData="M 96,16 C 82,16 82,32 96,32 Z" />
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M 96,21 C 88,21 88,27 96,27 Z" />
+    <!-- Діагональна ліва ніжка -->
+    <path
+        android:fillColor="#000000"
+        android:pathData="M 96,30 L 86,45 L 79,45 L 90,29 Z" />
+
+</vector>

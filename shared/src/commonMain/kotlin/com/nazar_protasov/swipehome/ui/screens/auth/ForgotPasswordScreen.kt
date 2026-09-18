@@ -122,7 +122,7 @@ class ForgotPasswordScreen : Screen {
         ) {
             // --- ВЕРХНЯ ПАНЕЛЬ ---
             Row(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth() .padding(top = 18.dp),
                 verticalAlignment = Alignment.CenterVertically
             ){
                 IconButton(

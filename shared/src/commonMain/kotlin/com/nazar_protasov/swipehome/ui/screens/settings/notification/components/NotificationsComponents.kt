@@ -67,7 +67,8 @@ fun NotificationsTopBar(navigator: Navigator) {
         modifier = Modifier
             .fillMaxWidth()
             .background(SwipeHomeTheme.colors.background)
-            .padding(horizontal = 16.dp, vertical = 12.dp),
+            .padding(horizontal = 16.dp, vertical = 12.dp)
+            .padding(top = 18.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ){

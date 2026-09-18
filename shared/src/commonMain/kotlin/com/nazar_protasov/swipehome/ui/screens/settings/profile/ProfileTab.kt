@@ -80,6 +80,12 @@ internal object ProfileScreen : Screen {
     override fun Content() {
         val scrollState = rememberScrollState()
         val navigator = LocalNavigator.currentOrThrow
+        // Шукаємо кореневий навігатор, щоб деталі відкривалися на весь екран (поверх BottomBar)
+        // і щоб уникнути помилки ClassCastException в TabNavigator
+        var rootNavigator = navigator
+        while (rootNavigator.parent != null) {
+            rootNavigator = rootNavigator.parent!!
+        }
 
         Column(
             modifier = Modifier
@@ -95,12 +101,12 @@ internal object ProfileScreen : Screen {
 
             ProfileMenuCard(
                 items = listOf(
-                    MenuItemData(painterResource(Res.drawable.ic_profile), stringResource(Res.string.profile_tab_edit_info), onClick = {navigator.push(EditProfileScreen()
+                    MenuItemData(painterResource(Res.drawable.ic_profile), stringResource(Res.string.profile_tab_edit_info), onClick = {rootNavigator.push(EditProfileScreen()
                     )}),
-                    MenuItemData(painterResource(Res.drawable.ic_certified_shield), stringResource(Res.string.profile_tab_verify_account), onClick = {/*TODO: Verify account*/}),
-                    MenuItemData(painterResource(Res.drawable.ic_list), stringResource(Res.string.profile_tab_my_list_properties), badgeCount = 12, onClick = {navigator.push(MyListingsScreen())} ),
-                    MenuItemData(painterResource(Res.drawable.ic_notifications_bell), stringResource(Res.string.profile_tab_settings_notifications), onClick = {navigator.push(NotificationsScreen())}),
-                    MenuItemData(painterResource(Res.drawable.ic_language), stringResource(Res.string.profile_tab_settings_language), onClick = {navigator.push(LanguageScreen())}),
+                    MenuItemData(painterResource(Res.drawable.ic_certified_shield), stringResource(Res.string.profile_tab_verify_account), onClick = {/*TODO: Verify account | rootNavigator.push()*/}),
+                    MenuItemData(painterResource(Res.drawable.ic_list), stringResource(Res.string.profile_tab_my_list_properties), badgeCount = 12, onClick = {rootNavigator.push(MyListingsScreen())} ),
+                    MenuItemData(painterResource(Res.drawable.ic_notifications_bell), stringResource(Res.string.profile_tab_settings_notifications), onClick = {rootNavigator.push(NotificationsScreen())}),
+                    MenuItemData(painterResource(Res.drawable.ic_language), stringResource(Res.string.profile_tab_settings_language), onClick = {rootNavigator.push(LanguageScreen())}),
                 )
             )
 
@@ -115,9 +121,9 @@ internal object ProfileScreen : Screen {
             Spacer(modifier = Modifier.height(8.dp))
             ProfileMenuCard(
                 items = listOf(
-                    MenuItemData(painterResource(Res.drawable.ic_support), stringResource(Res.string.profile_tab_support), onClick = {/*TODO: Support*/}),
-                    MenuItemData(painterResource(Res.drawable.ic_politics), stringResource(Res.string.profile_tab_conditions_of_use, ), onClick = {/*TODO: Conditions of use*/}),
-                    MenuItemData(painterResource(Res.drawable.ic_security), stringResource(Res.string.profile_tab_policity_description), onClick = {/*TODO: Privacy policy*/})
+                    MenuItemData(painterResource(Res.drawable.ic_support), stringResource(Res.string.profile_tab_support), onClick = {/*TODO: Support | rootNavigator.push()*/}),
+                    MenuItemData(painterResource(Res.drawable.ic_politics), stringResource(Res.string.profile_tab_conditions_of_use, ), onClick = {/*TODO: Conditions of use | rootNavigator.push()*/}),
+                    MenuItemData(painterResource(Res.drawable.ic_security), stringResource(Res.string.profile_tab_policity_description), onClick = {/*TODO: Privacy policy | rootNavigator.push()*/})
                 )
             )
 

@@ -1,0 +1,17 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+
+    <!-- Внешний силуэт щита и тёмные сектора (верхний правый и нижний левый) -->
+    <path
+        android:fillColor="#00695C"
+        android:pathData="M12,2 L4,5 V11 C4,16.55 7.41,21.74 12,23 C16.59,21.74 20,16.55 20,11 V5 L12,2 Z" />
+
+    <!-- Светлые контрастные сектора (верхний левый и нижний правый) -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M12,4.18 L6,6.43 V11 C6,11.36 6.03,11.72 6.09,12 H12 V4.18 Z M12,12 H17.91 C17.2,16.03 14.88,19.38 12,20.78 V12 Z" />
+
+</vector>

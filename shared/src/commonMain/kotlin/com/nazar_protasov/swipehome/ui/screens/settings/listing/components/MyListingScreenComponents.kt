@@ -26,6 +26,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.navigator.Navigator
 import coil3.compose.AsyncImage
+import com.nazar_protasov.swipehome.ui.screens.settings.listing.createListing.CreateListingScreen
 import com.nazar_protasov.swipehome.ui.theme.SwipeHomeTheme
 import mymultiplatformproject.shared.generated.resources.Res
 import mymultiplatformproject.shared.generated.resources.ic_add_circle
@@ -61,7 +62,8 @@ fun ListingsTopBar(navigator: Navigator) {
        modifier = Modifier
            .fillMaxWidth()
            .background(SwipeHomeTheme.colors.background)
-           .padding(horizontal = 16.dp, vertical = 12.dp),
+           .padding(horizontal = 16.dp, vertical = 12.dp)
+           .padding(top = 18.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ){
@@ -85,7 +87,7 @@ fun ListingsTopBar(navigator: Navigator) {
                 .size(36.dp)
                 .clip(CircleShape)
                 .background(SwipeHomeTheme.colors.background)
-                .clickable { /*TODO: Додати нове оголошення */ },
+                .clickable { navigator.push(CreateListingScreen()) },
             contentAlignment = Alignment.Center
         ){
             Icon(painterResource(Res.drawable.ic_add_circle), contentDescription = "Add", tint = SwipeHomeTheme.colors.neutral)
