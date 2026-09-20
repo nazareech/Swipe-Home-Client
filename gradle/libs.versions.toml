@@ -1,5 +1,5 @@
 [versions]
-agp = "9.4.0"
+agp = "9.4.1"
 android-compileSdk = "36"
 android-minSdk = "24"
 android-targetSdk = "36"
@@ -21,6 +21,7 @@ voyager = "1.1.0-beta02"
 koin-core = "4.0.0"
 koin-compose = "4.0.0"
 peekaboo = "0.5.2"
+compose-reorderable = "2.4.1"
 coil3 = "3.0.0-rc01"
 kotlin-serialization = "1.6.3"
 
@@ -66,6 +67,9 @@ koin-compose = { module = "io.insert-koin:koin-compose", version.ref = "koin-com
 
 # Peekaboo для дозволів та доступу до файлів
 peekaboo-image-picker = { module = "io.github.onseok:peekaboo-image-picker", version.ref = "peekaboo" }
+
+# Для реалізації drag and drop (KMP)
+compose-reorderable = { module = "sh.calvin.reorderable:reorderable", version.ref = "compose-reorderable" }
 
 # Coil, щоб красиво відмалювати завантажену аватарку
 coil-compose = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coil3"}

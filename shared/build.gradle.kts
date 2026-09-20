@@ -69,6 +69,8 @@ kotlin {
             // Coil (Завантаження зображень)
             implementation(libs.coil.compose)
             implementation(libs.coil.network.ktor)
+
+            implementation(libs.compose.reorderable)
         }
 
         commonTest.dependencies {
