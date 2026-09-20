@@ -13,8 +13,8 @@ class SearchHubScreenModel : ScreenModel {
     private val _selectedTabIndex = MutableStateFlow(0)
     val selectedTabIndex: StateFlow<Int> = _selectedTabIndex.asStateFlow()
 
-    private val _isCpmpareMode = MutableStateFlow(false)
-    val isCompareMode: StateFlow<Boolean> = _isCpmpareMode.asStateFlow()
+    private val _isCompareMode = MutableStateFlow(false)
+    val isCompareMode: StateFlow<Boolean> = _isCompareMode.asStateFlow()
 
     // Зберігаємо ID вибраних об'єктів
     private val _selectedForCompare = MutableStateFlow<Set<String>>(emptySet())
@@ -48,13 +48,13 @@ class SearchHubScreenModel : ScreenModel {
 
     fun setTabIndex(index: Int) {
         _selectedTabIndex.value = index
-        _isCpmpareMode.value = false
+        _isCompareMode.value = false
         _selectedForCompare.value = emptySet()
     }
 
     fun toggleCompareMode(){
-        _isCpmpareMode.value = !_isCpmpareMode.value
-        if (!_isCpmpareMode.value) {
+        _isCompareMode.value = !_isCompareMode.value
+        if (!_isCompareMode.value) {
             _selectedForCompare.value = emptySet()
         }
     }

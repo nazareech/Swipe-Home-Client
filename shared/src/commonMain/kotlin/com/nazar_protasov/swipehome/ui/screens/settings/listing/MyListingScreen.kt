@@ -15,10 +15,11 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.nazar_protasov.swipehome.ui.screens.settings.listing.components.ListingCard
 import com.nazar_protasov.swipehome.ui.screens.settings.listing.components.ListingItem
-import com.nazar_protasov.swipehome.ui.screens.settings.listing.components.ListingStaus
+import com.nazar_protasov.swipehome.ui.screens.settings.listing.components.ListingStatus
 import com.nazar_protasov.swipehome.ui.screens.settings.listing.components.ListingsHeader
 import com.nazar_protasov.swipehome.ui.screens.settings.listing.components.ListingsTopBar
 import com.nazar_protasov.swipehome.ui.screens.settings.analystics.AnalyticsScreen
+import com.nazar_protasov.swipehome.ui.screens.settings.listing.createListing.CreateListingScreen
 import com.nazar_protasov.swipehome.ui.theme.SwipeHomeTheme
 
 
@@ -29,11 +30,20 @@ class MyListingsScreen : Screen {
 
         // Моккові дані
         val listings = listOf(
-            ListingItem("1", "Title 1", "Location 1", listOf("https://images.unsplash.com/photo-1512917774080-9991f1c4c750?q=80&w=400"), ListingStaus.ACTIVE, "100", "10", onClick = { navigator.push(AnalyticsScreen())}),
-            ListingItem("2", "Title 2", "Location 2", listOf("https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?q=80&w=400"), ListingStaus.MODERATION, "--", "--", onClick = {/*TODO:*/}),
-            ListingItem("3", "Title 3", "Location 3", listOf("https://images.unsplash.com/photo-1512917774080-9991f1c4c750?q=80&w=400"), ListingStaus.HIDDEN, "1.2k", "84", onClick = {/*TODO:*/}),
-            ListingItem("4", "Title 4", "Location 4", listOf("https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?q=80&w=400"), ListingStaus.ACTIVE, "100", "10", onClick = {/*TODO:*/}),
-            ListingItem("5", "Title 5", "Location 5", listOf("https://images.unsplash.com/photo-1512917774080-9991f1c4c750?q=80&w=400"), ListingStaus.ACTIVE, "100", "10", onClick = {/*TODO:*/}),
+            ListingItem("1", "Title 1", "Location 1", listOf("https://images.unsplash.com/photo-1512917774080-9991f1c4c750?q=80&w=400"), ListingStatus.ACTIVE, "100", "10", onClick = { navigator.push(AnalyticsScreen())}),
+            ListingItem("2", "Title 2", "Location 2", listOf("https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?q=80&w=400"), ListingStatus.MODERATION, "--", "--", onClick = {/*TODO:*/}),
+            ListingItem("3", "Title 3", "Location 3", listOf("https://images.unsplash.com/photo-1512917774080-9991f1c4c750?q=80&w=400"), ListingStatus.HIDDEN, "1.2k", "84", onClick = {/*TODO:*/}),
+            ListingItem("4", "Title 4", "Location 4", listOf("https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?q=80&w=400"), ListingStatus.ACTIVE, "100", "10", onClick = {/*TODO:*/}),
+            ListingItem("5", "Title 5", "Location 5", listOf("https://images.unsplash.com/photo-1512917774080-9991f1c4c750?q=80&w=400"), ListingStatus.ACTIVE, "100", "10", onClick = {/*TODO:*/}),
+            ListingItem(
+                "draft_123",
+                "Title 6",
+                "Location 6",
+                emptyList(),
+                ListingStatus.DRAFT,
+                "--", "--",
+                onClick = {}
+            )
         )
 
         Scaffold(
@@ -52,11 +62,16 @@ class MyListingsScreen : Screen {
                 }
 
                 items(listings){ listing ->
-                    ListingCard(listing = listing)
+                    ListingCard(
+                        listing = listing,
+                        onEditClick = {
+                            navigator.push(
+                                CreateListingScreen(draftId = listing.id)
+                            )
+                        }
+                    )
                 }
-
             }
-
         }
     }
 }

@@ -24,6 +24,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import cafe.adriel.voyager.core.registry.screenModule
 import cafe.adriel.voyager.navigator.Navigator
 import coil3.compose.AsyncImage
 import com.nazar_protasov.swipehome.ui.screens.settings.listing.createListing.CreateListingScreen
@@ -39,9 +40,10 @@ import mymultiplatformproject.shared.generated.resources.ic_location_pin
 import org.jetbrains.compose.resources.painterResource
 
 // Модель даних для оголошення
-enum class ListingStaus {
+enum class ListingStatus {
     ACTIVE,
     MODERATION,
+    DRAFT,
     HIDDEN
 }
 
@@ -50,7 +52,7 @@ data class ListingItem(
     val title: String,
     val location: String,
     val imagesUrl: List<String>,
-    val status: ListingStaus,
+    val status: ListingStatus,
     val views: String,
     val likes: String,
     val onClick: () -> Unit // Обробник натискання
@@ -133,7 +135,7 @@ fun ListingsHeader(count: Int){
 }
 
 @Composable
-fun ListingCard (listing: ListingItem){
+fun ListingCard (listing: ListingItem, onEditClick: () -> Unit){
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = SwipeHomeTheme.shapes.mediumShape,
@@ -147,7 +149,7 @@ fun ListingCard (listing: ListingItem){
         ){
             // Фотографія об'єкта
             AsyncImage(
-                model = listing.imagesUrl[0],
+                model = listing.imagesUrl.firstOrNull() ?: "",
                 contentDescription = null,
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
@@ -176,7 +178,7 @@ fun ListingCard (listing: ListingItem){
                         modifier = Modifier.weight(1f)
                     )
 
-                    IconButton(onClick = {/*TODO: Редагувати*/ }){
+                    IconButton(onClick = onEditClick){
                         Icon(
                             painterResource(Res.drawable.ic_edit_pencil),
                             contentDescription = "Edit",
@@ -239,11 +241,12 @@ fun ListingCard (listing: ListingItem){
 }
 
 @Composable
-fun StatusBadge(status: ListingStaus){
+fun StatusBadge(status: ListingStatus){
     val (bgColor, textColor, text) = when(status){
-        ListingStaus.ACTIVE -> Triple(SwipeHomeTheme.colors.primary, SwipeHomeTheme.colors.onPrimary, "Активний")
-        ListingStaus.MODERATION -> Triple(SwipeHomeTheme.colors.secondary, SwipeHomeTheme.colors.onSurfaceSecondary, "В модерації")
-        ListingStaus.HIDDEN -> Triple(SwipeHomeTheme.colors.error, SwipeHomeTheme.colors.neutral, "Прихований")
+        ListingStatus.ACTIVE -> Triple(SwipeHomeTheme.colors.primary, SwipeHomeTheme.colors.onPrimary, "Активний")
+        ListingStatus.MODERATION -> Triple(SwipeHomeTheme.colors.secondary, SwipeHomeTheme.colors.onSurfaceSecondary, "В модерації")
+        ListingStatus.DRAFT -> Triple(SwipeHomeTheme.colors.surface, SwipeHomeTheme.colors.onSurfaceSecondary, "Чернетка")
+        ListingStatus.HIDDEN -> Triple(SwipeHomeTheme.colors.error, SwipeHomeTheme.colors.neutral, "Прихований")
     }
 
     Row(

@@ -11,32 +11,36 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateListOf
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
-import com.nazar_protasov.swipehome.ui.screens.settings.listing.createListing.components.PropertyType
+import com.nazar_protasov.swipehome.ui.screens.settings.listing.CreateListingScreenModel
 import com.nazar_protasov.swipehome.ui.screens.settings.listing.createListing.components.Step1BasicInfo
 import com.nazar_protasov.swipehome.ui.screens.settings.listing.createListing.components.Step2Details
 import com.nazar_protasov.swipehome.ui.screens.settings.listing.createListing.components.Step3Media
 import com.nazar_protasov.swipehome.ui.screens.settings.listing.createListing.components.Step4Verification
-import com.nazar_protasov.swipehome.ui.screens.settings.listing.createListing.components.VerificationMethods
 import com.nazar_protasov.swipehome.ui.screens.settings.listing.createListing.components.WizardBottomBar
 import com.nazar_protasov.swipehome.ui.screens.settings.listing.createListing.components.WizardTopBar
 import com.nazar_protasov.swipehome.ui.theme.SwipeHomeTheme
+import org.koin.compose.koinInject
+import kotlin.random.Random
 
-class CreateListingScreen : Screen {
+class CreateListingScreen(val draftId: String? = null) : Screen {
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
         val scrollState = rememberScrollState()
 
+        val screenModel: CreateListingScreenModel = koinInject()
+
+        // Якщо передано draftId, завантажуємо дані один раз при старті
+        LaunchedEffect(draftId){
+            draftId?.let { screenModel.loadDraft(it) }
+        }
+/*
         var currentStep by remember { mutableStateOf(1) }
         val totalSteps = 4
 
@@ -64,21 +68,30 @@ class CreateListingScreen : Screen {
         var securityIsSelect by remember { mutableStateOf(false) }
 
         val uploadedPhotos = remember { mutableStateListOf<String>() }
+*/
 
         Scaffold(
             topBar = {
                 WizardTopBar(
-                    currentStep = currentStep,
-                    totalSteps = totalSteps,
-                    onBackClick = { if(currentStep > 1) currentStep-- else navigator.pop() }
+                    currentStep = screenModel.currentStep,
+                    totalSteps = screenModel.totalSteps,
+                    onSaveClick = { screenModel.saveDraft (
+                        onSuccess = { navigator.pop()}
+                        )
+                    },
+                    onBackClick = { if(screenModel.currentStep > 1) screenModel.currentStep-- else navigator.pop() }
                 )
             },
             bottomBar = {
                 WizardBottomBar(
-                    currentStep = currentStep,
-                    totalSteps = totalSteps,
-                    onNext = { if(currentStep < totalSteps) currentStep++ else { /*TODO: Submit*/} },
-                    onPrev = { if(currentStep > 1) currentStep-- else navigator.pop() }
+                    currentStep = screenModel.currentStep,
+                    totalSteps = screenModel.totalSteps,
+                    onSaveClick = { screenModel.saveDraft (
+                        onSuccess = { navigator.pop()}
+                        )
+                    },
+                    onNext = { if(screenModel.currentStep < screenModel.totalSteps) screenModel.currentStep++ else screenModel.submitListing { navigator.pop() } },
+                    onPrev = { if(screenModel.currentStep > 1) screenModel.currentStep-- else navigator.pop() }
                 )
             },
             containerColor = SwipeHomeTheme.colors.background
@@ -88,7 +101,7 @@ class CreateListingScreen : Screen {
                     .fillMaxSize()
                     .padding(paddingValues)
             ){
-                Crossfade(targetState = currentStep, label = "StepTransition") { step ->
+                Crossfade(targetState = screenModel.currentStep, label = "StepTransition") { step ->
                     Column(modifier = Modifier
                         .fillMaxSize()
                         .verticalScroll(scrollState)
@@ -96,49 +109,49 @@ class CreateListingScreen : Screen {
                     ){
                         when(step){
                             1 -> Step1BasicInfo(
-                                selectedType = selectedType,
-                                onTypeSelected = { selectedType = it },
-                                address = address,
-                                onAddressChange = { address = it },
-                                area = area,
-                                onAreaChange = { area = it },
-                                price = price,
-                                onPriceChange = { price = it }
+                                selectedType = screenModel.selectedType,
+                                onTypeSelected = { screenModel.selectedType = it },
+                                address = screenModel.address,
+                                onAddressChange = { screenModel.address = it },
+                                area = screenModel.area,
+                                onAreaChange = { screenModel.area = it },
+                                price = screenModel.price,
+                                onPriceChange = { screenModel.price = it }
                             )
                             2 -> Step2Details(
-                                description = description,
-                                onDescriptionChange = { description = it },
+                                description = screenModel.description,
+                                onDescriptionChange = { screenModel.description = it },
 
-                                countBedrooms = countBedrooms, onCountBedrooms = { countBedrooms = it },
-                                countBathrooms = countBathrooms, onCountBathrooms = { countBathrooms = it },
-                                floorNumber = floorNumber, onFloorNumber = { floorNumber = it },
+                                countBedrooms = screenModel.countBedrooms, onCountBedrooms = { screenModel.countBedrooms = it },
+                                countBathrooms = screenModel.countBathrooms, onCountBathrooms = { screenModel.countBathrooms = it },
+                                floorNumber = screenModel.floorNumber, onFloorNumber = { screenModel.floorNumber = it },
 
-                                allowedPets = allowedPets, onAllowedPets = { allowedPets = it },
-                                isParking = isParking, onIsParking = { isParking = it },
-                                isFurnished = isFurnished, onIsFurnished = { isFurnished = it },
-                                isBalcony = isBalcony, onIsBalcony = { isBalcony = it },
-                                isCondition = isCondition, onIsCondition = { isCondition = it },
+                                allowedPets = screenModel.allowedPets, onAllowedPets = { screenModel.allowedPets = it },
+                                isParking = screenModel.isParking, onIsParking = { screenModel.isParking = it },
+                                isFurnished = screenModel.isFurnished, onIsFurnished = { screenModel.isFurnished = it },
+                                isBalcony = screenModel.isBalcony, onIsBalcony = { screenModel.isBalcony = it },
+                                isCondition = screenModel.isCondition, onIsCondition = { screenModel.isCondition = it },
 
-                                gymIsSelect = gymIsSelect, onGymIsSelect = { gymIsSelect = it},
-                                poolIsSelect = poolIsSelect, onPoolIsSelect = { poolIsSelect = it},
-                                elevatorIsSelect = elevatorIsSelect, onElevatorIsSelect = { elevatorIsSelect = it},
-                                securityIsSelect = securityIsSelect, onSecurityIsSelect = { securityIsSelect = it},
+                                gymIsSelect = screenModel.gymIsSelect, onGymIsSelect = { screenModel.gymIsSelect = it},
+                                poolIsSelect = screenModel.poolIsSelect, onPoolIsSelect = { screenModel.poolIsSelect = it},
+                                elevatorIsSelect = screenModel.elevatorIsSelect, onElevatorIsSelect = { screenModel.elevatorIsSelect = it},
+                                securityIsSelect = screenModel.securityIsSelect, onSecurityIsSelect = { screenModel.securityIsSelect = it},
                             )
                             3 -> Step3Media(
-                                    photos = uploadedPhotos,
+                                    photos = screenModel.uploadedPhotos,
                                     onAddPhoto = {
-                                        uploadedPhotos.add("https://picsum.photos/200/300?id=${uploadedPhotos.size + 1}")
+                                        screenModel.uploadedPhotos.add("https://picsum.photos/200/300?id=${Random.nextInt(100000)}")
                                     },
-                                    onRemovePhoto = { index -> uploadedPhotos.removeAt(index) },
+                                    onRemovePhoto = { index -> screenModel.uploadedPhotos.removeAt(index) },
                                     onMovePhoto = { fromIndex, toIndex ->
                                         // Логіка перетягування (Drag & Drop)
-                                        val item = uploadedPhotos.removeAt(fromIndex)
-                                        uploadedPhotos.add(toIndex, item)
+                                        val item = screenModel.uploadedPhotos.removeAt(fromIndex)
+                                        screenModel.uploadedPhotos.add(toIndex, item)
                                     }
                                 )
                             4 -> Step4Verification(
-                                verificationMethod = verificationMethod,
-                                onVerificationMethod = { verificationMethod = it }
+                                verificationMethod = screenModel.verificationMethod,
+                                onVerificationMethod = { screenModel.verificationMethod = it }
                             )
                         }
                         Spacer(modifier = Modifier.height(80.dp))

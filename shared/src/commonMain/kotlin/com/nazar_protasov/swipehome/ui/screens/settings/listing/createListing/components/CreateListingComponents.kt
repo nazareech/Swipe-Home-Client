@@ -41,6 +41,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -54,7 +55,10 @@ import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.hapticfeedback.HapticFeedback
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
@@ -62,6 +66,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
+import com.nazar_protasov.swipehome.ui.screens.settings.listing.CreateListingScreenModel
 import com.nazar_protasov.swipehome.ui.theme.SwipeHomeTheme
 import mymultiplatformproject.shared.generated.resources.Res
 import mymultiplatformproject.shared.generated.resources.ic_arrow_back
@@ -104,7 +109,7 @@ enum class VerificationMethods{
 // --- НАВІГАЦІЯ ТА ПРОГРЕС ---
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun WizardTopBar(currentStep: Int, totalSteps: Int, onBackClick: () -> Unit){
+fun WizardTopBar(currentStep: Int, totalSteps: Int, onBackClick: () -> Unit, onSaveClick: () -> Unit){
     val titles = listOf("Основна інформація", "Деталі та особливості", "Медіа", "Фінальний крок")
 
     Column(modifier = Modifier.background(SwipeHomeTheme.colors.background)) {
@@ -123,7 +128,7 @@ fun WizardTopBar(currentStep: Int, totalSteps: Int, onBackClick: () -> Unit){
             },
             actions = {
                 if (currentStep > 1 && currentStep != totalSteps){
-                    TextButton(onClick = {/*TODO: Save draft*/}) {
+                    TextButton(onClick = onSaveClick) {
                         Text("Зберегти", style = SwipeHomeTheme.typography.caption, fontWeight = FontWeight.Bold, color = SwipeHomeTheme.colors.primary)
                     }
                 }
@@ -159,7 +164,7 @@ fun SegmentedProgressBar(currentStep: Int, totalSteps: Int, modifier: Modifier =
 }
 
 @Composable
-fun WizardBottomBar(currentStep: Int, totalSteps: Int, onNext: () -> Unit, onPrev: () -> Unit){
+fun WizardBottomBar(currentStep: Int, totalSteps: Int,onSaveClick: () -> Unit, onNext: () -> Unit, onPrev: () -> Unit){
     Column(modifier = Modifier.background(SwipeHomeTheme.colors.background)) {
         HorizontalDivider( color = SwipeHomeTheme.colors.outline)
         Row(
@@ -210,7 +215,7 @@ fun WizardBottomBar(currentStep: Int, totalSteps: Int, onNext: () -> Unit, onPre
 
         if (currentStep == 4) {
             OutlinedButton(
-                onClick = { /*TODO:*/ },
+                onClick = { onSaveClick() },
                 modifier = Modifier.fillMaxWidth().padding(bottom = 8.dp, start = 16.dp, end = 16.dp),
             ){
                 Icon(painterResource(Res.drawable.ic_save_floppy), contentDescription = null, tint = SwipeHomeTheme.colors.primary)
@@ -534,6 +539,9 @@ fun Step3Media(
     onRemovePhoto: (Int) -> Unit,
     onMovePhoto: (Int, Int) -> Unit
 ){
+    // Отримуємо доступ до контролера вібрації
+    val hapticFeedback = LocalHapticFeedback.current
+
     Column {
         Text("Завантажити фото", style = SwipeHomeTheme.typography.headline, fontWeight = FontWeight.Bold)
         Spacer(modifier = Modifier.height(8.dp))
@@ -592,7 +600,12 @@ fun Step3Media(
                     }
                     .clip(SwipeHomeTheme.shapes.mediumShape)
                     .background(SwipeHomeTheme.colors.outline)
-                    .clickable { onAddPhoto() },
+                    .clickable {
+                        onAddPhoto()
+                        // Викликаємо вібрацію при кліку
+                        // Доступні базові варіанти: LongPress або TextHandleMove
+                        hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
+                       },
                 contentAlignment = Alignment.Center
             ) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -630,7 +643,8 @@ fun Step3Media(
             val reorderableLazyGridState = rememberReorderableLazyGridState(lazyGridState) { from, to ->
                 // Забороняємо перетягувати кнопку додати
                 if (from.index < photos.size && to.index < photos.size) {
-                    onMovePhoto(from.index, to.index)
+                     onMovePhoto(from.index, to.index)
+                    hapticFeedback.performHapticFeedback(HapticFeedbackType.TextHandleMove)
                 }
             }
             // Сітка з фотографіями та кнопкою "Додати ще"
@@ -653,13 +667,17 @@ fun Step3Media(
                             Modifier
                         }
 
+                        hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
                         Box(
                             modifier = itemModifier.longPressDraggableHandle()
                         ) {
                             PhotoItemCard(
                                 photoUrl = photos[index], // Передаємо URL
                                 isMain = index == 0,
-                                onRemove = { onRemovePhoto(index) }
+                                hapticFeedback = hapticFeedback,
+                                onRemove = {
+                                    onRemovePhoto(index)
+                                }
                             )
                         }
                     }
@@ -672,10 +690,21 @@ fun Step3Media(
                     Box(
                         modifier = Modifier
                             .aspectRatio(1f)
-                            .drawBehind{ drawRoundRect(color = color, style = stroke, cornerRadius = CornerRadius(16.dp.toPx())) }
-                            .clip(SwipeHomeTheme.shapes.smallShape)
+                            .drawBehind {
+                                drawRoundRect(
+                                    color = color,
+                                    style = stroke,
+                                    cornerRadius = CornerRadius(16.dp.toPx())
+                                )
+                            }
+                            .clip(SwipeHomeTheme.shapes.mediumShape)
                             .background(SwipeHomeTheme.colors.outline)
-                            .clickable { onAddPhoto() },
+                            .clickable {
+                                onAddPhoto()
+                                // Викликаємо вібрацію при кліку
+                                // Доступні базові варіанти: LongPress або TextHandleMove
+                                hapticFeedback.performHapticFeedback(HapticFeedbackType.Confirm)
+                               },
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(painterResource(Res.drawable.ic_image_upload), contentDescription = null, tint = SwipeHomeTheme.colors.neutral)
@@ -699,7 +728,7 @@ fun Step3Media(
 }
 
 @Composable
-fun PhotoItemCard(photoUrl: String, isMain: Boolean, onRemove: () -> Unit){
+fun PhotoItemCard(photoUrl: String, isMain: Boolean, hapticFeedback: HapticFeedback, onRemove: () -> Unit){
     Box(
         modifier = Modifier
             .aspectRatio(1f)
@@ -741,7 +770,12 @@ fun PhotoItemCard(photoUrl: String, isMain: Boolean, onRemove: () -> Unit){
                 .size(24.dp)
                 .clip(CircleShape)
                 .background(SwipeHomeTheme.colors.surface.copy(alpha = 0.8f))
-                .clickable { onRemove() },
+                .clickable {
+                    onRemove()
+                    // Викликаємо вібрацію при кліку
+                    // Доступні базові варіанти: LongPress або TextHandleMove
+                    hapticFeedback.performHapticFeedback(HapticFeedbackType.LongPress)
+                   },
             contentAlignment = Alignment.Center
         ){
             Icon(painterResource(Res.drawable.ic_close), contentDescription = null, tint = SwipeHomeTheme.colors.onSurfaceSecondary, modifier = Modifier.size(14.dp))

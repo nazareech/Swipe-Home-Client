@@ -30,6 +30,7 @@ import com.nazar_protasov.swipehome.ui.screens.settings.profile.components.Profi
 import com.nazar_protasov.swipehome.ui.screens.settings.listing.MyListingsScreen
 import com.nazar_protasov.swipehome.ui.screens.settings.notification.NotificationsScreen
 import com.nazar_protasov.swipehome.ui.theme.SwipeHomeTheme
+import kotlin.time.TimeSource
 import mymultiplatformproject.shared.generated.resources.Res
 import mymultiplatformproject.shared.generated.resources.ic_certified_shield
 import mymultiplatformproject.shared.generated.resources.ic_language
@@ -87,6 +88,18 @@ internal object ProfileScreen : Screen {
             rootNavigator = rootNavigator.parent!!
         }
 
+        // Стан для збереження часу останнього натискання кнопки
+        var lastClickMark = remember { TimeSource.Monotonic.markNow() }
+
+        // Функція-обгортка для безпечної навігації
+        val navigationSafely: (Screen) -> Unit = { screen ->
+            // Дозволяємо новий перехід, лише якщо з моменту останнього натискання пройшло більше ніж 300 мс
+            if (lastClickMark.elapsedNow().inWholeMilliseconds > 300L) {
+                lastClickMark = TimeSource.Monotonic.markNow()
+                rootNavigator.push(screen)
+            }
+        }
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -101,12 +114,32 @@ internal object ProfileScreen : Screen {
 
             ProfileMenuCard(
                 items = listOf(
-                    MenuItemData(painterResource(Res.drawable.ic_profile), stringResource(Res.string.profile_tab_edit_info), onClick = {rootNavigator.push(EditProfileScreen()
-                    )}),
-                    MenuItemData(painterResource(Res.drawable.ic_certified_shield), stringResource(Res.string.profile_tab_verify_account), onClick = {/*TODO: Verify account | rootNavigator.push()*/}),
-                    MenuItemData(painterResource(Res.drawable.ic_list), stringResource(Res.string.profile_tab_my_list_properties), badgeCount = 12, onClick = {rootNavigator.push(MyListingsScreen())} ),
-                    MenuItemData(painterResource(Res.drawable.ic_notifications_bell), stringResource(Res.string.profile_tab_settings_notifications), onClick = {rootNavigator.push(NotificationsScreen())}),
-                    MenuItemData(painterResource(Res.drawable.ic_language), stringResource(Res.string.profile_tab_settings_language), onClick = {rootNavigator.push(LanguageScreen())}),
+                    MenuItemData(
+                        painterResource(Res.drawable.ic_profile),
+                        stringResource(Res.string.profile_tab_edit_info),
+                        onClick = {navigationSafely(EditProfileScreen())}
+                    ),
+                    MenuItemData(
+                        painterResource(Res.drawable.ic_certified_shield),
+                        stringResource(Res.string.profile_tab_verify_account),
+                        onClick = {/*TODO: Verify account | rootNavigator.push()*/}
+                    ),
+                    MenuItemData(
+                        painterResource(Res.drawable.ic_list),
+                        stringResource(Res.string.profile_tab_my_list_properties),
+                        badgeCount = 12,
+                        onClick = {navigationSafely(MyListingsScreen())}
+                    ),
+                    MenuItemData(
+                        painterResource(Res.drawable.ic_notifications_bell),
+                        stringResource(Res.string.profile_tab_settings_notifications),
+                        onClick = {navigationSafely(NotificationsScreen())}
+                    ),
+                    MenuItemData(
+                        painterResource(Res.drawable.ic_language),
+                        stringResource(Res.string.profile_tab_settings_language),
+                        onClick = {navigationSafely(LanguageScreen())}
+                    ),
                 )
             )
 
@@ -122,7 +155,7 @@ internal object ProfileScreen : Screen {
             ProfileMenuCard(
                 items = listOf(
                     MenuItemData(painterResource(Res.drawable.ic_support), stringResource(Res.string.profile_tab_support), onClick = {/*TODO: Support | rootNavigator.push()*/}),
-                    MenuItemData(painterResource(Res.drawable.ic_politics), stringResource(Res.string.profile_tab_conditions_of_use, ), onClick = {/*TODO: Conditions of use | rootNavigator.push()*/}),
+                    MenuItemData(painterResource(Res.drawable.ic_politics), stringResource(Res.string.profile_tab_conditions_of_use), onClick = {/*TODO: Conditions of use | rootNavigator.push()*/}),
                     MenuItemData(painterResource(Res.drawable.ic_security), stringResource(Res.string.profile_tab_policity_description), onClick = {/*TODO: Privacy policy | rootNavigator.push()*/})
                 )
             )
