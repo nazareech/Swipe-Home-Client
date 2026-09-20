@@ -8,26 +8,55 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import com.nazar_protasov.swipehome.ui.screens.settings.analystics.AnalyticsScreen
 import com.nazar_protasov.swipehome.ui.screens.settings.listing.components.ListingCard
 import com.nazar_protasov.swipehome.ui.screens.settings.listing.components.ListingItem
 import com.nazar_protasov.swipehome.ui.screens.settings.listing.components.ListingStatus
 import com.nazar_protasov.swipehome.ui.screens.settings.listing.components.ListingsHeader
 import com.nazar_protasov.swipehome.ui.screens.settings.listing.components.ListingsTopBar
-import com.nazar_protasov.swipehome.ui.screens.settings.analystics.AnalyticsScreen
 import com.nazar_protasov.swipehome.ui.screens.settings.listing.createListing.CreateListingScreen
 import com.nazar_protasov.swipehome.ui.theme.SwipeHomeTheme
+import org.koin.compose.koinInject
 
 
 class MyListingsScreen : Screen {
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
+        val screenModel: MyListingsScreenModel = koinInject()
 
+        // Підписуємося на нашу базу даних
+        val draftEntities by screenModel.drafts.collectAsState(initial = emptyList())
+
+        // Мапимо дані з ДБ у формат для карток
+        val listings = draftEntities.map { draft ->
+            val photosList = if (draft.photosUris.isNotBlank()) draft.photosUris.split(",") else emptyList()
+            val displayTitle = if (draft.title.isNotBlank()) "Чернетка: ${draft.title}" else "Нове оголошення"
+            val displayLocation = draft.address.ifBlank{ "Адресу не вказано" }
+
+            ListingItem(
+                id = draft.draftId,
+                title = displayTitle,
+                location = displayLocation,
+                imagesUrl = photosList,
+                status = ListingStatus.DRAFT,
+                views = "--",
+                likes = "--",
+                onClick = {
+                    // Відкриваємо редактор зі збереженими даними чернетки
+                    navigator.push(AnalyticsScreen()/*TODO: Передавання ID (draftId = listing.id) для відображення статистики даного оголошення */)
+                }
+            )
+
+        }
+/*
         // Моккові дані
         val listings = listOf(
             ListingItem("1", "Title 1", "Location 1", listOf("https://images.unsplash.com/photo-1512917774080-9991f1c4c750?q=80&w=400"), ListingStatus.ACTIVE, "100", "10", onClick = { navigator.push(AnalyticsScreen())}),
@@ -45,6 +74,7 @@ class MyListingsScreen : Screen {
                 onClick = {}
             )
         )
+ */
 
         Scaffold(
             topBar = { ListingsTopBar(navigator) },

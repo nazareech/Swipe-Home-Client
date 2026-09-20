@@ -41,7 +41,6 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -66,7 +65,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
-import com.nazar_protasov.swipehome.ui.screens.settings.listing.CreateListingScreenModel
 import com.nazar_protasov.swipehome.ui.theme.SwipeHomeTheme
 import mymultiplatformproject.shared.generated.resources.Res
 import mymultiplatformproject.shared.generated.resources.ic_arrow_back
@@ -377,6 +375,7 @@ fun CustomInputField(label: String, value: String, onValueChange: (String) -> Un
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Step2Details(
+    title: String, onTitleChange: (String) -> Unit,
     description: String, onDescriptionChange: (String) -> Unit,
 
     countBedrooms: Int, onCountBedrooms: (Int) -> Unit,
@@ -446,6 +445,20 @@ fun Step2Details(
             AmenityCard("Ліфт", painterResource(Res.drawable.ic_elevator), elevatorIsSelect, Modifier.weight(1f)) {onElevatorIsSelect(!elevatorIsSelect)}
             AmenityCard("Охорона", painterResource(Res.drawable.ic_shield_security), securityIsSelect, Modifier.weight(1f)) {onSecurityIsSelect(!securityIsSelect)}
         }
+
+        Spacer(modifier = Modifier.height(12.dp))
+        Row(horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()){
+            Text("Заголовок оголошення", style = SwipeHomeTheme.typography.label, fontWeight = FontWeight.Bold)
+        }
+        Spacer(modifier = Modifier.height(8.dp))
+        OutlinedTextField(
+            value = title,
+            onValueChange = onTitleChange,
+            placeholder = { Text("Коротко характеризуйте помешкання", color = SwipeHomeTheme.colors.onSurfaceSecondary) },
+            modifier = Modifier.fillMaxWidth(),
+            shape = SwipeHomeTheme.shapes.mediumShape,
+            colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = SwipeHomeTheme.colors.primary, unfocusedBorderColor = SwipeHomeTheme.colors.neutral)
+        )
 
         Spacer(modifier = Modifier.height(12.dp))
         Row(horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()){

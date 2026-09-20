@@ -24,6 +24,7 @@ peekaboo = "0.5.2"
 compose-reorderable = "2.4.1"
 coil3 = "3.0.0-rc01"
 kotlin-serialization = "1.6.3"
+room = "2.7.0-alpha13"
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
@@ -70,6 +71,9 @@ peekaboo-image-picker = { module = "io.github.onseok:peekaboo-image-picker", ver
 
 # Для реалізації drag and drop (KMP)
 compose-reorderable = { module = "sh.calvin.reorderable:reorderable", version.ref = "compose-reorderable" }
+
+# Room Database
+androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "room" }
 
 # Coil, щоб красиво відмалювати завантажену аватарку
 coil-compose = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coil3"}

@@ -1,9 +1,13 @@
 package com.nazar_protasov.swipehome.di
 
+import com.nazar_protasov.swipehome.data.local.entity.InMemorySwipeHomeDao
+import com.nazar_protasov.swipehome.data.local.entity.SwipeHomeDao
+import com.nazar_protasov.swipehome.data.local.getRoomDatabase
 import com.nazar_protasov.swipehome.network.PropertyApiService
 import com.nazar_protasov.swipehome.ui.screens.home.main.HomeScreenModel
 import com.nazar_protasov.swipehome.ui.screens.hub.SearchHubScreenModel
 import com.nazar_protasov.swipehome.ui.screens.settings.listing.CreateListingScreenModel
+import com.nazar_protasov.swipehome.ui.screens.settings.listing.MyListingsScreenModel
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.serialization.kotlinx.json.json
@@ -30,5 +34,16 @@ val appModule: Module = module {
     // Моделі екранів (Factory, бо вони створюються заново для нових екранів)
     single { HomeScreenModel(get()) }
     factory { SearchHubScreenModel() }
-    factory { CreateListingScreenModel() }
+
+    single<SwipeHomeDao> {
+        try {
+            getRoomDatabase().swipeHomeDao()
+        } catch (e: Throwable) {
+            println("Room Database not generated, using InMemorySwipeHomeDao: ${e.message}")
+            InMemorySwipeHomeDao()
+        }
+    }
+
+    factory { CreateListingScreenModel(get()) }
+    factory { MyListingsScreenModel(get()) }
 }

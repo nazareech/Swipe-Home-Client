@@ -71,6 +71,9 @@ kotlin {
             implementation(libs.coil.network.ktor)
 
             implementation(libs.compose.reorderable)
+
+            // Room Database
+            implementation(libs.androidx.room.runtime)
         }
 
         commonTest.dependencies {

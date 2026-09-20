@@ -119,6 +119,8 @@ class CreateListingScreen(val draftId: String? = null) : Screen {
                                 onPriceChange = { screenModel.price = it }
                             )
                             2 -> Step2Details(
+                                title = screenModel.title,
+                                onTitleChange = { screenModel.title = it },
                                 description = screenModel.description,
                                 onDescriptionChange = { screenModel.description = it },
 

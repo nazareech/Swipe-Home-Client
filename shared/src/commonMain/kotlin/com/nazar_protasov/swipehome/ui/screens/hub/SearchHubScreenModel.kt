@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.update
 
 class SearchHubScreenModel : ScreenModel {
 
-    // 0 - Збережені, 1 - Відхтлені
+    // 0 - Збережені, 1 - Відхилені
     private val _selectedTabIndex = MutableStateFlow(0)
     val selectedTabIndex: StateFlow<Int> = _selectedTabIndex.asStateFlow()
 
