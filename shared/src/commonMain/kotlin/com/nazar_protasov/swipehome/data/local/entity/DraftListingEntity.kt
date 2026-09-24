@@ -4,7 +4,9 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.nazar_protasov.swipehome.ui.screens.settings.listing.createListing.components.PropertyType
 import com.nazar_protasov.swipehome.ui.screens.settings.listing.createListing.components.VerificationMethods
+import kotlinx.serialization.Serializable
 
+@Serializable
 @Entity(tableName="draft_listings")
 data class DraftListingEntity(
     @PrimaryKey

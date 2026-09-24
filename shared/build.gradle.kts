@@ -1,13 +1,23 @@
+import androidx.room.gradle.RoomExtension
+
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
-    alias(libs.plugins.androidMultiplatformLibrary)
+    id("com.android.library") // Використовуємо стабільний Android-плагін
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
     alias(libs.plugins.kotlin.serialization)
+    alias(libs.plugins.ksp)
+    alias(libs.plugins.androidx.room)
 }
 
 kotlin {
-    // Налаштування для iOS (iPhone / Симулятор)
+    // Вказуємо єдину версію Java для всього проєкту
+    jvmToolchain(11)
+
+    // 1. Стандартна реєстрація Android-таргету
+    androidTarget()
+
+    // 2. Налаштування для iOS
     listOf(
         iosArm64(),
         iosSimulatorArm64()
@@ -18,25 +28,7 @@ kotlin {
         }
     }
 
-    // Налаштування для Android
-    android {
-        withHostTest {}
-        namespace = "com.nazar_protasov.swipehome.shared"
-        compileSdk = libs.versions.android.compileSdk.get().toInt()
-        minSdk = libs.versions.android.minSdk.get().toInt()
-
-        compilerOptions {
-            jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_11)
-        }
-        androidResources {
-            enable = true
-        }
-    }
-
-
-
-
-
+    // 3. Залежності
     sourceSets {
         commonMain.dependencies {
             implementation(libs.compose.runtime)
@@ -58,6 +50,7 @@ kotlin {
             implementation(libs.voyager.transitions)
             implementation(libs.voyager.tab.navigator)
             implementation(libs.voyager.screenmodel)
+            implementation(libs.voyager.koin)
 
             // Koin (DI)
             implementation(libs.koin.core)
@@ -74,6 +67,7 @@ kotlin {
 
             // Room Database
             implementation(libs.androidx.room.runtime)
+            implementation(libs.sqlite.bundled)
         }
 
         commonTest.dependencies {
@@ -90,6 +84,30 @@ kotlin {
     }
 }
 
+// 4. Окремий блок для конфігурації Android-модуля
+android {
+    namespace = "com.nazar_protasov.swipehome.shared"
+    compileSdk = libs.versions.android.compileSdk.get().toInt()
+
+    defaultConfig {
+        minSdk = libs.versions.android.minSdk.get().toInt()
+    }
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_11
+        targetCompatibility = JavaVersion.VERSION_11
+    }
+}
+
+// 5. Налаштування Room KMP
+configure<RoomExtension> {
+    schemaDirectory("$projectDir/schemas")
+}
+
+// 6. Залежності компілятора (KSP)
 dependencies {
-    androidRuntimeClasspath(libs.compose.uiTooling)
+    // Вказуємо KSP для всіх таргетів
+    add("kspAndroid", libs.androidx.room.compiler)
+    add("kspIosArm64", libs.androidx.room.compiler)
+    add("kspIosSimulatorArm64", libs.androidx.room.compiler)
 }

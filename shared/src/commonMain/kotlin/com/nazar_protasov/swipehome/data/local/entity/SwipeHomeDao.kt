@@ -18,7 +18,10 @@ interface SwipeHomeDao {
     fun getAllDrafts(): Flow<List<DraftListingEntity>>
 
     @Query("SELECT * FROM draft_listings WHERE draftId = :id")
-    fun getDraftById(id: String): DraftListingEntity?
+    suspend fun getDraftById(id: String): DraftListingEntity?
+
+    @Query("SELECT * FROM analytics_listing WHERE analyticId = :id")
+    suspend fun getCardById(id: String): AnalyticsListingEntity?
 
     @Query("DELETE FROM draft_listings WHERE draftId = :id")
     suspend fun deleteDraftById(id: String)
@@ -30,7 +33,7 @@ interface SwipeHomeDao {
 
     // Отримуємо всі несинхронізовані свайпи, щоб відправити їх на бекенд
     @Query("SELECT * FROM swipes_history WHERE isSynced = 0")
-    fun getUnsyncedSwipe(): List<SwipeEntity>
+    suspend fun getUnsyncedSwipe(): List<SwipeEntity>
 
     // Позначаємо свайп як відправлений та синхронізований з бекендом
     @Query("DELETE FROM swipes_history WHERE swipeId IN (:ids)")

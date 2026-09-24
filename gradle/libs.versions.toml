@@ -1,5 +1,5 @@
 [versions]
-agp = "9.4.1"
+agp = "8.13.2"
 android-compileSdk = "36"
 android-minSdk = "24"
 android-targetSdk = "36"
@@ -9,9 +9,9 @@ androidx-core = "1.19.0"
 androidx-espresso = "3.7.0"
 androidx-lifecycle = "2.8.4"
 androidx-testExt = "1.3.0"
-composeMultiplatform = "1.11.1"
+composeMultiplatform = "1.7.1"
 junit = "4.13.2"
-kotlin = "2.4.10"
+kotlin = "2.1.0"
 kotlin-wrappers = "2026.7.2"
 kotlinx-coroutines = "1.11.0"
 material3 = "1.11.0-alpha07"
@@ -25,6 +25,8 @@ compose-reorderable = "2.4.1"
 coil3 = "3.0.0-rc01"
 kotlin-serialization = "1.6.3"
 room = "2.7.0-alpha13"
+sqlite = "2.5.0-alpha13"
+ksp = "2.1.0-1.0.29"
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
@@ -61,6 +63,7 @@ voyager-transitions = { module = "cafe.adriel.voyager:voyager-transitions", vers
 # У libs.versions.toml
 voyager-tab-navigator = { module = "cafe.adriel.voyager:voyager-tab-navigator", version.ref = "voyager" }
 voyager-screenmodel = { module = "cafe.adriel.voyager:voyager-screenmodel", version.ref = "voyager" }
+voyager-koin = { module = "cafe.adriel.voyager:voyager-koin", version.ref = "voyager" }
 
 # Koin (Dependency Injection)
 koin-core = { module = "io.insert-koin:koin-core", version.ref = "koin-core" }
@@ -74,6 +77,8 @@ compose-reorderable = { module = "sh.calvin.reorderable:reorderable", version.re
 
 # Room Database
 androidx-room-runtime = { module = "androidx.room:room-runtime", version.ref = "room" }
+androidx-room-compiler = { module = "androidx.room:room-compiler", version.ref = "room" }
+sqlite-bundled = { module = "androidx.sqlite:sqlite-bundled", version.ref = "sqlite" }
 
 # Coil, щоб красиво відмалювати завантажену аватарку
 coil-compose = { module = "io.coil-kt.coil3:coil-compose", version.ref = "coil3"}
@@ -82,9 +87,11 @@ coil-network-ktor = { module = "io.coil-kt.coil3:coil-network-ktor3", version.re
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
-androidMultiplatformLibrary = { id = "com.android.kotlin.multiplatform.library", version.ref = "agp" }
+#androidMultiplatformLibrary = { id = "com.android.kotlin.multiplatform.library", version.ref = "agp" }
 composeMultiplatform = { id = "org.jetbrains.compose", version.ref = "composeMultiplatform" }
 composeCompiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 kotlinJvm = { id = "org.jetbrains.kotlin.jvm", version.ref = "kotlin" }
 kotlinMultiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
+ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
+androidx-room = { id = "androidx.room", version.ref = "room" }

@@ -37,95 +37,103 @@ fun App() {
     }
 
     KoinApplication(application = {
-            modules(appModule)
+        modules(appModule)
     }) {
         SwipeHomeTheme {
-            // Navigator починає роботу з SplashScreen
-            Navigator(SplashScreen()) { navigator ->
-                AnimatedContent(
-                    targetState = navigator.lastItem,
-                    transitionSpec = {
-                        // Визначаємо, чи рухаємося ми вперед (Push або Replace)
-                        val ifForward = navigator.lastEvent == StackEvent.Push || navigator.lastEvent == StackEvent.Replace
+            val isDebug = false
 
-                        // Спільний tween для всіх
-                        val animationSpec = tween<IntOffset>(durationMillis = 250, easing = FastOutSlowInEasing)
-                        val alphaSpec = tween<Float>(durationMillis = 250, easing = FastOutSlowInEasing)
-                        if (ifForward){
-                            // Перехід вперед (Відкриття екрана)
+            if (isDebug){
+                Navigator(MyListingsScreen())
+            } else {
+                // Navigator починає роботу з SplashScreen
+                Navigator(SplashScreen()) { navigator ->
+                    AnimatedContent(
+                        targetState = navigator.lastItem,
+                        transitionSpec = {
+                            // Визначаємо, чи рухаємося ми вперед (Push або Replace)
+                            val ifForward =
+                                navigator.lastEvent == StackEvent.Push || navigator.lastEvent == StackEvent.Replace
 
-                            // Спеціальний випадок: Якщо завершуємо Onboarding, він має поїхати ВГОРУ
-                            if (targetState is OnboardingScreen){
-                                fadeIn(alphaSpec) togetherWith  slideOutVertically(
-                                    animationSpec = animationSpec,
-                                    targetOffsetY = { fullHeight -> -fullHeight }
-                                )
-                            }
-                            // Правила для інших екранів при відкритті
-                            else when(targetState){
-                                is FilterScreen -> {
-                                    // Фільтри виїжджають ЗВЕРХУ вниз
-                                    slideInVertically(
-                                    animationSpec = animationSpec,
-                                        initialOffsetY = { fullHeight -> -fullHeight }
-                                    ) togetherWith fadeOut(animationSpec = tween(400))
-                                }
+                            // Спільний tween для всіх
+                            val animationSpec =
+                                tween<IntOffset>(durationMillis = 250, easing = FastOutSlowInEasing)
+                            val alphaSpec =
+                                tween<Float>(durationMillis = 250, easing = FastOutSlowInEasing)
+                            if (ifForward) {
+                                // Перехід вперед (Відкриття екрана)
 
-                                is PropertyDetailsScreen -> {
-                                    // Для Details та інших екранів -> виїжджає ЗНИЗУ вгору (ti)
-                                    slideInVertically (
-                                        animationSpec = animationSpec,
-                                        initialOffsetY = { fullHeight -> fullHeight }
-                                    ) togetherWith fadeOut(animationSpec = tween(400))
-                                }
-
-                                else -> {
-                                    // Всі інші екрани виїжджають СПРАВА наліво
-                                    slideInHorizontally(
-                                        animationSpec = animationSpec,
-                                        initialOffsetX = { fullWidth -> fullWidth }
-                                    ) togetherWith fadeOut(animationSpec = tween(400))
-                                }
-                            }
-
-                        } else {
-                            // ПЕРЕХІД НАЗАД (ЗАКРИТТЯ) (StackEvent.Pop)
-                            when (initialState) {
-                                is FilterScreen -> {
-                                    // Фільтри ховаються назад ВГОРУ
-                                    fadeIn(animationSpec = alphaSpec) togetherWith slideOutVertically(
+                                // Спеціальний випадок: Якщо завершуємо Onboarding, він має поїхати ВГОРУ
+                                if (targetState is OnboardingScreen) {
+                                    fadeIn(alphaSpec) togetherWith slideOutVertically(
                                         animationSpec = animationSpec,
                                         targetOffsetY = { fullHeight -> -fullHeight }
                                     )
                                 }
+                                // Правила для інших екранів при відкритті
+                                else when (targetState) {
+                                    is FilterScreen -> {
+                                        // Фільтри виїжджають ЗВЕРХУ вниз
+                                        slideInVertically(
+                                            animationSpec = animationSpec,
+                                            initialOffsetY = { fullHeight -> -fullHeight }
+                                        ) togetherWith fadeOut(animationSpec = tween(400))
+                                    }
 
-                                is PropertyDetailsScreen -> {
-                                    // Деталі ховаються назад ВНИЗ
-                                    fadeIn(animationSpec = alphaSpec) togetherWith slideOutVertically(
-                                        animationSpec = animationSpec,
-                                        targetOffsetY = { fullHeight -> fullHeight }
-                                    )
+                                    is PropertyDetailsScreen -> {
+                                        // Для Details та інших екранів -> виїжджає ЗНИЗУ вгору (ti)
+                                        slideInVertically(
+                                            animationSpec = animationSpec,
+                                            initialOffsetY = { fullHeight -> fullHeight }
+                                        ) togetherWith fadeOut(animationSpec = tween(400))
+                                    }
+
+                                    else -> {
+                                        // Всі інші екрани виїжджають СПРАВА наліво
+                                        slideInHorizontally(
+                                            animationSpec = animationSpec,
+                                            initialOffsetX = { fullWidth -> fullWidth }
+                                        ) togetherWith fadeOut(animationSpec = tween(400))
+                                    }
                                 }
 
-                                else -> {
-                                    // Всі інші екрани ховаються ЗЛІВА направо
-                                    fadeIn(animationSpec = alphaSpec) togetherWith slideOutHorizontally(
-                                        animationSpec = animationSpec,
-                                        targetOffsetX = { fullWidth -> fullWidth }
-                                    )
+                            } else {
+                                // ПЕРЕХІД НАЗАД (ЗАКРИТТЯ) (StackEvent.Pop)
+                                when (initialState) {
+                                    is FilterScreen -> {
+                                        // Фільтри ховаються назад ВГОРУ
+                                        fadeIn(animationSpec = alphaSpec) togetherWith slideOutVertically(
+                                            animationSpec = animationSpec,
+                                            targetOffsetY = { fullHeight -> -fullHeight }
+                                        )
+                                    }
+
+                                    is PropertyDetailsScreen -> {
+                                        // Деталі ховаються назад ВНИЗ
+                                        fadeIn(animationSpec = alphaSpec) togetherWith slideOutVertically(
+                                            animationSpec = animationSpec,
+                                            targetOffsetY = { fullHeight -> fullHeight }
+                                        )
+                                    }
+
+                                    else -> {
+                                        // Всі інші екрани ховаються ЗЛІВА направо
+                                        fadeIn(animationSpec = alphaSpec) togetherWith slideOutHorizontally(
+                                            animationSpec = animationSpec,
+                                            targetOffsetX = { fullWidth -> fullWidth }
+                                        )
+                                    }
                                 }
                             }
+                        },
+                        label = "RootNavigatorAnimation"
+                    ) { currentScreen ->
+                        navigator.saveableState("transition", currentScreen) {
+                            currentScreen.Content()
                         }
-                    },
-                    label = "RootNavigatorAnimation"
-                ){ currentScreen ->
-                    navigator.saveableState("transition", currentScreen){
-                        currentScreen.Content()
                     }
                 }
             }
         }
     }
 }
-
 

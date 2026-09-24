@@ -15,6 +15,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
+import cafe.adriel.voyager.koin.koinScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.nazar_protasov.swipehome.ui.screens.settings.listing.CreateListingScreenModel
@@ -25,7 +26,6 @@ import com.nazar_protasov.swipehome.ui.screens.settings.listing.createListing.co
 import com.nazar_protasov.swipehome.ui.screens.settings.listing.createListing.components.WizardBottomBar
 import com.nazar_protasov.swipehome.ui.screens.settings.listing.createListing.components.WizardTopBar
 import com.nazar_protasov.swipehome.ui.theme.SwipeHomeTheme
-import org.koin.compose.koinInject
 import kotlin.random.Random
 
 class CreateListingScreen(val draftId: String? = null) : Screen {
@@ -34,7 +34,7 @@ class CreateListingScreen(val draftId: String? = null) : Screen {
         val navigator = LocalNavigator.currentOrThrow
         val scrollState = rememberScrollState()
 
-        val screenModel: CreateListingScreenModel = koinInject()
+        val screenModel = koinScreenModel<CreateListingScreenModel>()
 
         // Якщо передано draftId, завантажуємо дані один раз при старті
         LaunchedEffect(draftId){

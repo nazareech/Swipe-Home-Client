@@ -1,11 +1,12 @@
 package com.nazar_protasov.swipehome.di
 
-import com.nazar_protasov.swipehome.data.local.entity.InMemorySwipeHomeDao
 import com.nazar_protasov.swipehome.data.local.entity.SwipeHomeDao
+import com.nazar_protasov.swipehome.data.local.entity.SwipeHomeDatabase
 import com.nazar_protasov.swipehome.data.local.getRoomDatabase
 import com.nazar_protasov.swipehome.network.PropertyApiService
 import com.nazar_protasov.swipehome.ui.screens.home.main.HomeScreenModel
 import com.nazar_protasov.swipehome.ui.screens.hub.SearchHubScreenModel
+import com.nazar_protasov.swipehome.ui.screens.settings.analystics.AnalyticsScreenModel
 import com.nazar_protasov.swipehome.ui.screens.settings.listing.CreateListingScreenModel
 import com.nazar_protasov.swipehome.ui.screens.settings.listing.MyListingsScreenModel
 import io.ktor.client.HttpClient
@@ -31,19 +32,19 @@ val appModule: Module = module {
 
     single { PropertyApiService(get()) }
 
+    // Ініціалізуємо саму базу даних Room (синглтон)
+    single<SwipeHomeDatabase> { getRoomDatabase() }
+
+
+    // Витягуємо DAO з бази даних (теж синглтон)
+    single<SwipeHomeDao> {
+        get<SwipeHomeDatabase>().swipeHomeDao() // Використовуємо get(), щоб отримати інстанс із Koin
+    }
+
     // Моделі екранів (Factory, бо вони створюються заново для нових екранів)
     single { HomeScreenModel(get()) }
     factory { SearchHubScreenModel() }
-
-    single<SwipeHomeDao> {
-        try {
-            getRoomDatabase().swipeHomeDao()
-        } catch (e: Throwable) {
-            println("Room Database not generated, using InMemorySwipeHomeDao: ${e.message}")
-            InMemorySwipeHomeDao()
-        }
-    }
-
     factory { CreateListingScreenModel(get()) }
     factory { MyListingsScreenModel(get()) }
+    factory { AnalyticsScreenModel(get()) }
 }

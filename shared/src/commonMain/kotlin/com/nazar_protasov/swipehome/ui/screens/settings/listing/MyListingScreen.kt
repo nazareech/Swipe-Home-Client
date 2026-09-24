@@ -51,30 +51,10 @@ class MyListingsScreen : Screen {
                 likes = "--",
                 onClick = {
                     // Відкриваємо редактор зі збереженими даними чернетки
-                    navigator.push(AnalyticsScreen()/*TODO: Передавання ID (draftId = listing.id) для відображення статистики даного оголошення */)
+                    navigator.push(AnalyticsScreen(cardId = draft.draftId)/*TODO: Передавання ID (draftId = listing.id) для відображення статистики даного оголошення */)
                 }
             )
-
         }
-/*
-        // Моккові дані
-        val listings = listOf(
-            ListingItem("1", "Title 1", "Location 1", listOf("https://images.unsplash.com/photo-1512917774080-9991f1c4c750?q=80&w=400"), ListingStatus.ACTIVE, "100", "10", onClick = { navigator.push(AnalyticsScreen())}),
-            ListingItem("2", "Title 2", "Location 2", listOf("https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?q=80&w=400"), ListingStatus.MODERATION, "--", "--", onClick = {/*TODO:*/}),
-            ListingItem("3", "Title 3", "Location 3", listOf("https://images.unsplash.com/photo-1512917774080-9991f1c4c750?q=80&w=400"), ListingStatus.HIDDEN, "1.2k", "84", onClick = {/*TODO:*/}),
-            ListingItem("4", "Title 4", "Location 4", listOf("https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?q=80&w=400"), ListingStatus.ACTIVE, "100", "10", onClick = {/*TODO:*/}),
-            ListingItem("5", "Title 5", "Location 5", listOf("https://images.unsplash.com/photo-1512917774080-9991f1c4c750?q=80&w=400"), ListingStatus.ACTIVE, "100", "10", onClick = {/*TODO:*/}),
-            ListingItem(
-                "draft_123",
-                "Title 6",
-                "Location 6",
-                emptyList(),
-                ListingStatus.DRAFT,
-                "--", "--",
-                onClick = {}
-            )
-        )
- */
 
         Scaffold(
             topBar = { ListingsTopBar(navigator) },

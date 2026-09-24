@@ -1,8 +1,10 @@
 package com.nazar_protasov.swipehome.ui.screens.settings.analystics.components
 
+import androidx.compose.animation.core.Animatable
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.gestures.detectVerticalDragGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -12,9 +14,12 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
@@ -23,6 +28,11 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -31,15 +41,22 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import cafe.adriel.voyager.navigator.Navigator
 import coil3.compose.AsyncImage
+import com.nazar_protasov.swipehome.ui.screens.settings.listing.components.ListingStatus
 import com.nazar_protasov.swipehome.ui.theme.SwipeHomeTheme
+import kotlinx.coroutines.launch
 import mymultiplatformproject.shared.generated.resources.Res
 import mymultiplatformproject.shared.generated.resources.ic_arrow_back
+import mymultiplatformproject.shared.generated.resources.ic_arrow_next
 import mymultiplatformproject.shared.generated.resources.ic_arrow_single_down
 import mymultiplatformproject.shared.generated.resources.ic_close
 import mymultiplatformproject.shared.generated.resources.ic_eye_visible
@@ -47,6 +64,8 @@ import mymultiplatformproject.shared.generated.resources.ic_heart_border
 import mymultiplatformproject.shared.generated.resources.ic_lightning
 import mymultiplatformproject.shared.generated.resources.ic_support
 import org.jetbrains.compose.resources.painterResource
+import kotlin.math.abs
+import kotlin.math.roundToInt
 
 @Composable
 fun AnalyticsTopBar(navigator: Navigator){
@@ -77,7 +96,18 @@ fun AnalyticsTopBar(navigator: Navigator){
     }
 }
 @Composable
-fun PropertyHeroSection(){
+fun PropertyHeroSection(listOfPhotos: List<String>, address: String, countOfRooms: Int, area: String, status: ListingStatus){
+    // Стани для відстеження поточної фотографії
+    val images = listOfPhotos
+    val imagesCount = images.size
+
+    // PagerState = HorizontalPager
+    val pagerState = rememberPagerState(pageCount = { imagesCount })
+    val coroutineScope = rememberCoroutineScope()
+
+    // Стан для повноекранного режиму
+    var isFullScreen by remember { mutableStateOf(false) }
+
     Column{
         Text("ВАШ ОБ'ЄКТ", style = SwipeHomeTheme.typography.subheadline, color = SwipeHomeTheme.colors.primary, modifier = Modifier.padding(bottom = 8.dp))
         Card(
@@ -87,7 +117,7 @@ fun PropertyHeroSection(){
         ){
             Box(modifier = Modifier.fillMaxSize()){
                 AsyncImage(
-                    model = "https://images.unsplash.com/photo-1502672260266-1c1e52409818?q=80&w=600",
+                    model = listOfPhotos.firstOrNull() ?: "",
                     contentDescription = null,
                     contentScale = ContentScale.Crop,
                     modifier = Modifier.fillMaxSize()
@@ -108,6 +138,54 @@ fun PropertyHeroSection(){
                         )
                 )
 
+                // Стрілки вправо/вліво (тільки якщо фоток більше ніж 1)
+                if (imagesCount > 1){
+                    if (pagerState.currentPage > 0){
+                        IconButton(
+                            onClick = { coroutineScope.launch { pagerState.animateScrollToPage(pagerState.currentPage - 1) } },
+                            modifier = Modifier
+                                .align(Alignment.CenterStart)
+                                .padding(start = 8.dp, bottom = 70.dp)
+                                .background(SwipeHomeTheme.colors.background.copy(alpha = 0.3f), CircleShape)
+                        ) {
+                            Icon(painterResource(Res.drawable.ic_arrow_back), contentDescription = "", tint = Color.White)
+                        }
+                    }
+
+                    if (pagerState.currentPage < imagesCount - 1){
+                        IconButton(
+                            onClick = { coroutineScope.launch { pagerState.animateScrollToPage(pagerState.currentPage + 1) } },
+                            modifier = Modifier
+                                .align(Alignment.CenterEnd)
+                                .padding(start = 8.dp, bottom = 70.dp)
+                                .background(SwipeHomeTheme.colors.background.copy(alpha = 0.3f), CircleShape)
+                        ) {
+                            Icon(painterResource(Res.drawable.ic_arrow_next), contentDescription = "", tint = Color.White)
+                        }
+                    }
+                }
+
+                // Білі лінії індикації
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 12.dp, start = 12.dp, end = 12.dp)
+                        .align(Alignment.TopCenter),
+                    horizontalArrangement = Arrangement.spacedBy(4.dp)
+                ){
+                    for (i in 0 until imagesCount){
+                        Box(
+                            modifier = Modifier
+                                .weight(1f)
+                                .height(4.dp)
+                                .clip(SwipeHomeTheme.shapes.smallShape)
+                                .background(
+                                    if (i == pagerState.currentPage) SwipeHomeTheme.colors.primary
+                                    else SwipeHomeTheme.colors.tertiary.copy(alpha = 0.4f))
+                        )
+                    }
+                }
+
                 // Бейдж
                 Box(
                     modifier = Modifier
@@ -117,13 +195,28 @@ fun PropertyHeroSection(){
                         .background(SwipeHomeTheme.colors.primary)
                         .padding(horizontal = 12.dp, vertical = 6.dp)
                 ){
-                    Text("Активно", style = SwipeHomeTheme.typography.body, color = SwipeHomeTheme.colors.onPrimary)
+                    Text("$status", style = SwipeHomeTheme.typography.body, color = SwipeHomeTheme.colors.onPrimary)
                 }
 
                 // Текст знизу
                 Column(modifier = Modifier.align(Alignment.BottomStart).padding(16.dp)){
-                    Text("Люблін, Вєнява", style = SwipeHomeTheme.typography.subheadline, color = SwipeHomeTheme.colors.neutral)
-                    Text("2 кімн. • 65м²", style = SwipeHomeTheme.typography.caption, color = SwipeHomeTheme.colors.neutral.copy(alpha = 0.8f))
+                    Text(address, style = SwipeHomeTheme.typography.subheadline, color = SwipeHomeTheme.colors.neutral)
+                    Text("$countOfRooms кімн. • $area m²", style = SwipeHomeTheme.typography.caption, color = SwipeHomeTheme.colors.neutral.copy(alpha = 0.8f))
+                }
+
+                // --- ДІАЛОГ ДЛЯ ПОВНОЕКРАННОГО ПЕРЕГЛЯДУ ---
+                if (isFullScreen){
+                    FullScreenGallery(
+                        images = images,
+                        initialPage = pagerState.currentPage,
+                        onDismiss = { finalPage ->
+                            isFullScreen = false
+                            // При закритті гортаємо маленьку карусель на те фото, на якому зупинилися у фулскріні
+                            coroutineScope.launch {
+                                pagerState.scrollToPage(finalPage)
+                            }
+                        }
+                    )
                 }
             }
         }
@@ -131,15 +224,114 @@ fun PropertyHeroSection(){
 }
 
 @Composable
-fun StatsGridSection(){
+fun FullScreenGallery(
+    images: List<String>,
+    initialPage: Int,
+    onDismiss: (Int) -> Unit // Передаємо індекс назад
+){
+    val pagerState = rememberPagerState(initialPage = initialPage, pageCount = {images.size})
+
+    // Стани для вертикального зсуву (свайп вниз/вгору)
+    val offsetY = remember { Animatable(0f) }
+    val coroutineScope = rememberCoroutineScope()
+
+    Dialog(
+        onDismissRequest = { onDismiss(pagerState.currentPage) },
+        properties = DialogProperties(
+            usePlatformDefaultWidth = false, // Займає весь екран, а не віконце
+            dismissOnBackPress = true
+        )
+    ){
+        val backgroundAlpha = (1f - (abs(offsetY.value) / 1000f)).coerceIn(0f, 1f)
+
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(SwipeHomeTheme.colors.background.copy(alpha = backgroundAlpha))
+                // Обробка жестів
+                .pointerInput(Unit){
+                    detectVerticalDragGestures(
+                        onDragEnd = {
+                            coroutineScope.launch {
+                                // Якщо відтягнули більше ніж на 200 пікселів - закриваємо
+                                if (abs(offsetY.value) > 200f){
+                                    onDismiss(pagerState.currentPage)
+                                } else {
+                                    // Повертаємо на місце
+                                    offsetY.animateTo(0f)
+                                }
+                            }
+                        },
+                        // Обробка переривання/скасування жесту системою
+                        onDragCancel = {
+                            coroutineScope.launch {
+                                offsetY.animateTo(0f)
+                            }
+                        },
+                        onVerticalDrag = { change, dragAmount ->
+                            change.consume() // Споживаємо текст
+                            coroutineScope.launch {
+                                // Миттєво змінюємо позицію слідом за пальцем
+                                offsetY.snapTo(offsetY.value + dragAmount)
+                            }
+                        }
+                    )
+                }
+        ){
+            // Обгортка вмісту, яка фізично буде зміщуватись по осі Y
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .offset { IntOffset(0, offsetY.value.roundToInt()) }
+            ){
+                HorizontalPager(
+                    state = pagerState,
+                    modifier = Modifier.fillMaxSize()
+                ){ page ->
+                    AsyncImage(
+                        model = images.getOrNull(page),
+                        contentDescription = "Повноекранне фото нерухомості",
+                        modifier = Modifier.fillMaxSize(),
+                        contentScale = ContentScale.Fit
+                    )
+                }
+
+                // Індикатор (1/5)
+                Text(
+                    text = "${pagerState.currentPage + 1}/${images.size}",
+                    style = SwipeHomeTheme.typography.body,
+                    color = SwipeHomeTheme.colors.neutral,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier
+                        .align(Alignment.BottomCenter)
+                        .padding(bottom = 32.dp)
+                )
+
+                // Кнопка закриття
+                IconButton(
+                    onClick = { onDismiss(pagerState.currentPage) },
+                    modifier = Modifier
+                        .align(Alignment.TopEnd)
+                        .padding(top = 32.dp, end = 16.dp)
+                        .background(Color.Black.copy(alpha = 0.4f), CircleShape)
+                ){
+                    Icon(painterResource(Res.drawable.ic_close), contentDescription = null, tint = Color.White)
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun StatsGridSection(viewsNumber: Int, likesNumber: Int, rejectsNumber: Int, goToContactsNumber: Int){
         Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
             Row(horizontalArrangement = Arrangement.spacedBy(12.dp)){
                StatCard(
                    modifier = Modifier.weight(1f),
                    icon = painterResource(Res.drawable.ic_eye_visible),
                    title = "Загальна кількість...",
-                iconColor = SwipeHomeTheme.colors.primary,
-                   value = "1,245",
+                   iconColor = SwipeHomeTheme.colors.primary,
+                   value = viewsNumber.toString(),
                    trend = "+12%" ,
                    isPositive = true
                )
@@ -148,7 +340,7 @@ fun StatsGridSection(){
                    icon = painterResource(Res.drawable.ic_heart_border),
                    title = "Зацікавленість...",
                    iconColor = SwipeHomeTheme.colors.error,
-                   value = "312",
+                   value = likesNumber.toString(),
                    trend = "+5%" ,
                    isPositive = true
                )
@@ -159,7 +351,7 @@ fun StatsGridSection(){
                     icon = painterResource(Res.drawable.ic_close),
                     title = "Відмови (свайпи...",
                     iconColor = SwipeHomeTheme.colors.primary,
-                    value = "840",
+                    value = rejectsNumber.toString(),
                     trend = "-2%" ,
                     isPositive = true
                )
@@ -168,7 +360,7 @@ fun StatsGridSection(){
                     icon = painterResource(Res.drawable.ic_support),
                     title = "Конверсія у контакти...",
                     iconColor = SwipeHomeTheme.colors.primary,
-                    value = "15",
+                    value = goToContactsNumber.toString(),
                     trend = "4.8%" ,
                     isPositive = true,
                     subtitle = "повідомлень"
@@ -319,7 +511,7 @@ fun ChartSection(){
 }
 
 @Composable
-fun ReactionRatioSection(){
+fun ReactionRatioSection(likesNumber: Int, rejectsNumber: Int){
     Card(
         modifier = Modifier.fillMaxWidth(),
         shape = RoundedCornerShape(16.dp),
@@ -375,7 +567,7 @@ fun ReactionRatioSection(){
                         Spacer(modifier = Modifier.width(8.dp))
                         Text("Свайпи вправо", style = SwipeHomeTheme.typography.label, color = SwipeHomeTheme.colors.onSurfaceSecondary)
                     }
-                    Text("312", style = SwipeHomeTheme.typography.caption, color = SwipeHomeTheme.colors.onSurfaceSecondary)
+                    Text(likesNumber.toString(), style = SwipeHomeTheme.typography.caption, color = SwipeHomeTheme.colors.onSurfaceSecondary)
                 }
                 Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
                     Row(verticalAlignment = Alignment.CenterVertically){
@@ -383,7 +575,7 @@ fun ReactionRatioSection(){
                         Spacer(modifier = Modifier.width(8.dp))
                         Text("Свайпи вліво", style = SwipeHomeTheme.typography.label, color = SwipeHomeTheme.colors.onSurfaceSecondary)
                     }
-                    Text("840", style = SwipeHomeTheme.typography.caption, color = SwipeHomeTheme.colors.onSurfaceSecondary)
+                    Text(rejectsNumber.toString(), style = SwipeHomeTheme.typography.caption, color = SwipeHomeTheme.colors.onSurfaceSecondary)
                 }
             }
         }

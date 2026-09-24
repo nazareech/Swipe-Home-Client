@@ -6,13 +6,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.CenterAlignedTopAppBar
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
@@ -25,15 +21,19 @@ import com.nazar_protasov.swipehome.ui.screens.settings.analystics.components.Pr
 import com.nazar_protasov.swipehome.ui.screens.settings.analystics.components.ReactionRatioSection
 import com.nazar_protasov.swipehome.ui.screens.settings.analystics.components.StatsGridSection
 import com.nazar_protasov.swipehome.ui.theme.SwipeHomeTheme
-import mymultiplatformproject.shared.generated.resources.Res
-import mymultiplatformproject.shared.generated.resources.ic_arrow_back
-import org.jetbrains.compose.resources.painterResource
+import cafe.adriel.voyager.koin.koinScreenModel
 
-class AnalyticsScreen : Screen {
+class AnalyticsScreen(val cardId: String? = null) : Screen {
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
         val scrollState = rememberScrollState()
+
+        val screenModel = koinScreenModel<AnalyticsScreenModel>()
+
+        LaunchedEffect(cardId) {
+            cardId?.let { screenModel.loadCard(it) }
+        }
 
         Scaffold(
             topBar = { AnalyticsTopBar(navigator)},
@@ -48,16 +48,27 @@ class AnalyticsScreen : Screen {
                 verticalArrangement = Arrangement.spacedBy(24.dp)
             ){
                 // Картка об'єкта
-                PropertyHeroSection()
+                PropertyHeroSection(
+                    listOfPhotos = screenModel.uploadedPhotos,
+                    address = screenModel.address,
+                    countOfRooms = screenModel.countBedrooms,
+                    area = screenModel.area,
+                    status = screenModel.listingStatus,
+                )
 
                 // Сітка статистики
-                StatsGridSection()
+                StatsGridSection(
+                    screenModel.viewsNumber,
+                    screenModel.likesNumber,
+                    screenModel.rejectsNumber,
+                    screenModel.goToContactsNumber
+                )
 
                 // Динаміка зацікавлення (стовпчиковий графік)
                 ChartSection()
 
                 // Співвідношення реакцій (Кільцевий графік)
-                ReactionRatioSection()
+                ReactionRatioSection(screenModel.likesNumber, screenModel.rejectsNumber)
 
                 // Інсайти активності
                 InsightsSection()
