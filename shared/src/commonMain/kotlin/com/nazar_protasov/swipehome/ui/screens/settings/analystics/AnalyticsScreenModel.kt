@@ -8,9 +8,11 @@ import cafe.adriel.voyager.core.model.ScreenModel
 import com.nazar_protasov.swipehome.data.local.entity.SwipeHomeDao
 import com.nazar_protasov.swipehome.ui.screens.settings.listing.components.ListingStatus
 import cafe.adriel.voyager.core.model.screenModelScope
+import com.nazar_protasov.swipehome.data.local.entity.AnalyticsListingEntity
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
+import kotlinx.coroutines.flow.Flow
 
 class AnalyticsScreenModel(
     private val dao: SwipeHomeDao
@@ -32,26 +34,33 @@ class AnalyticsScreenModel(
 
     fun loadCard(cardId: String){
         screenModelScope.launch(Dispatchers.IO) {
-            val card = dao.getCardById(cardId)
+            val data = dao.getListWithAnalyticsById(cardId)
 
-            if(card != null){
-                this@AnalyticsScreenModel.listingId = card.analyticId
-                this@AnalyticsScreenModel.title = card.title
-                this@AnalyticsScreenModel.likesNumber = card.likesNumber
-                this@AnalyticsScreenModel.viewsNumber = card.viewsNumber
-                this@AnalyticsScreenModel.rejectsNumber = card.rejectsNumber
-                this@AnalyticsScreenModel.goToContactsNumber = card.goToContactsNumber
-                this@AnalyticsScreenModel.listingStatus = card.listingStatus
-                this@AnalyticsScreenModel.countBedrooms = card.bedrooms
-                this@AnalyticsScreenModel.area = card.area
-                this@AnalyticsScreenModel.address = card.address
+            if(data != null){
+                val draft = data.draft
+                val analytics = data.analytics
+
+                this@AnalyticsScreenModel.listingId = draft.draftId
+                this@AnalyticsScreenModel.title = draft.title
+                this@AnalyticsScreenModel.countBedrooms = draft.bedrooms
+                this@AnalyticsScreenModel.area = draft.area
+                this@AnalyticsScreenModel.address = draft.address
 
                 // Розпаковуємо рядок фотографій назад у список
                 this@AnalyticsScreenModel.uploadedPhotos.clear()
-                if (card.imageUrl.isNotBlank()){
-                    this@AnalyticsScreenModel.uploadedPhotos.addAll(card.imageUrl.split(","))
+                if (draft.photosUris.isNotBlank()){
+                    this@AnalyticsScreenModel.uploadedPhotos.addAll(draft.photosUris.split(","))
                 }
+
+                this@AnalyticsScreenModel.likesNumber = analytics?.likesNumber ?: 0
+                this@AnalyticsScreenModel.viewsNumber = analytics?.viewsNumber ?: 0
+                this@AnalyticsScreenModel.rejectsNumber = analytics?.rejectsNumber ?: 0
+                this@AnalyticsScreenModel.goToContactsNumber = analytics?.goToContactsNumber ?: 0
+                this@AnalyticsScreenModel.listingStatus = analytics?.listingStatus ?: ListingStatus.DRAFT
             }
         }
     }
+
+    val cards: Flow<List<AnalyticsListingEntity>>
+        get() = dao.getAllMyCards()
 }

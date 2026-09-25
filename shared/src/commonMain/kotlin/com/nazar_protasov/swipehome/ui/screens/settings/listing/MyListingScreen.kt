@@ -33,10 +33,13 @@ class MyListingsScreen : Screen {
         val screenModel: MyListingsScreenModel = koinInject()
 
         // Підписуємося на нашу базу даних
-        val draftEntities by screenModel.drafts.collectAsState(initial = emptyList())
+        val listingsData by screenModel.listingsWithAnalytics.collectAsState(initial = emptyList())
 
         // Мапимо дані з ДБ у формат для карток
-        val listings = draftEntities.map { draft ->
+        val listings = listingsData.map { data ->
+            val draft = data.draft
+            val analytics = data.analytics
+
             val photosList = if (draft.photosUris.isNotBlank()) draft.photosUris.split(",") else emptyList()
             val displayTitle = if (draft.title.isNotBlank()) "Чернетка: ${draft.title}" else "Нове оголошення"
             val displayLocation = draft.address.ifBlank{ "Адресу не вказано" }
@@ -46,12 +49,13 @@ class MyListingsScreen : Screen {
                 title = displayTitle,
                 location = displayLocation,
                 imagesUrl = photosList,
-                status = ListingStatus.DRAFT,
-                views = "--",
-                likes = "--",
+
+                status = analytics?.listingStatus ?: ListingStatus.DRAFT,
+                views = analytics?.viewsNumber?.toString() ?: "--",
+                likes = analytics?.likesNumber?.toString() ?: "--",
                 onClick = {
                     // Відкриваємо редактор зі збереженими даними чернетки
-                    navigator.push(AnalyticsScreen(cardId = draft.draftId)/*TODO: Передавання ID (draftId = listing.id) для відображення статистики даного оголошення */)
+                    navigator.push(AnalyticsScreen(cardId = draft.draftId)/*TODO: Передавання для відображення статистики даного оголошення */)
                 }
             )
         }

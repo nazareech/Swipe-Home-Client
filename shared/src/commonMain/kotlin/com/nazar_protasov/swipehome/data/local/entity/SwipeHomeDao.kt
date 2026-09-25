@@ -4,6 +4,8 @@ import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import androidx.room.Transaction
+import com.nazar_protasov.swipehome.data.local.ListingWithAnalytics
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -16,6 +18,9 @@ interface SwipeHomeDao {
     // Flow дозволяє UI автоматично оновлюватися при зміні даних у базі
     @Query("SELECT * FROM draft_listings ORDER BY updateAt DESC")
     fun getAllDrafts(): Flow<List<DraftListingEntity>>
+
+    @Query("SELECT * FROM analytics_listing ORDER BY updateAt DESC")
+    fun getAllMyCards(): Flow<List<AnalyticsListingEntity>>
 
     @Query("SELECT * FROM draft_listings WHERE draftId = :id")
     suspend fun getDraftById(id: String): DraftListingEntity?
@@ -38,4 +43,12 @@ interface SwipeHomeDao {
     // Позначаємо свайп як відправлений та синхронізований з бекендом
     @Query("DELETE FROM swipes_history WHERE swipeId IN (:ids)")
     suspend fun markSwipeAsSynced(ids: List<String>)
+
+    @Transaction
+    @Query("SELECT * FROM draft_listings ORDER BY updateAt DESC")
+    fun getDraftsWithAnalytics(): Flow<List<ListingWithAnalytics>>
+
+    @Transaction
+    @Query("SELECT * FROM draft_listings WHERE draftId = :id")
+    fun getListWithAnalyticsById(id: String): ListingWithAnalytics
 }

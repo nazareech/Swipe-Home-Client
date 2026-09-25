@@ -12,6 +12,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
+import cafe.adriel.voyager.koin.koinScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.nazar_protasov.swipehome.ui.screens.settings.analystics.components.AnalyticsTopBar
@@ -21,9 +22,8 @@ import com.nazar_protasov.swipehome.ui.screens.settings.analystics.components.Pr
 import com.nazar_protasov.swipehome.ui.screens.settings.analystics.components.ReactionRatioSection
 import com.nazar_protasov.swipehome.ui.screens.settings.analystics.components.StatsGridSection
 import com.nazar_protasov.swipehome.ui.theme.SwipeHomeTheme
-import cafe.adriel.voyager.koin.koinScreenModel
 
-class AnalyticsScreen(val cardId: String? = null) : Screen {
+class AnalyticsScreen(val cardId: String) : Screen {
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
@@ -32,7 +32,7 @@ class AnalyticsScreen(val cardId: String? = null) : Screen {
         val screenModel = koinScreenModel<AnalyticsScreenModel>()
 
         LaunchedEffect(cardId) {
-            cardId?.let { screenModel.loadCard(it) }
+            cardId.let { screenModel.loadCard(it) }
         }
 
         Scaffold(

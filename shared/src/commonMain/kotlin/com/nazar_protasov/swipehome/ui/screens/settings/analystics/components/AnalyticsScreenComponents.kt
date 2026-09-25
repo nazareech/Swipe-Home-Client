@@ -4,6 +4,7 @@ import androidx.compose.animation.core.Animatable
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectVerticalDragGestures
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -36,7 +37,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
@@ -56,7 +56,6 @@ import com.nazar_protasov.swipehome.ui.theme.SwipeHomeTheme
 import kotlinx.coroutines.launch
 import mymultiplatformproject.shared.generated.resources.Res
 import mymultiplatformproject.shared.generated.resources.ic_arrow_back
-import mymultiplatformproject.shared.generated.resources.ic_arrow_next
 import mymultiplatformproject.shared.generated.resources.ic_arrow_single_down
 import mymultiplatformproject.shared.generated.resources.ic_close
 import mymultiplatformproject.shared.generated.resources.ic_eye_visible
@@ -115,54 +114,24 @@ fun PropertyHeroSection(listOfPhotos: List<String>, address: String, countOfRoom
             shape = RoundedCornerShape(16.dp),
             elevation = CardDefaults.cardElevation(4.dp)
         ){
-            Box(modifier = Modifier.fillMaxSize()){
-                AsyncImage(
-                    model = listOfPhotos.firstOrNull() ?: "",
-                    contentDescription = null,
-                    contentScale = ContentScale.Crop,
+            Box(Modifier.fillMaxSize()) {
+                // Зображення зі свайпом
+                HorizontalPager(
+                    state = pagerState,
                     modifier = Modifier.fillMaxSize()
-                )
-
-                // Градієнт
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(
-                            Brush.verticalGradient(
-                                colors = listOf(
-                                    SwipeHomeTheme.colors.neutral,
-                                    SwipeHomeTheme.colors.neutral.copy(alpha = 0.8f)
-                                ),
-                                startY = 150f
-                            )
-                        )
-                )
-
-                // Стрілки вправо/вліво (тільки якщо фоток більше ніж 1)
-                if (imagesCount > 1){
-                    if (pagerState.currentPage > 0){
-                        IconButton(
-                            onClick = { coroutineScope.launch { pagerState.animateScrollToPage(pagerState.currentPage - 1) } },
-                            modifier = Modifier
-                                .align(Alignment.CenterStart)
-                                .padding(start = 8.dp, bottom = 70.dp)
-                                .background(SwipeHomeTheme.colors.background.copy(alpha = 0.3f), CircleShape)
-                        ) {
-                            Icon(painterResource(Res.drawable.ic_arrow_back), contentDescription = "", tint = Color.White)
+                ) { page ->
+                    AsyncImage(
+                        model = listOfPhotos.getOrNull(page),
+                        contentDescription = null,
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .clickable { isFullScreen = !isFullScreen },
+                        contentScale = ContentScale.Crop,
+                        onError = { error ->
+                            println("COIL ERROR: ${error.result.throwable.message}")
+                            error.result.throwable.printStackTrace()
                         }
-                    }
-
-                    if (pagerState.currentPage < imagesCount - 1){
-                        IconButton(
-                            onClick = { coroutineScope.launch { pagerState.animateScrollToPage(pagerState.currentPage + 1) } },
-                            modifier = Modifier
-                                .align(Alignment.CenterEnd)
-                                .padding(start = 8.dp, bottom = 70.dp)
-                                .background(SwipeHomeTheme.colors.background.copy(alpha = 0.3f), CircleShape)
-                        ) {
-                            Icon(painterResource(Res.drawable.ic_arrow_next), contentDescription = "", tint = Color.White)
-                        }
-                    }
+                    )
                 }
 
                 // Білі лінії індикації
@@ -172,8 +141,8 @@ fun PropertyHeroSection(listOfPhotos: List<String>, address: String, countOfRoom
                         .padding(top = 12.dp, start = 12.dp, end = 12.dp)
                         .align(Alignment.TopCenter),
                     horizontalArrangement = Arrangement.spacedBy(4.dp)
-                ){
-                    for (i in 0 until imagesCount){
+                ) {
+                    for (i in 0 until imagesCount) {
                         Box(
                             modifier = Modifier
                                 .weight(1f)
@@ -181,7 +150,8 @@ fun PropertyHeroSection(listOfPhotos: List<String>, address: String, countOfRoom
                                 .clip(SwipeHomeTheme.shapes.smallShape)
                                 .background(
                                     if (i == pagerState.currentPage) SwipeHomeTheme.colors.primary
-                                    else SwipeHomeTheme.colors.tertiary.copy(alpha = 0.4f))
+                                    else SwipeHomeTheme.colors.tertiary.copy(alpha = 0.4f)
+                                )
                         )
                     }
                 }
@@ -194,18 +164,30 @@ fun PropertyHeroSection(listOfPhotos: List<String>, address: String, countOfRoom
                         .clip(RoundedCornerShape(8.dp))
                         .background(SwipeHomeTheme.colors.primary)
                         .padding(horizontal = 12.dp, vertical = 6.dp)
-                ){
-                    Text("$status", style = SwipeHomeTheme.typography.body, color = SwipeHomeTheme.colors.onPrimary)
+                ) {
+                    Text(
+                        "$status",
+                        style = SwipeHomeTheme.typography.body,
+                        color = SwipeHomeTheme.colors.onPrimary
+                    )
                 }
 
                 // Текст знизу
-                Column(modifier = Modifier.align(Alignment.BottomStart).padding(16.dp)){
-                    Text(address, style = SwipeHomeTheme.typography.subheadline, color = SwipeHomeTheme.colors.neutral)
-                    Text("$countOfRooms кімн. • $area m²", style = SwipeHomeTheme.typography.caption, color = SwipeHomeTheme.colors.neutral.copy(alpha = 0.8f))
+                Column(modifier = Modifier.align(Alignment.BottomStart).padding(16.dp)) {
+                    Text(
+                        address,
+                        style = SwipeHomeTheme.typography.subheadline,
+                        color = SwipeHomeTheme.colors.neutral
+                    )
+                    Text(
+                        "$countOfRooms кімн. • $area m²",
+                        style = SwipeHomeTheme.typography.caption,
+                        color = SwipeHomeTheme.colors.neutral.copy(alpha = 0.8f)
+                    )
                 }
 
                 // --- ДІАЛОГ ДЛЯ ПОВНОЕКРАННОГО ПЕРЕГЛЯДУ ---
-                if (isFullScreen){
+                if (isFullScreen) {
                     FullScreenGallery(
                         images = images,
                         initialPage = pagerState.currentPage,

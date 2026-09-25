@@ -18,5 +18,6 @@ data class AnalyticsListingEntity(
     val area: String,
     val bedrooms: Int,
     val address: String,
-    val imageUrl: String
+    val imageUrl: String,
+    val updateAt: String
 )
