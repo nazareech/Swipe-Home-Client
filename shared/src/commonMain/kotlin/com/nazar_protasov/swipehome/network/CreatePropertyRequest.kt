@@ -13,9 +13,9 @@ data class CreatePropertyRequest(
     val category: String,
     val subcategory: String,
     val parking: String,
-    val pets_allowed: Boolean,
+    val petsAllowed: Boolean,
     val elevator: Boolean,
     val furniture: Boolean,
-    val building_type: String,
+    val buildingType: String,
     val status: String
 )

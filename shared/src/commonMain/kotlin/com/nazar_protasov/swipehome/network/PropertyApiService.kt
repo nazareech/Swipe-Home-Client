@@ -21,8 +21,8 @@ data class PropertyResponseDTO(
 
 @Serializable
 data class PropertyDTO(
-    val id_property: Int? = null,
-    val id_owner: Int,
+    val idProperty: Int? = null,
+    val idOwner: Int,
     val title: String,
     val description: String,
     val localization: String,
@@ -32,19 +32,19 @@ data class PropertyDTO(
     val category: String,
     @SerialName("subcategory") val subCategory: String,
     val parking: String,
-    val pets_allowed: Boolean,
+    val petsAllowed: Boolean,
     val elevator: Boolean,
     val furniture: Boolean,
-    val building_type: String,
+    val buildingType: String,
     val status: String,
-    val images_map: Map<String, Boolean>? = null,
-    @SerialName("creates_at") val creates_at: String? = null
+    val imagesMap: Map<String, Boolean>? = null,
+    @SerialName("creates_at") val createsAt: String? = null
 )
 
 // Функція-розширення для мапінгу
 fun PropertyDTO.toUIProperty(): Property {
     // Формуємо повний URL для зображення
-    val rawImages = this.images_map?.keys?.toList() ?: emptyList()
+    val rawImages = this.imagesMap?.keys?.toList() ?: emptyList()
 
     val imageUrls = if (rawImages.isNotEmpty()) {
         // Додаємо /uploads/, оскільки сервер зазвичай віддає статику за цим префіксом
@@ -56,20 +56,20 @@ fun PropertyDTO.toUIProperty(): Property {
     val formattedPrice = "$${this.price.toInt()}"
 
     return Property(
-        id = this.id_property?.toString() ?: "0",
+        id = this.idProperty?.toString() ?: "0",
         imagesUrl = imageUrls,
         price = formattedPrice,
         title = this.title,
         location = this.localization,
         rooms = this.rooms,
         area = this.area,
-        buildingType = this.building_type
+        buildingType = this.buildingType
     )
 }
 // Функція-розширення для мапінгу
 fun PropertyDTO.toUIDetailsProperty(): PropertyDetails {
     // Формуємо повний URL для зображення
-    val rawImages = this.images_map?.keys?.toList() ?: emptyList()
+    val rawImages = this.imagesMap?.keys?.toList() ?: emptyList()
 
     val imageUrls = if (rawImages.isNotEmpty()) {
         // Додаємо /uploads/, оскільки сервер зазвичай віддає статику за цим префіксом
@@ -80,11 +80,11 @@ fun PropertyDTO.toUIDetailsProperty(): PropertyDetails {
 
     val formattedPrice = "$${this.price}"
 
-    val formatedCreatedAt = this.creates_at?.split("T")?.get(0) ?: ""
+    val formatedCreatedAt = this.createsAt?.split("T")?.get(0) ?: ""
 
     return PropertyDetails(
-        id_property = this.id_property ?: 0,
-        id_owner = this.id_owner,
+        id_property = this.idProperty ?: 0,
+        id_owner = this.idOwner,
         title = this.title,
         description = this.description,
         localization = this.localization,
@@ -94,10 +94,10 @@ fun PropertyDTO.toUIDetailsProperty(): PropertyDetails {
         category = this.category,
         subCategory = this.subCategory,
         parking = this.parking,
-        pets_allowed = this.pets_allowed,
+        pets_allowed = this.petsAllowed,
         elevator = this.elevator,
         furniture = this.furniture,
-        building_type = this.building_type,
+        building_type = this.buildingType,
         status = this.status,
         imagesUrl = imageUrls,
         creates_at = formatedCreatedAt
@@ -106,7 +106,6 @@ fun PropertyDTO.toUIDetailsProperty(): PropertyDetails {
 
 class PropertyApiService(private val client: io.ktor.client.HttpClient){
     companion object {
-//        const val BASE_URL = "http://192.168.0.78:8080"
         const val BASE_URL = "http://192.168.1.5:8080"
     }
 

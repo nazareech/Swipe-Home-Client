@@ -8,7 +8,7 @@ import cafe.adriel.voyager.core.model.ScreenModel
 import com.nazar_protasov.swipehome.data.local.entity.SwipeHomeDao
 import com.nazar_protasov.swipehome.ui.screens.settings.listing.components.ListingStatus
 import cafe.adriel.voyager.core.model.screenModelScope
-import com.nazar_protasov.swipehome.data.local.entity.AnalyticsListingEntity
+import com.nazar_protasov.swipehome.data.local.entity.MyListingEntity
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
@@ -37,30 +37,28 @@ class AnalyticsScreenModel(
             val data = dao.getListWithAnalyticsById(cardId)
 
             if(data != null){
-                val draft = data.draft
-                val analytics = data.analytics
 
-                this@AnalyticsScreenModel.listingId = draft.draftId
-                this@AnalyticsScreenModel.title = draft.title
-                this@AnalyticsScreenModel.countBedrooms = draft.bedrooms
-                this@AnalyticsScreenModel.area = draft.area
-                this@AnalyticsScreenModel.address = draft.address
+                this@AnalyticsScreenModel.listingId = data.localId
+                this@AnalyticsScreenModel.title = data.title
+                this@AnalyticsScreenModel.countBedrooms = data.bedrooms
+                this@AnalyticsScreenModel.area = data.area
+                this@AnalyticsScreenModel.address = data.address
 
                 // Розпаковуємо рядок фотографій назад у список
                 this@AnalyticsScreenModel.uploadedPhotos.clear()
-                if (draft.photosUris.isNotBlank()){
-                    this@AnalyticsScreenModel.uploadedPhotos.addAll(draft.photosUris.split(","))
+                if (data.photosUris.isNotBlank()){
+                    this@AnalyticsScreenModel.uploadedPhotos.addAll(data.photosUris.split(","))
                 }
 
-                this@AnalyticsScreenModel.likesNumber = analytics?.likesNumber ?: 0
-                this@AnalyticsScreenModel.viewsNumber = analytics?.viewsNumber ?: 0
-                this@AnalyticsScreenModel.rejectsNumber = analytics?.rejectsNumber ?: 0
-                this@AnalyticsScreenModel.goToContactsNumber = analytics?.goToContactsNumber ?: 0
-                this@AnalyticsScreenModel.listingStatus = analytics?.listingStatus ?: ListingStatus.DRAFT
+                this@AnalyticsScreenModel.likesNumber = data.likesNumber
+                this@AnalyticsScreenModel.viewsNumber = data.viewsNumber
+                this@AnalyticsScreenModel.rejectsNumber = data.rejectsNumber
+                this@AnalyticsScreenModel.goToContactsNumber = data.goToContactsNumber
+                this@AnalyticsScreenModel.listingStatus = data.listingStatus
             }
         }
     }
 
-    val cards: Flow<List<AnalyticsListingEntity>>
+    val cards: Flow<List<MyListingEntity>>
         get() = dao.getAllMyCards()
 }

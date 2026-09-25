@@ -40,7 +40,7 @@ fun App() {
         modules(appModule)
     }) {
         SwipeHomeTheme {
-            val isDebug = false
+            val isDebug = true
 
             if (isDebug){
                 Navigator(MyListingsScreen())

@@ -176,10 +176,10 @@ internal class HomeScreen : Screen {
                     val visibleCards = properties.take(2).reversed()
 
                     visibleCards.forEach { property ->
-                        val isTopCard = property.id_property == properties.first().id_property
+                        val isTopCard = property.idProperty == properties.first().idProperty
 
                         // key допомагає Compose розуміти, яка саме картка видалилася, щоб не забивати анімації
-                        key(property.id_property) {
+                        key(property.idProperty) {
                             if (isTopCard) {
                                 // Активна картка (можна свайпати)
                                 // Свайп обгортка

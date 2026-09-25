@@ -6,8 +6,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
-import com.nazar_protasov.swipehome.data.local.entity.AnalyticsListingEntity
-import com.nazar_protasov.swipehome.data.local.entity.DraftListingEntity
+import com.nazar_protasov.swipehome.data.local.entity.MyListingEntity
 import com.nazar_protasov.swipehome.data.local.entity.SwipeHomeDao
 import com.nazar_protasov.swipehome.network.CreatePropertyRequest
 import com.nazar_protasov.swipehome.network.PropertyApiService
@@ -16,6 +15,8 @@ import com.nazar_protasov.swipehome.ui.screens.settings.listing.createListing.co
 import com.nazar_protasov.swipehome.ui.screens.settings.listing.createListing.components.VerificationMethods
 import kotlinx.coroutines.launch
 import kotlin.random.Random
+import kotlin.time.Clock
+import kotlin.time.ExperimentalTime
 import kotlin.time.TimeSource
 
 class CreateListingScreenModel(
@@ -57,13 +58,14 @@ class CreateListingScreenModel(
     // Завантаження існуючої чернетки
     fun loadDraft(draftId: String) {
         screenModelScope.launch {
-            val draft = dao.getDraftById(draftId)
+            val draft = dao.getCardById(draftId)
 
             if (draft != null){
-                this@CreateListingScreenModel.listingId = draft.draftId
+                this@CreateListingScreenModel.listingId = draft.localId
                 this@CreateListingScreenModel.selectedType = draft.propertyType
                 this@CreateListingScreenModel.address = draft.address
                 this@CreateListingScreenModel.area = draft.area
+                this@CreateListingScreenModel.price = draft.price
                 this@CreateListingScreenModel.countBedrooms = draft.bedrooms
                 this@CreateListingScreenModel.countBathrooms = draft.bathrooms
                 this@CreateListingScreenModel.title = draft.title
@@ -95,50 +97,66 @@ class CreateListingScreenModel(
     // Збереження чернетки (кнопка "Зберегти" в TopBar)
     fun saveDraft(onSuccess: () -> Unit){
         screenModelScope.launch {
-            // Якщо це нова чернетка, генеруємо ID. Якщо вже редагуємо - залишаємо старий.
-            val currentDraftId = listingId ?: Random.nextInt(100000).toString()
 
-            // Room не вміє автоматично зберігати списки (List<String>)
-            // Тому конвертуємо список фото у рядок, розділений комами.
-            val photosString = uploadedPhotos.joinToString(",")
-
-            // Пакуємо всі наші стани в Entity
-            val draftEntity = DraftListingEntity(
-                draftId = currentDraftId,
-                propertyType = selectedType,
-                address = address,
-                area = area,
-                price = price,
-                bedrooms = countBedrooms,
-                bathrooms = countBathrooms,
-                title = title,
-                description = description,
-                floorNumber = floorNumber,
-                allowedPets = allowedPets,
-                isParking = isParking,
-                isFurnished = isFurnished,
-                isBalcony = isBalcony,
-                isCondition = isCondition,
-                gymIsSelect = gymIsSelect,
-                poolIsSelect = poolIsSelect,
-                elevatorIsSelect = elevatorIsSelect,
-                securityIsSelect = securityIsSelect,
-                verificationMethod = verificationMethod,
-                photosUris = photosString,
-                updateAt = TimeSource.Monotonic.markNow().toString()
-            )
-
-            // Відправляємо в локальну базу даних
-            dao.saveDraft(draftEntity)
-
-            // Зберігаємо ID, щоб наступне натискання "Зберегти" оновило цей самий запис, а не створило новий
-            listingId = currentDraftId
+            saveDraftInternal()
 
             onSuccess()
         }
     }
 
+    // Внутрішня функція, яка гарантує що код виконається і дочекається результату
+    private suspend fun saveDraftInternal(){
+        // Якщо це нова чернетка, генеруємо ID. Якщо вже редагуємо - залишаємо старий.
+        val currentDraftId = listingId ?: Random.nextInt(100000).toString()
+
+        // Room не вміє автоматично зберігати списки (List<String>)
+        // Тому конвертуємо список фото у рядок, розділений комами.
+        val photosString = uploadedPhotos.joinToString(",")
+
+        // Пакуємо всі наші стани в Entity
+        val myListingEntity = MyListingEntity(
+            localId = currentDraftId,
+            listingStatus = ListingStatus.DRAFT,
+
+            title = title,
+            description = description,
+            address = address,
+            area = area,
+            price = price,
+            bedrooms = countBedrooms,
+            bathrooms = countBathrooms,
+            floorNumber = floorNumber,
+            propertyType = selectedType,
+
+            allowedPets = allowedPets,
+            isParking = isParking,
+            isFurnished = isFurnished,
+            isBalcony = isBalcony,
+            isCondition = isCondition,
+            gymIsSelect = gymIsSelect,
+            poolIsSelect = poolIsSelect,
+            elevatorIsSelect = elevatorIsSelect,
+            securityIsSelect = securityIsSelect,
+            verificationMethod = verificationMethod,
+            photosUris = photosString,
+
+            likesNumber = 0,
+            viewsNumber = 0,
+            rejectsNumber = 0,
+            goToContactsNumber = 0,
+            createAt = TimeSource.Monotonic.markNow().toString(),
+            updateAt = TimeSource.Monotonic.markNow().toString()
+        )
+
+        // Відправляємо в локальну базу даних
+        dao.saveListing(myListingEntity)
+
+        // Зберігаємо ID, щоб наступне натискання "Зберегти" оновило цей самий запис, а не створило новий
+        listingId = currentDraftId
+    }
+
     // Фінальна відправка на сервер
+    @OptIn(ExperimentalTime::class)
     fun submitListing(onSuccess: () -> Unit) {
         screenModelScope.launch {
             // Формуємо об'єкт для Ktor і робимо POST запит
@@ -167,13 +185,14 @@ class CreateListingScreenModel(
                     category = categoryString,
                     subcategory = "RENT",
                     parking = parkingString,
-                    pets_allowed = allowedPets,
+                    petsAllowed = allowedPets,
                     elevator = elevatorIsSelect,
                     furniture = isFurnished,
-                    building_type = "APARTMENT",
+                    buildingType = "APARTMENT",
                     status = "MODERATION"
                 )
 
+                /*TODO: Зробити токен у вигляді змінної*/
                 val userToken = "d0d20eeb-2c54-4363-9b7b-0631ae0f9892"
                 //
                 val isSuccess = apiService.createProperty(request, userToken)
@@ -183,20 +202,41 @@ class CreateListingScreenModel(
                     val currentId = listingId ?: return@launch
 
                     // Створюємо локальну аналітику, якщо сервер прийняв оголошення
-                    val analyticsEntry = AnalyticsListingEntity(
-                        analyticId = currentId,
+                    val myListingEntity = MyListingEntity(
+                        localId = currentId,
+                        listingStatus = ListingStatus.MODERATION,
+
+                        title = title,
+                        description = description,
+                        address = address,
+                        area = area,
+                        price = price,
+                        bedrooms = countBedrooms,
+                        bathrooms = countBathrooms,
+                        floorNumber = floorNumber,
+                        propertyType = selectedType,
+
+                        allowedPets = allowedPets,
+                        isParking = isParking,
+                        isFurnished = isFurnished,
+                        isBalcony = isBalcony,
+                        isCondition = isCondition,
+                        gymIsSelect = gymIsSelect,
+                        poolIsSelect = poolIsSelect,
+                        elevatorIsSelect = elevatorIsSelect,
+                        securityIsSelect = securityIsSelect,
+                        verificationMethod = verificationMethod,
+                        photosUris = uploadedPhotos.joinToString(","),
+
                         likesNumber = 0,
                         viewsNumber = 0,
                         rejectsNumber = 0,
                         goToContactsNumber = 0,
-                        listingStatus = ListingStatus.MODERATION,
-                        updateAt = TimeSource.Monotonic.markNow().toString()
+                        createAt = Clock.System.now().toString(),
+                        updateAt = Clock.System.now().toString()
                     )
 
-                    dao.saveAnalytics(analyticsEntry)
-
-                    // Видаляємо з чернеток, бо відправлене на сервер
-                    dao.deleteDraftById(currentId)
+                    dao.saveListing(myListingEntity)
 
                     println("Оголошення створено та відправлено на модерацію")
                     onSuccess()

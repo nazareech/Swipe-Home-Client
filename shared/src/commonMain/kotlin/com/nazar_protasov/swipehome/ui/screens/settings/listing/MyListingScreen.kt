@@ -33,29 +33,39 @@ class MyListingsScreen : Screen {
         val screenModel: MyListingsScreenModel = koinInject()
 
         // Підписуємося на нашу базу даних
-        val listingsData by screenModel.listingsWithAnalytics.collectAsState(initial = emptyList())
+        val listingsData by screenModel.myListingProperties.collectAsState(initial = emptyList())
 
         // Мапимо дані з ДБ у формат для карток
         val listings = listingsData.map { data ->
-            val draft = data.draft
-            val analytics = data.analytics
 
-            val photosList = if (draft.photosUris.isNotBlank()) draft.photosUris.split(",") else emptyList()
-            val displayTitle = if (draft.title.isNotBlank()) "Чернетка: ${draft.title}" else "Нове оголошення"
-            val displayLocation = draft.address.ifBlank{ "Адресу не вказано" }
+            val photosList = if (data.photosUris.isNotBlank()) data.photosUris.split(",") else emptyList()
+            val displayTitle = when {
+                data.title.isNotBlank() && data.listingStatus == ListingStatus.DRAFT -> "Чернетка: ${data.title}"
+                data.title.isNotBlank() -> data.title
+                else -> "Нове оголошення"
+            }
+
+            val displayLocation = data.address.ifBlank{ "Адресу не вказано" }
 
             ListingItem(
-                id = draft.draftId,
+                id = data.localId,
                 title = displayTitle,
                 location = displayLocation,
                 imagesUrl = photosList,
 
-                status = analytics?.listingStatus ?: ListingStatus.DRAFT,
-                views = analytics?.viewsNumber?.toString() ?: "--",
-                likes = analytics?.likesNumber?.toString() ?: "--",
+                status = data.listingStatus,
+                views = if (data.viewsNumber == 0) "--" else data.viewsNumber.toString(),
+                likes = if (data.likesNumber == 0) "--" else data.likesNumber.toString(),
                 onClick = {
                     // Відкриваємо редактор зі збереженими даними чернетки
-                    navigator.push(AnalyticsScreen(cardId = draft.draftId)/*TODO: Передавання для відображення статистики даного оголошення */)
+                    navigator.push(
+                        if(data.listingStatus == ListingStatus.DRAFT) {
+                            CreateListingScreen(draftId = data.localId)
+                        } else {
+                            AnalyticsScreen(cardId = data.localId)
+                        }
+                        /*TODO: Передавання для відображення статистики даного оголошення */
+                    )
                 }
             )
         }

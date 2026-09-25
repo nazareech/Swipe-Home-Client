@@ -1,3 +1,5 @@
+@file:Suppress("EXPECT_ACTUAL_CLASSIFIERS_ARE_IN_BETA_WARNING")
+
 package com.nazar_protasov.swipehome.data.local.entity
 
 import androidx.room.ConstructedBy
@@ -8,11 +10,10 @@ import androidx.room.TypeConverters
 
 @Database(
     entities = [
-        DraftListingEntity::class,
-        SwipeEntity::class,
-        AnalyticsListingEntity::class
+        MyListingEntity::class,
+        SwipeEntity::class
        ],
-    version = 3,
+    version = 4,
     exportSchema = false
 )
 @TypeConverters(SwipeHomeTypeConverters::class)

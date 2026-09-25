@@ -5,34 +5,26 @@ import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Transaction
-import com.nazar_protasov.swipehome.data.local.ListingWithAnalytics
 import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface SwipeHomeDao {
-    // --- Робота над чернетками ---
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun saveDraft(draft: DraftListingEntity)
-
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun saveAnalytics(analytics: AnalyticsListingEntity)
+    suspend fun saveListing(analytics: MyListingEntity)
 
     // Flow дозволяє UI автоматично оновлюватися при зміні даних у базі
-    @Query("SELECT * FROM draft_listings ORDER BY updateAt DESC")
-    fun getAllDrafts(): Flow<List<DraftListingEntity>>
+    @Query("SELECT * FROM my_listings WHERE listingStatus = 'DRAFT' ORDER BY updateAt DESC")
+    fun getAllDrafts(): Flow<List<MyListingEntity>>
 
-    @Query("SELECT * FROM analytics_listing ORDER BY updateAt DESC")
-    fun getAllMyCards(): Flow<List<AnalyticsListingEntity>>
+    @Query("SELECT * FROM my_listings ORDER BY updateAt DESC")
+    fun getAllMyCards(): Flow<List<MyListingEntity>>
 
-    @Query("SELECT * FROM draft_listings WHERE draftId = :id")
-    suspend fun getDraftById(id: String): DraftListingEntity?
+    @Query("SELECT * FROM my_listings WHERE localId = :id")
+    suspend fun getCardById(id: String): MyListingEntity?
 
-    @Query("SELECT * FROM analytics_listing WHERE analyticId = :id")
-    suspend fun getCardById(id: String): AnalyticsListingEntity?
-
-    @Query("DELETE FROM draft_listings WHERE draftId = :id")
-    suspend fun deleteDraftById(id: String)
+    @Query("DELETE FROM my_listings WHERE localId = :id")
+    suspend fun deleteCardById(id: String)
 
     // --- Робота зі свайпами --
 
@@ -48,10 +40,10 @@ interface SwipeHomeDao {
     suspend fun markSwipeAsSynced(ids: List<String>)
 
     @Transaction
-    @Query("SELECT * FROM draft_listings ORDER BY updateAt DESC")
-    fun getDraftsWithAnalytics(): Flow<List<ListingWithAnalytics>>
+    @Query("SELECT * FROM my_listings ORDER BY updateAt DESC")
+    fun getMyListing(): Flow<List<MyListingEntity>>
 
     @Transaction
-    @Query("SELECT * FROM draft_listings WHERE draftId = :id")
-    suspend fun getListWithAnalyticsById(id: String): ListingWithAnalytics?
+    @Query("SELECT * FROM my_listings WHERE localId = :id")
+    suspend fun getListWithAnalyticsById(id: String): MyListingEntity?
 }
