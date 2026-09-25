@@ -15,6 +15,9 @@ interface SwipeHomeDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun saveDraft(draft: DraftListingEntity)
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun saveAnalytics(analytics: AnalyticsListingEntity)
+
     // Flow дозволяє UI автоматично оновлюватися при зміні даних у базі
     @Query("SELECT * FROM draft_listings ORDER BY updateAt DESC")
     fun getAllDrafts(): Flow<List<DraftListingEntity>>
@@ -50,5 +53,5 @@ interface SwipeHomeDao {
 
     @Transaction
     @Query("SELECT * FROM draft_listings WHERE draftId = :id")
-    fun getListWithAnalyticsById(id: String): ListingWithAnalytics
+    suspend fun getListWithAnalyticsById(id: String): ListingWithAnalytics?
 }

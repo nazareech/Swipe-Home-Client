@@ -40,35 +40,6 @@ class CreateListingScreen(val draftId: String? = null) : Screen {
         LaunchedEffect(draftId){
             draftId?.let { screenModel.loadDraft(it) }
         }
-/*
-        var currentStep by remember { mutableStateOf(1) }
-        val totalSteps = 4
-
-        //TODO: Потом перекинуть в CreateListingScreenModel
-        var selectedType by remember { mutableStateOf(PropertyType.APARTMENT) }
-        var address by remember { mutableStateOf("") }
-        var area by remember { mutableStateOf("") }
-        var price by remember { mutableStateOf("") }
-        var verificationMethod by remember { mutableStateOf(VerificationMethods.DIIA) }
-
-        var countBedrooms by remember { mutableStateOf(1) }
-        var countBathrooms by remember { mutableStateOf(1) }
-        var floorNumber by remember { mutableStateOf(1) }
-
-        var allowedPets by remember { mutableStateOf(false) }
-        var isParking by remember { mutableStateOf(false) }
-        var isFurnished by remember { mutableStateOf(false) }
-        var isBalcony by remember { mutableStateOf(false) }
-        var isCondition by remember { mutableStateOf(false) }
-
-        var description by remember { mutableStateOf("") }
-        var gymIsSelect by remember { mutableStateOf(false) }
-        var poolIsSelect by remember { mutableStateOf(false) }
-        var elevatorIsSelect by remember { mutableStateOf(false) }
-        var securityIsSelect by remember { mutableStateOf(false) }
-
-        val uploadedPhotos = remember { mutableStateListOf<String>() }
-*/
 
         Scaffold(
             topBar = {

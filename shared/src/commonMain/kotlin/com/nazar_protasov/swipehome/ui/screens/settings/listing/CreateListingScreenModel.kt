@@ -6,8 +6,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
+import com.nazar_protasov.swipehome.data.local.entity.AnalyticsListingEntity
 import com.nazar_protasov.swipehome.data.local.entity.DraftListingEntity
 import com.nazar_protasov.swipehome.data.local.entity.SwipeHomeDao
+import com.nazar_protasov.swipehome.network.CreatePropertyRequest
+import com.nazar_protasov.swipehome.network.PropertyApiService
+import com.nazar_protasov.swipehome.ui.screens.settings.listing.components.ListingStatus
 import com.nazar_protasov.swipehome.ui.screens.settings.listing.createListing.components.PropertyType
 import com.nazar_protasov.swipehome.ui.screens.settings.listing.createListing.components.VerificationMethods
 import kotlinx.coroutines.launch
@@ -15,7 +19,8 @@ import kotlin.random.Random
 import kotlin.time.TimeSource
 
 class CreateListingScreenModel(
-    private val dao: SwipeHomeDao
+    private val dao: SwipeHomeDao,
+    private val apiService: PropertyApiService
 ): ScreenModel {
     // ID чернетки, якщо ми редагуємо існуючу, або null, якщо це нове оголошення
     var listingId by mutableStateOf<String?>(null)
@@ -134,20 +139,72 @@ class CreateListingScreenModel(
     }
 
     // Фінальна відправка на сервер
-    fun submitListing(onSuccess: () -> Unit){
+    fun submitListing(onSuccess: () -> Unit) {
         screenModelScope.launch {
             // Формуємо об'єкт для Ktor і робимо POST запит
-            /*
-            val request = CreateListingRequest(
-                address = address,
-                area = area,
-                price = price.toDoubleOrNull() ?: 0.0,
-                ...
-            )
-            val result = apiService.postListing(request)
-            */
-            println("Оголошення створено та відправлено на модерацію")
-            onSuccess()
+            screenModelScope.launch {
+                // Зберігаємо всі введені дані локально востаннє (щоб нічого не загубилось)
+                saveDraft { }
+
+                // Мапимо Enum типу нерухомості у строки для сервера
+                val categoryString = when (selectedType) {
+                    PropertyType.APARTMENT -> "APARTMENT"
+                    PropertyType.HOUSE -> "HOUSE"
+                    PropertyType.STUDIO -> "STUDIO"
+                }
+
+                //
+                val parkingString = if (isParking) "YES" else "NO"
+
+                //
+                val request = CreatePropertyRequest(
+                    title = title.ifBlank { "Нове оголошення" },
+                    description = description.ifBlank { "Опис відсутній" },
+                    localization = address,
+                    price = price.toDoubleOrNull() ?: 0.0,
+                    area = area.toDoubleOrNull() ?: 0.0,
+                    rooms = countBedrooms,
+                    category = categoryString,
+                    subcategory = "RENT",
+                    parking = parkingString,
+                    pets_allowed = allowedPets,
+                    elevator = elevatorIsSelect,
+                    furniture = isFurnished,
+                    building_type = "APARTMENT",
+                    status = "MODERATION"
+                )
+
+                val userToken = "d0d20eeb-2c54-4363-9b7b-0631ae0f9892"
+                //
+                val isSuccess = apiService.createProperty(request, userToken)
+
+                if (isSuccess) {
+                    // Отримуємо поточний
+                    val currentId = listingId ?: return@launch
+
+                    // Створюємо локальну аналітику, якщо сервер прийняв оголошення
+                    val analyticsEntry = AnalyticsListingEntity(
+                        analyticId = currentId,
+                        likesNumber = 0,
+                        viewsNumber = 0,
+                        rejectsNumber = 0,
+                        goToContactsNumber = 0,
+                        listingStatus = ListingStatus.MODERATION,
+                        updateAt = TimeSource.Monotonic.markNow().toString()
+                    )
+
+                    dao.saveAnalytics(analyticsEntry)
+
+                    // Видаляємо з чернеток, бо відправлене на сервер
+                    dao.deleteDraftById(currentId)
+
+                    println("Оголошення створено та відправлено на модерацію")
+                    onSuccess()
+                } else {
+                    println("Помилка відправки")
+                    // TODO: Показати Snackbar з помилкою
+                }
+            }
         }
     }
 }

@@ -162,7 +162,7 @@ fun SegmentedProgressBar(currentStep: Int, totalSteps: Int, modifier: Modifier =
 }
 
 @Composable
-fun WizardBottomBar(currentStep: Int, totalSteps: Int,onSaveClick: () -> Unit, onNext: () -> Unit, onPrev: () -> Unit){
+fun WizardBottomBar(currentStep: Int, totalSteps: Int, onSaveClick: () -> Unit, onNext: () -> Unit, onPrev: () -> Unit){
     Column(modifier = Modifier.background(SwipeHomeTheme.colors.background)) {
         HorizontalDivider( color = SwipeHomeTheme.colors.outline)
         Row(

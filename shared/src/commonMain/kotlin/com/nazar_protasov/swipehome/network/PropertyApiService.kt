@@ -4,9 +4,11 @@ import com.nazar_protasov.swipehome.network.dto.FilterRequestDTO
 import com.nazar_protasov.swipehome.ui.models.Property
 import com.nazar_protasov.swipehome.ui.models.PropertyDetails
 import io.ktor.client.call.body
+import io.ktor.client.request.bearerAuth
 import io.ktor.client.request.header
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
+import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
 import kotlinx.serialization.SerialName
@@ -105,7 +107,7 @@ fun PropertyDTO.toUIDetailsProperty(): PropertyDetails {
 class PropertyApiService(private val client: io.ktor.client.HttpClient){
     companion object {
 //        const val BASE_URL = "http://192.168.0.78:8080"
-        const val BASE_URL = "http://192.168.1.6:8080"
+        const val BASE_URL = "http://192.168.1.5:8080"
     }
 
     suspend fun fetchProperties(
@@ -130,6 +132,22 @@ class PropertyApiService(private val client: io.ktor.client.HttpClient){
         } catch (e: Exception) {
             println("Error fetching properties: ${e.message}")
             emptyList() // Повертаємо пустий список у разі помилки
+        }
+    }
+
+    suspend fun createProperty(request: CreatePropertyRequest, token: String): Boolean {
+        return try {
+           val response = client.post("${BASE_URL}/properties/create"){
+               bearerAuth(token)
+               contentType(ContentType.Application.Json)
+               setBody(request)
+           }
+            println("СЕРВЕР ВІДПОВІВ: ${response.status} - Тіло: ${response.bodyAsText()}")
+
+           response.status.value in 200..299
+        } catch (e: Exception) {
+            println("Помилка відправки оголошення: ${e.message}")
+            false
         }
     }
 }
