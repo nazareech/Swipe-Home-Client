@@ -176,7 +176,12 @@ class CreateListingScreenModel(
             isLoading = true
 
             try {
-                // Формуємо об'єкт для Ktor і робимо POST запит
+                val currentId = listingId ?: Random.nextInt(100000).toString()
+                listingId = currentId
+
+                /*TODO: Зробити токен у вигляді змінної*/
+                val userToken = "d0d20eeb-2c54-4363-9b7b-0631ae0f9892"
+
                 // Зберігаємо всі введені дані локально востаннє (щоб нічого не загубилось)
                 saveDraftInternal()
 
@@ -208,22 +213,30 @@ class CreateListingScreenModel(
                     status = "MODERATION"
                 )
 
-                /*TODO: Зробити токен у вигляді змінної*/
-                val userToken = "d0d20eeb-2c54-4363-9b7b-0631ae0f9892"
-
-
-                val isSuccess = withTimeoutOrNull(5.seconds) {
+                // Відправляємо Оголошення (Отримуємо ID від сервера)
+                val createdPropertyId = withTimeoutOrNull(10.seconds) {
                     apiService.createProperty(request, userToken)
                 }
 
-                when (isSuccess) {
-                    true -> {
+                if (createdPropertyId != null) {
+                    // Відправляємо фотографії, якщо вони є
+                    var imagesUploadSuccess = true
+                    if (uploadedPhotos.isNotEmpty()) {
+                        imagesUploadSuccess = withTimeoutOrNull(30.seconds) {
+                            apiService.uploadImage(
+                                propertyId = createdPropertyId,
+                                photoPaths =  uploadedPhotos,
+                                token = userToken
+                            )
+                        } ?: false // Якщо таймаут, вважаємо, що завантаження не вдалося
+                    }
+                    if (imagesUploadSuccess) {
                         // Отримуємо поточний
                         val currentId = listingId ?: return@launch
-
                         // Створюємо локальну аналітику, якщо сервер прийняв оголошення
                         val myListingEntity = MyListingEntity(
                             localId = currentId,
+                            serverId = createdPropertyId,
                             listingStatus = ListingStatus.MODERATION,
 
                             title = title,
@@ -255,21 +268,17 @@ class CreateListingScreenModel(
                             createAt = Clock.System.now().toString(),
                             updateAt = Clock.System.now().toString()
                         )
-
                         dao.saveListing(myListingEntity)
 
-                        println("Оголошення створено та відправлено на модерацію")
+                        println("Оголошення створено та фото створено і відправлено на модерацію")
+                        _snackbarEvent.send("Оголошення створено та фото створено і відправлено на модерацію")
                         onSuccess()
 
+                    }else{
+                        _snackbarEvent.send("Оголошення створено, але не вдалося завантажити фото. Спробуйте пізніше.")
                     }
-
-                    false -> {
-                        _snackbarEvent.send("Сервер відхилив запит. Перевірте дані")
-                    }
-
-                    else -> {
-                        _snackbarEvent.send("Сервер не відповідає. Перевірте з'єднання та спробуйте ще раз")
-                    }
+                } else {
+                    _snackbarEvent.send("Сервер не відповідає. Перевірте з'єднання та спробуйте ще раз")
                 }
             } catch (e: Exception) {
                 println("Помилка мережі: ${e.message}")

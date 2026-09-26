@@ -17,6 +17,7 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
@@ -33,7 +34,13 @@ import com.nazar_protasov.swipehome.ui.screens.settings.listing.createListing.co
 import com.nazar_protasov.swipehome.ui.screens.settings.listing.createListing.components.WizardBottomBar
 import com.nazar_protasov.swipehome.ui.screens.settings.listing.createListing.components.WizardTopBar
 import com.nazar_protasov.swipehome.ui.theme.SwipeHomeTheme
-import kotlin.random.Random
+import com.nazar_protasov.swipehome.ui.utils.saveImageToCache
+import com.preat.peekaboo.image.picker.SelectionMode
+import com.preat.peekaboo.image.picker.rememberImagePickerLauncher
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.IO
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class CreateListingScreen(val draftId: String? = null) : Screen {
     @Composable
@@ -45,6 +52,27 @@ class CreateListingScreen(val draftId: String? = null) : Screen {
 
         // Створюємо стан для SnackBar
         val snackbarHostState = remember { SnackbarHostState() }
+
+        val coroutineScope = rememberCoroutineScope()
+
+        // Ініціалізуємо пікер галереї
+        val multipleImagePicker = rememberImagePickerLauncher(
+            selectionMode = SelectionMode.Multiple(),
+            scope = coroutineScope,
+            onResult = { byteArrays ->
+                // Зберігаємо отримані масиви байтів у фоновому потоці
+                coroutineScope.launch {
+                    val newPaths = withContext(Dispatchers.IO){
+                        byteArrays.map { byteArray ->
+                            saveImageToCache(byteArray)
+                        }
+                    }
+                    // Додаємо шляхи до нашого списку
+                    screenModel.uploadedPhotos.addAll(newPaths)
+                }
+
+            }
+        )
 
         // Підписуємося на події з ScreenModel
         LaunchedEffect(Unit) {
@@ -132,7 +160,9 @@ class CreateListingScreen(val draftId: String? = null) : Screen {
                             3 -> Step3Media(
                                     photos = screenModel.uploadedPhotos,
                                     onAddPhoto = {
-                                        screenModel.uploadedPhotos.add("https://picsum.photos/200/300?id=${Random.nextInt(100000)}")
+//                                        screenModel.uploadedPhotos.add("https://picsum.photos/200/300?id=${Random.nextInt(100000)}")
+                                        // Запускаємо вибір фото з галереї
+                                        multipleImagePicker.launch()
                                     },
                                     onRemovePhoto = { index -> screenModel.uploadedPhotos.removeAt(index) },
                                     onMovePhoto = { fromIndex, toIndex ->

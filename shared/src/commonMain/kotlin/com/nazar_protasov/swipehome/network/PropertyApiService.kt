@@ -3,14 +3,18 @@ package com.nazar_protasov.swipehome.network
 import com.nazar_protasov.swipehome.network.dto.FilterRequestDTO
 import com.nazar_protasov.swipehome.ui.models.Property
 import com.nazar_protasov.swipehome.ui.models.PropertyDetails
+import com.nazar_protasov.swipehome.ui.utils.readBytesFromCache
 import io.ktor.client.call.body
-import io.ktor.client.request.bearerAuth
+import io.ktor.client.request.forms.MultiPartFormDataContent
+import io.ktor.client.request.forms.formData
 import io.ktor.client.request.header
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
-import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType
+import io.ktor.http.Headers
+import io.ktor.http.HttpHeaders
 import io.ktor.http.contentType
+import io.ktor.http.isSuccess
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
@@ -106,7 +110,7 @@ fun PropertyDTO.toUIDetailsProperty(): PropertyDetails {
 
 class PropertyApiService(private val client: io.ktor.client.HttpClient){
     companion object {
-        const val BASE_URL = "http://192.168.1.5:8080"
+        const val BASE_URL = "http://192.168.1.2:8080"
     }
 
     suspend fun fetchProperties(
@@ -134,18 +138,66 @@ class PropertyApiService(private val client: io.ktor.client.HttpClient){
         }
     }
 
-    suspend fun createProperty(request: CreatePropertyRequest, token: String): Boolean {
+    suspend fun createProperty(request: CreatePropertyRequest, token: String): String? {
         return try {
            val response = client.post("${BASE_URL}/properties/create"){
-               bearerAuth(token)
+               header("Authorization", "Bearer $token")
                contentType(ContentType.Application.Json)
                setBody(request)
            }
-            println("СЕРВЕР ВІДПОВІВ: ${response.status} - Тіло: ${response.bodyAsText()}")
 
-           response.status.value in 200..299
+            if(response.status.isSuccess()) {
+                val responseBody = response.body<CreatePropertyResponse>()
+                responseBody.idProperty
+            }else{
+                val errorBody = response.body<String>()
+                println("Помилка відправки оголошення: ${response.status} - $errorBody")
+                null
+            }
         } catch (e: Exception) {
             println("Помилка відправки оголошення: ${e.message}")
+            null
+        }
+    }
+
+    suspend fun uploadImage(propertyId: String, photoPaths: List<String>,  token: String): Boolean {
+        return try {
+            val response = client.post("${BASE_URL}/properties/images/upload") {
+                header("Authorization", "Bearer $token")
+                setBody(
+                    MultiPartFormDataContent(
+                        formData {
+                            // Передаємо propertyId
+                            append("id_property", propertyId)
+
+                            // Проходимось по всіх фотографіях
+                            photoPaths.forEachIndexed { index, path ->
+                                // Перше фото (index == 0) завжди головне
+                                val isMain = if (index == 0) "true" else "false"
+                                append("is_main", isMain)
+
+                                // Читаємо файл і додаємо його як частину форми
+                                val imagesBytes = readBytesFromCache(path)
+                                append("image", imagesBytes, Headers.build {
+                                    append(HttpHeaders.ContentType, "image/jpeg")
+                                    append(HttpHeaders.ContentDisposition, "form-data; name=\"image\"; filename=\"photo_$index.jpg\"")
+                                })
+                            }
+                        }
+                    )
+                )
+            }
+            if (response.status.isSuccess()) {
+                val responseBody = response.body<UploadImagesResponse>()
+                println("Фото завантажено: ${responseBody.message}")
+                responseBody.images.isNotEmpty()
+            } else {
+                val errorBody = response.body<String>()
+                println("Помилка завантаження фото: ${response.status} - $errorBody")
+                false
+            }
+        } catch (e: Exception) {
+            println("Помилка завантаження фото: ${e.message}")
             false
         }
     }

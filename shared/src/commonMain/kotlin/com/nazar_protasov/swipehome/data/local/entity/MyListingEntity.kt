@@ -12,7 +12,7 @@ import kotlinx.serialization.Serializable
 data class MyListingEntity(
     @PrimaryKey
     val localId: String,        // Локальний ID
-    val serverId: Int? = null,  // ID з сервера
+    val serverId: String? = null,  // ID з сервера
 
     val listingStatus: ListingStatus,
 
