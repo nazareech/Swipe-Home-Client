@@ -1,6 +1,7 @@
 package com.nazar_protasov.swipehome.ui.screens.settings.listing.createListing
 
 import androidx.compose.animation.Crossfade
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -9,10 +10,16 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.koin.koinScreenModel
@@ -36,12 +43,24 @@ class CreateListingScreen(val draftId: String? = null) : Screen {
 
         val screenModel = koinScreenModel<CreateListingScreenModel>()
 
+        // Створюємо стан для SnackBar
+        val snackbarHostState = remember { SnackbarHostState() }
+
+        // Підписуємося на події з ScreenModel
+        LaunchedEffect(Unit) {
+            screenModel.snackbarEvent.collect { message ->
+                // Показуємо SnackBar з повідомленням
+                snackbarHostState.showSnackbar(message)
+            }
+        }
+
         // Якщо передано draftId, завантажуємо дані один раз при старті
         LaunchedEffect(draftId){
             draftId?.let { screenModel.loadDraft(it) }
         }
 
         Scaffold(
+            snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
             topBar = {
                 WizardTopBar(
                     currentStep = screenModel.currentStep,
@@ -130,6 +149,20 @@ class CreateListingScreen(val draftId: String? = null) : Screen {
                         Spacer(modifier = Modifier.height(80.dp))
                     }
                 }
+            }
+        }
+
+        if (screenModel.isLoading){
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(SwipeHomeTheme.colors.background.copy(alpha = 0.4f))
+                    .pointerInput(Unit) {},
+                contentAlignment = Alignment.Center
+            ){
+                CircularProgressIndicator(
+                    color = SwipeHomeTheme.colors.primary
+                )
             }
         }
     }
