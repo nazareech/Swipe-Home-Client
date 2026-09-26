@@ -3,7 +3,7 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 plugins {
     alias(libs.plugins.androidApplication)
     alias(libs.plugins.composeCompiler)
-    id("org.jetbrains.kotlin.android") // Обов'язково для класичного Android додатку
+    alias(libs.plugins.kotlinAndroid)    // Обов'язково для класичного Android додатку
 }
 
 kotlin {

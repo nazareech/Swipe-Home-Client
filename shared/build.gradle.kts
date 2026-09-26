@@ -2,7 +2,7 @@ import androidx.room.gradle.RoomExtension
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
-    id("com.android.library") // Використовуємо стабільний Android-плагін
+    alias(libs.plugins.androidLibrary) // Використовуємо стабільний Android-плагін
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
     alias(libs.plugins.kotlin.serialization)

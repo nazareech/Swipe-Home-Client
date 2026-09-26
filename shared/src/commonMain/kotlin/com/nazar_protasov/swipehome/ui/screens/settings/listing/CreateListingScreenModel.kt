@@ -160,91 +160,90 @@ class CreateListingScreenModel(
     fun submitListing(onSuccess: () -> Unit) {
         screenModelScope.launch {
             // Формуємо об'єкт для Ktor і робимо POST запит
-            screenModelScope.launch {
-                // Зберігаємо всі введені дані локально востаннє (щоб нічого не загубилось)
-                saveDraft { }
+            // Зберігаємо всі введені дані локально востаннє (щоб нічого не загубилось)
+            saveDraft { }
 
-                // Мапимо Enum типу нерухомості у строки для сервера
-                val categoryString = when (selectedType) {
-                    PropertyType.APARTMENT -> "APARTMENT"
-                    PropertyType.HOUSE -> "HOUSE"
-                    PropertyType.STUDIO -> "STUDIO"
-                }
+            // Мапимо Enum типу нерухомості у строки для сервера
+            val categoryString = when (selectedType) {
+                PropertyType.APARTMENT -> "APARTMENT"
+                PropertyType.HOUSE -> "HOUSE"
+                PropertyType.STUDIO -> "STUDIO"
+            }
 
-                //
-                val parkingString = if (isParking) "YES" else "NO"
+            //
+            val parkingString = if (isParking) "YES" else "NO"
 
-                //
-                val request = CreatePropertyRequest(
-                    title = title.ifBlank { "Нове оголошення" },
-                    description = description.ifBlank { "Опис відсутній" },
-                    localization = address,
-                    price = price.toDoubleOrNull() ?: 0.0,
-                    area = area.toDoubleOrNull() ?: 0.0,
-                    rooms = countBedrooms,
-                    category = categoryString,
-                    subcategory = "RENT",
-                    parking = parkingString,
-                    petsAllowed = allowedPets,
-                    elevator = elevatorIsSelect,
-                    furniture = isFurnished,
-                    buildingType = "APARTMENT",
-                    status = "MODERATION"
+            //
+            val request = CreatePropertyRequest(
+                title = title.ifBlank { "Нове оголошення" },
+                description = description.ifBlank { "Опис відсутній" },
+                localization = address,
+                price = price.toDoubleOrNull() ?: 0.0,
+                area = area.toDoubleOrNull() ?: 0.0,
+                rooms = countBedrooms,
+                category = categoryString,
+                subcategory = "RENT",
+                parking = parkingString,
+                petsAllowed = allowedPets,
+                elevator = elevatorIsSelect,
+                furniture = isFurnished,
+                buildingType = "APARTMENT",
+                status = "MODERATION"
+            )
+
+            /*TODO: Зробити токен у вигляді змінної*/
+            val userToken = "d0d20eeb-2c54-4363-9b7b-0631ae0f9892"
+            //
+            val isSuccess = apiService.createProperty(request, userToken)
+
+            if (isSuccess) {
+                // Отримуємо поточний
+                val currentId = listingId ?: return@launch
+
+                // Створюємо локальну аналітику, якщо сервер прийняв оголошення
+                val myListingEntity = MyListingEntity(
+                    localId = currentId,
+                    listingStatus = ListingStatus.MODERATION,
+
+                    title = title,
+                    description = description,
+                    address = address,
+                    area = area,
+                    price = price,
+                    bedrooms = countBedrooms,
+                    bathrooms = countBathrooms,
+                    floorNumber = floorNumber,
+                    propertyType = selectedType,
+
+                    allowedPets = allowedPets,
+                    isParking = isParking,
+                    isFurnished = isFurnished,
+                    isBalcony = isBalcony,
+                    isCondition = isCondition,
+                    gymIsSelect = gymIsSelect,
+                    poolIsSelect = poolIsSelect,
+                    elevatorIsSelect = elevatorIsSelect,
+                    securityIsSelect = securityIsSelect,
+                    verificationMethod = verificationMethod,
+                    photosUris = uploadedPhotos.joinToString(","),
+
+                    likesNumber = 0,
+                    viewsNumber = 0,
+                    rejectsNumber = 0,
+                    goToContactsNumber = 0,
+                    createAt = Clock.System.now().toString(),
+                    updateAt = Clock.System.now().toString()
                 )
 
-                /*TODO: Зробити токен у вигляді змінної*/
-                val userToken = "d0d20eeb-2c54-4363-9b7b-0631ae0f9892"
-                //
-                val isSuccess = apiService.createProperty(request, userToken)
+                dao.saveListing(myListingEntity)
 
-                if (isSuccess) {
-                    // Отримуємо поточний
-                    val currentId = listingId ?: return@launch
-
-                    // Створюємо локальну аналітику, якщо сервер прийняв оголошення
-                    val myListingEntity = MyListingEntity(
-                        localId = currentId,
-                        listingStatus = ListingStatus.MODERATION,
-
-                        title = title,
-                        description = description,
-                        address = address,
-                        area = area,
-                        price = price,
-                        bedrooms = countBedrooms,
-                        bathrooms = countBathrooms,
-                        floorNumber = floorNumber,
-                        propertyType = selectedType,
-
-                        allowedPets = allowedPets,
-                        isParking = isParking,
-                        isFurnished = isFurnished,
-                        isBalcony = isBalcony,
-                        isCondition = isCondition,
-                        gymIsSelect = gymIsSelect,
-                        poolIsSelect = poolIsSelect,
-                        elevatorIsSelect = elevatorIsSelect,
-                        securityIsSelect = securityIsSelect,
-                        verificationMethod = verificationMethod,
-                        photosUris = uploadedPhotos.joinToString(","),
-
-                        likesNumber = 0,
-                        viewsNumber = 0,
-                        rejectsNumber = 0,
-                        goToContactsNumber = 0,
-                        createAt = Clock.System.now().toString(),
-                        updateAt = Clock.System.now().toString()
-                    )
-
-                    dao.saveListing(myListingEntity)
-
-                    println("Оголошення створено та відправлено на модерацію")
-                    onSuccess()
-                } else {
-                    println("Помилка відправки")
-                    // TODO: Показати Snackbar з помилкою
-                }
+                println("Оголошення створено та відправлено на модерацію")
+                onSuccess()
+            } else {
+                println("Помилка відправки")
+                // TODO: Показати Snackbar з помилкою
             }
+
         }
     }
 }
