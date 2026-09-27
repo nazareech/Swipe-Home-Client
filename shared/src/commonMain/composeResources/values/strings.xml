@@ -13,6 +13,12 @@
     <string name="btn_filter">Фільтри</string>
     <string name="photo_description">Фото нерухомості</string>
 
+    <!-- Стани парковки -->
+    <string name="parking_state_garage">В гаражі</string>
+    <string name="parking_state_parking">На вулиці</string>
+    <string name="parking_state_none">Немає</string>
+    <string name="parking_state_protected">Під охороною</string>
+
     <!--    Екран Онбординг-->
     <string name="onboarding_title_1">Свайпни вправо, щоб зберегти\nбудинок своєї мрії</string>
     <string name="onboarding_description_1">Легко переглядайте підібрані об’єкти нерухомості. Сподобалося? Проведіть пальцем вправо, щоб додати його до обраного.</string>

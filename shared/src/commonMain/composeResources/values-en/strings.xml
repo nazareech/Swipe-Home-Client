@@ -13,6 +13,12 @@
     <string name="btn_filter">Filters</string>
     <string name="photo_description">Real estate photos</string>
 
+    <!-- Стани парковки -->
+    <string name="parking_state_garage">In a garage</string>
+    <string name="parking_state_parking">In a street</string>
+    <string name="parking_state_none">None</string>
+    <string name="parking_state_protected">Under guard</string>
+
     <!--    Екран Онбординг-->
     <string name="onboarding_title_1">Swipe Right ti Save\nYour Dream Home</string>
     <string name="onboarding_description_1">Browse curated properties effortlessly. Love it? Swipe right to save it to your favorites.</string>

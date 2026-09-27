@@ -11,6 +11,7 @@ import com.nazar_protasov.swipehome.data.local.entity.SwipeHomeDao
 import com.nazar_protasov.swipehome.network.CreatePropertyRequest
 import com.nazar_protasov.swipehome.network.PropertyApiService
 import com.nazar_protasov.swipehome.ui.screens.settings.listing.components.ListingStatus
+import com.nazar_protasov.swipehome.ui.screens.settings.listing.createListing.components.ParkingType
 import com.nazar_protasov.swipehome.ui.screens.settings.listing.createListing.components.PropertyType
 import com.nazar_protasov.swipehome.ui.screens.settings.listing.createListing.components.VerificationMethods
 import com.nazar_protasov.swipehome.ui.utils.getLocalizedMessage
@@ -44,7 +45,7 @@ class CreateListingScreenModel(
     var floorNumber by mutableStateOf(1)
 
     var allowedPets by mutableStateOf(false)
-    var isParking by mutableStateOf(false)
+    var parkingType by mutableStateOf(ParkingType.NONE)
     var isFurnished by mutableStateOf(false)
     var isBalcony by mutableStateOf(false)
     var isCondition by mutableStateOf(false)
@@ -83,7 +84,7 @@ class CreateListingScreenModel(
                 this@CreateListingScreenModel.description = draft.description
                 this@CreateListingScreenModel.floorNumber = draft.floorNumber
                 this@CreateListingScreenModel.allowedPets = draft.allowedPets
-                this@CreateListingScreenModel.isParking = draft.isParking
+                this@CreateListingScreenModel.parkingType = draft.parkingType
                 this@CreateListingScreenModel.isFurnished = draft.isFurnished
                 this@CreateListingScreenModel.isBalcony = draft.isBalcony
                 this@CreateListingScreenModel.isCondition = draft.isCondition
@@ -109,7 +110,14 @@ class CreateListingScreenModel(
     fun saveDraft(onSuccess: () -> Unit){
         screenModelScope.launch {
             saveDraftInternal()
+            onSuccess()
+        }
+    }
 
+    // Видалення чернетки (кнопка "Видалити" в TopBar)
+    fun deleteDraft(id: String, onSuccess: () -> Unit){
+        screenModelScope.launch {
+            dao.deleteCardById(id)
             onSuccess()
         }
     }
@@ -139,7 +147,7 @@ class CreateListingScreenModel(
             propertyType = selectedType,
 
             allowedPets = allowedPets,
-            isParking = isParking,
+            parkingType = parkingType,
             isFurnished = isFurnished,
             isBalcony = isBalcony,
             isCondition = isCondition,
@@ -193,19 +201,20 @@ class CreateListingScreenModel(
                 }
 
                 //
-                val parkingString = if (isParking) "YES" else "NO"
+
 
                 //
                 val request = CreatePropertyRequest(
                     title = title.ifBlank { "Нове оголошення" },
                     description = description.ifBlank { "Опис відсутній" },
+                    photosList = uploadedPhotos,
                     localization = address,
                     price = price.toDoubleOrNull() ?: 0.0,
                     area = area.toDoubleOrNull() ?: 0.0,
                     rooms = countBedrooms,
                     category = categoryString,
                     subcategory = "RENT",
-                    parking = parkingString,
+                    parkingType = parkingType.code,
                     petsAllowed = allowedPets,
                     elevator = elevatorIsSelect,
                     furniture = isFurnished,
@@ -214,8 +223,8 @@ class CreateListingScreenModel(
                 )
 
                 // Відправляємо Оголошення (Отримуємо ID від сервера)
-                val createdPropertyId = withTimeoutOrNull(10.seconds) {
-                    apiService.createProperty(request, userToken)
+                val createdPropertyId = withTimeoutOrNull(30.seconds) {
+                    apiService.createProperty(request, uploadedPhotos, userToken)
                 }
 
                 if (createdPropertyId != null) {
@@ -228,7 +237,7 @@ class CreateListingScreenModel(
                                 photoPaths =  uploadedPhotos,
                                 token = userToken
                             )
-                        } ?: false // Якщо таймаут, вважаємо, що завантаження не вдалося
+                        } ?: false // Якщо тайм-аут, вважаємо, що завантаження не вдалося
                     }
                     if (imagesUploadSuccess) {
                         // Отримуємо поточний
@@ -250,7 +259,7 @@ class CreateListingScreenModel(
                             propertyType = selectedType,
 
                             allowedPets = allowedPets,
-                            isParking = isParking,
+                            parkingType = parkingType,
                             isFurnished = isFurnished,
                             isBalcony = isBalcony,
                             isCondition = isCondition,

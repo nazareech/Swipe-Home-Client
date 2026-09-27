@@ -147,7 +147,7 @@ class CreateListingScreen(val draftId: String? = null) : Screen {
                                 floorNumber = screenModel.floorNumber, onFloorNumber = { screenModel.floorNumber = it },
 
                                 allowedPets = screenModel.allowedPets, onAllowedPets = { screenModel.allowedPets = it },
-                                isParking = screenModel.isParking, onIsParking = { screenModel.isParking = it },
+                                currentParkingType = screenModel.parkingType, onCurrentParking = { screenModel.parkingType = it },
                                 isFurnished = screenModel.isFurnished, onIsFurnished = { screenModel.isFurnished = it },
                                 isBalcony = screenModel.isBalcony, onIsBalcony = { screenModel.isBalcony = it },
                                 isCondition = screenModel.isCondition, onIsCondition = { screenModel.isCondition = it },

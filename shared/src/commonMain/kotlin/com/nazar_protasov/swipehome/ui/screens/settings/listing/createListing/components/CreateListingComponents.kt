@@ -29,7 +29,10 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -67,8 +70,10 @@ import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
 import com.nazar_protasov.swipehome.ui.theme.SwipeHomeTheme
 import mymultiplatformproject.shared.generated.resources.Res
+import mymultiplatformproject.shared.generated.resources.Res.string
 import mymultiplatformproject.shared.generated.resources.ic_arrow_back
 import mymultiplatformproject.shared.generated.resources.ic_arrow_next
+import mymultiplatformproject.shared.generated.resources.ic_arrow_single_down
 import mymultiplatformproject.shared.generated.resources.ic_badge
 import mymultiplatformproject.shared.generated.resources.ic_balcony
 import mymultiplatformproject.shared.generated.resources.ic_buildindings
@@ -83,7 +88,6 @@ import mymultiplatformproject.shared.generated.resources.ic_hint
 import mymultiplatformproject.shared.generated.resources.ic_home_area
 import mymultiplatformproject.shared.generated.resources.ic_image_upload
 import mymultiplatformproject.shared.generated.resources.ic_location_pin
-import mymultiplatformproject.shared.generated.resources.ic_parking
 import mymultiplatformproject.shared.generated.resources.ic_pets_allowed
 import mymultiplatformproject.shared.generated.resources.ic_pool
 import mymultiplatformproject.shared.generated.resources.ic_save_floppy
@@ -91,7 +95,14 @@ import mymultiplatformproject.shared.generated.resources.ic_shield_security
 import mymultiplatformproject.shared.generated.resources.ic_snowflake
 import mymultiplatformproject.shared.generated.resources.ic_sofa
 import mymultiplatformproject.shared.generated.resources.ic_user_verified
+import mymultiplatformproject.shared.generated.resources.parking_state_garage
+import mymultiplatformproject.shared.generated.resources.parking_state_none
+import mymultiplatformproject.shared.generated.resources.parking_state_parking
+import mymultiplatformproject.shared.generated.resources.parking_state_protected
+import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
+
 
 enum class PropertyType{
     APARTMENT,
@@ -102,6 +113,12 @@ enum class VerificationMethods{
     DIIA,
     ID,
     DOC
+}
+enum class ParkingType(val code: String, val resource: StringResource){
+    GARAGE("GARAGE", string.parking_state_garage),
+    PARKING("PARKING", string.parking_state_parking),
+    NONE("NONE", string.parking_state_none),
+    PROTECTED("PROTECTED", string.parking_state_protected)
 }
 
 // --- НАВІГАЦІЯ ТА ПРОГРЕС ---
@@ -383,7 +400,7 @@ fun Step2Details(
     floorNumber: Int, onFloorNumber: (Int) -> Unit,
 
     allowedPets: Boolean, onAllowedPets: (Boolean) -> Unit,
-    isParking: Boolean, onIsParking: (Boolean) -> Unit,
+    currentParkingType: ParkingType, onCurrentParking: (ParkingType) -> Unit,
     isFurnished: Boolean, onIsFurnished: (Boolean) -> Unit,
     isBalcony: Boolean, onIsBalcony: (Boolean) -> Unit,
     isCondition: Boolean, onIsCondition: (Boolean) -> Unit,
@@ -426,11 +443,17 @@ fun Step2Details(
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
             FeatureChip(painterResource(Res.drawable.ic_pets_allowed), "Дозволено з тваринами", allowedPets) { onAllowedPets(!allowedPets)}
-            FeatureChip(painterResource(Res.drawable.ic_parking), "Паркомісце включено", isParking) {onIsParking(!isParking)}
             FeatureChip(painterResource(Res.drawable.ic_sofa), "З меблями", isFurnished) {onIsFurnished(!isFurnished)}
             FeatureChip(painterResource(Res.drawable.ic_balcony), "Балкон / Тераса", isBalcony) {onIsBalcony(!isBalcony)}
             FeatureChip(painterResource(Res.drawable.ic_snowflake), "Кондиціонер", isCondition) {onIsCondition(!isCondition)}
         }
+
+        Spacer(modifier = Modifier.height(12.dp))
+        ParkingDropdownMenu(
+            selectedParkingType = currentParkingType,
+            onSelectedParking = { onCurrentParking(it) },
+            modifier = Modifier.fillMaxWidth().background(SwipeHomeTheme.colors.surface)
+        )
 
         Spacer(modifier = Modifier.height(24.dp))
         Text("Зручності в будинку", style = SwipeHomeTheme.typography.label, fontWeight = FontWeight.Bold)
@@ -506,6 +529,56 @@ fun FeatureChip(icon: Painter, text: String, isChecked: Boolean, onClick: () -> 
         Icon(icon, contentDescription = null, tint = SwipeHomeTheme.colors.neutral)
         Spacer(modifier = Modifier.width(6.dp))
         Text(text, style = SwipeHomeTheme.typography.caption, color = SwipeHomeTheme.colors.neutral)
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ParkingDropdownMenu(
+    selectedParkingType: ParkingType,
+    onSelectedParking: (ParkingType) -> Unit,
+    modifier: Modifier = Modifier
+){
+    var expanded by remember { mutableStateOf(false) }
+
+    ExposedDropdownMenuBox(
+        expanded = expanded,
+        onExpandedChange = { expanded = it },
+        modifier = modifier
+    ) {
+        // Текстове поле
+        OutlinedTextField(
+            value = stringResource(selectedParkingType.resource),
+            onValueChange = {},
+            shape = SwipeHomeTheme.shapes.mediumShape,
+            readOnly = true,
+            trailingIcon = { Icon(painterResource(Res.drawable.ic_arrow_single_down), contentDescription = null)},
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedBorderColor = SwipeHomeTheme.colors.primary,
+                unfocusedBorderColor = SwipeHomeTheme.colors.neutral
+            ),
+            modifier = Modifier.fillMaxWidth().menuAnchor(),
+        )
+
+        // Випадне меню
+        ExposedDropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false }
+        ){
+            //
+            ParkingType.entries.forEach { parking ->
+                DropdownMenuItem(
+                    text = {
+                        Text(stringResource(parking.resource))
+                    },
+                    onClick = {
+                        onSelectedParking(parking)
+                        expanded = false
+                    },
+                    contentPadding = ExposedDropdownMenuDefaults.ItemContentPadding
+                )
+            }
+        }
     }
 }
 

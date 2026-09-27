@@ -3,6 +3,7 @@ package com.nazar_protasov.swipehome.data.local.entity
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.nazar_protasov.swipehome.ui.screens.settings.listing.components.ListingStatus
+import com.nazar_protasov.swipehome.ui.screens.settings.listing.createListing.components.ParkingType
 import com.nazar_protasov.swipehome.ui.screens.settings.listing.createListing.components.PropertyType
 import com.nazar_protasov.swipehome.ui.screens.settings.listing.createListing.components.VerificationMethods
 import kotlinx.serialization.Serializable
@@ -27,7 +28,7 @@ data class MyListingEntity(
     val propertyType: PropertyType,
 
     val allowedPets: Boolean,
-    val isParking: Boolean,
+    val parkingType: ParkingType,
     val isFurnished: Boolean,
     val isBalcony: Boolean,
     val isCondition: Boolean,

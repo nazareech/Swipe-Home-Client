@@ -17,6 +17,8 @@ import io.ktor.http.contentType
 import io.ktor.http.isSuccess
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.encodeToString
+import kotlinx.serialization.json.Json
 
 @Serializable
 data class PropertyResponseDTO(
@@ -110,7 +112,7 @@ fun PropertyDTO.toUIDetailsProperty(): PropertyDetails {
 
 class PropertyApiService(private val client: io.ktor.client.HttpClient){
     companion object {
-        const val BASE_URL = "http://192.168.1.2:8080"
+        const val BASE_URL = "http://192.168.1.5:8080"
     }
 
     suspend fun fetchProperties(
@@ -138,12 +140,33 @@ class PropertyApiService(private val client: io.ktor.client.HttpClient){
         }
     }
 
-    suspend fun createProperty(request: CreatePropertyRequest, token: String): String? {
+    suspend fun createProperty(request: CreatePropertyRequest, photoPaths: List<String>, token: String): String? {
         return try {
            val response = client.post("${BASE_URL}/properties/create"){
                header("Authorization", "Bearer $token")
-               contentType(ContentType.Application.Json)
-               setBody(request)
+
+                // Створюємо Multipart форму
+                setBody(MultiPartFormDataContent(formData{
+
+                    // Кодуємо об'єкт у JSON і кладемо його як текстове поле
+                    val jsonString = Json.encodeToString(request)
+                    append("property_data", jsonString)
+
+                    // Якщо є фото, відправляємо, що перше - головне
+                    if (photoPaths.isNotEmpty()) {
+                        append("is_main", "true")
+                    }
+
+                    // Додаємо файли
+                    photoPaths.forEachIndexed { index, path ->
+                        val imagesBytes = readBytesFromCache(path)
+                        append("is_main", imagesBytes, Headers.build {
+                            append(HttpHeaders.ContentType, "image/jpeg")
+                            append(HttpHeaders.ContentDisposition, "form-data; name=\"image\"; filename=\"photo_$index.jpg\"")
+                        })
+                    }
+                })
+                )
            }
 
             if(response.status.isSuccess()) {

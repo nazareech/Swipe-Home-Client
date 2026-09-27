@@ -13,6 +13,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
+import cafe.adriel.voyager.koin.koinScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.nazar_protasov.swipehome.ui.screens.settings.analystics.AnalyticsScreen
@@ -31,6 +32,7 @@ class MyListingsScreen : Screen {
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
         val screenModel: MyListingsScreenModel = koinInject()
+        val screenModelListing = koinScreenModel<CreateListingScreenModel>()
 
         // Підписуємося на нашу базу даних
         val listingsData by screenModel.myListingProperties.collectAsState(initial = emptyList())
@@ -64,7 +66,6 @@ class MyListingsScreen : Screen {
                         } else {
                             AnalyticsScreen(cardId = data.localId)
                         }
-                        /*TODO: Передавання для відображення статистики даного оголошення */
                     )
                 }
             )
@@ -91,6 +92,17 @@ class MyListingsScreen : Screen {
                         onEditClick = {
                             navigator.push(
                                 CreateListingScreen(draftId = listing.id)
+                            )
+                        },
+                        onAnalyticClick = {
+                            navigator.push(
+                                AnalyticsScreen(cardId = listing.id)
+                            )
+                        },
+                        onDeleteClick = {
+                            screenModelListing.deleteDraft(
+                                id = listing.id,
+                                onSuccess = {/*TODO: Зробити спиливаюче сповіщення TOST з інформацією про видалення*/}
                             )
                         }
                     )

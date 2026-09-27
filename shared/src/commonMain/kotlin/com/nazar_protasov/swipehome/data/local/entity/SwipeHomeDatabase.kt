@@ -13,7 +13,7 @@ import androidx.room.TypeConverters
         MyListingEntity::class,
         SwipeEntity::class
        ],
-    version = 5,
+    version = 1,
     exportSchema = false
 )
 @TypeConverters(SwipeHomeTypeConverters::class)
