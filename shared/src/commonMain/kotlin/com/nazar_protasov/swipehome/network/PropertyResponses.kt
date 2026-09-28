@@ -6,7 +6,8 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class CreatePropertyResponse(
     val message: String,
-    val idProperty: String? = null
+    val idProperty: String? = null,
+    val images: List<String> = emptyList()
 )
 
 // Модель відповіді при завантаженні фото

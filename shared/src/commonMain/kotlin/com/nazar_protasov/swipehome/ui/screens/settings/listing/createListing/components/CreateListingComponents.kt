@@ -99,15 +99,18 @@ import mymultiplatformproject.shared.generated.resources.parking_state_garage
 import mymultiplatformproject.shared.generated.resources.parking_state_none
 import mymultiplatformproject.shared.generated.resources.parking_state_parking
 import mymultiplatformproject.shared.generated.resources.parking_state_protected
+import mymultiplatformproject.shared.generated.resources.property_type_apartment
+import mymultiplatformproject.shared.generated.resources.property_type_house
+import mymultiplatformproject.shared.generated.resources.property_type_studio
 import org.jetbrains.compose.resources.StringResource
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 
 
-enum class PropertyType{
-    APARTMENT,
-    HOUSE,
-    STUDIO
+enum class PropertyType(key: String, val resource: StringResource){
+    APARTMENT("APARTMENT", string.property_type_apartment),
+    HOUSE("HOUSE", string.property_type_house),
+    STUDIO("STUDIO", string.property_type_studio)
 }
 enum class VerificationMethods{
     DIIA,
@@ -472,11 +475,16 @@ fun Step2Details(
         Spacer(modifier = Modifier.height(12.dp))
         Row(horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()){
             Text("Заголовок оголошення", style = SwipeHomeTheme.typography.label, fontWeight = FontWeight.Bold)
+            Text("${title.length} / 100 символів", style = SwipeHomeTheme.typography.caption,
+                color = if(title.length > 100) SwipeHomeTheme.colors.error else SwipeHomeTheme.colors.neutral
+            )
         }
         Spacer(modifier = Modifier.height(8.dp))
         OutlinedTextField(
             value = title,
-            onValueChange = onTitleChange,
+            onValueChange = { newValue ->
+                if(newValue.length <= 100) onTitleChange(newValue)
+            },
             placeholder = { Text("Коротко характеризуйте помешкання", color = SwipeHomeTheme.colors.onSurfaceSecondary) },
             modifier = Modifier.fillMaxWidth(),
             shape = SwipeHomeTheme.shapes.mediumShape,
@@ -486,12 +494,14 @@ fun Step2Details(
         Spacer(modifier = Modifier.height(12.dp))
         Row(horizontalArrangement = Arrangement.SpaceBetween, modifier = Modifier.fillMaxWidth()){
             Text("Опис оголошення", style = SwipeHomeTheme.typography.label, fontWeight = FontWeight.Bold)
-            Text("${description.length} / 1000 символів", style = SwipeHomeTheme.typography.caption, color = SwipeHomeTheme.colors.neutral)
+            Text("${description.length} / 1000 символів", style = SwipeHomeTheme.typography.caption, color = if(title.length > 100) SwipeHomeTheme.colors.error else SwipeHomeTheme.colors.neutral)
         }
         Spacer(modifier = Modifier.height(8.dp))
         OutlinedTextField(
             value = description,
-            onValueChange = onDescriptionChange,
+            onValueChange = { newValue ->
+                if(newValue.length <= 1000) onDescriptionChange(newValue)
+            },
             placeholder = { Text("Опишіть особливості квартири (наприклад перша здача після авторського ремонту...", color = SwipeHomeTheme.colors.onSurfaceSecondary) },
             modifier = Modifier.fillMaxWidth().height(120.dp),
             shape = SwipeHomeTheme.shapes.mediumShape,

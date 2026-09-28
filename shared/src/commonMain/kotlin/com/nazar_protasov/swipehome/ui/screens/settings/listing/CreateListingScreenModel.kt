@@ -31,6 +31,7 @@ class CreateListingScreenModel(
 ): ScreenModel {
     // ID чернетки, якщо ми редагуємо існуючу, або null, якщо це нове оголошення
     var listingId by mutableStateOf<String?>(null)
+    var serverId by mutableStateOf<String?>(null)
 
     var currentStep by mutableStateOf(1)
     val totalSteps = 4
@@ -74,6 +75,7 @@ class CreateListingScreenModel(
 
             if (draft != null){
                 this@CreateListingScreenModel.listingId = draft.localId
+                this@CreateListingScreenModel.serverId = draft.serverId
                 this@CreateListingScreenModel.selectedType = draft.propertyType
                 this@CreateListingScreenModel.address = draft.address
                 this@CreateListingScreenModel.area = draft.area
@@ -97,7 +99,11 @@ class CreateListingScreenModel(
                 // Розпаковуємо рядок фотографій назад у список
                 this@CreateListingScreenModel.uploadedPhotos.clear()
                 if(draft.photosUris.isNotBlank()){
-                    this@CreateListingScreenModel.uploadedPhotos.addAll(draft.photosUris.split(","))
+                    val photos = draft.photosUris.split(",").map { path ->
+                        if (path.startsWith("http") || path.startsWith("file://")) path
+                        else "${PropertyApiService.BASE_URL}/uploads/$path"
+                    }
+                    this@CreateListingScreenModel.uploadedPhotos.addAll(photos)
                 }
 
                 // Можна додати логіку визначення CurrentStep
@@ -134,6 +140,7 @@ class CreateListingScreenModel(
         // Пакуємо всі наші стани в Entity
         val myListingEntity = MyListingEntity(
             localId = currentDraftId,
+            serverId = this@CreateListingScreenModel.serverId,
             listingStatus = ListingStatus.DRAFT,
 
             title = title,
@@ -193,26 +200,21 @@ class CreateListingScreenModel(
                 // Зберігаємо всі введені дані локально востаннє (щоб нічого не загубилось)
                 saveDraftInternal()
 
-                // Мапимо Enum типу нерухомості у строки для сервера
-                val categoryString = when (selectedType) {
-                    PropertyType.APARTMENT -> "APARTMENT"
-                    PropertyType.HOUSE -> "HOUSE"
-                    PropertyType.STUDIO -> "STUDIO"
-                }
+                // Відділяємо старі (вже на сервері) фотографії
+                val existingPhotosOnServer = uploadedPhotos.filter { it.startsWith("http") }
+                    .map { it.substringAfter("/uploads/") } // Передаємо бекенду тільки відносні шляхи
 
-                //
-
-
-                //
+                // Готуємо дані для відправки на сервер
                 val request = CreatePropertyRequest(
+                    idProperty = this@CreateListingScreenModel.serverId,
                     title = title.ifBlank { "Нове оголошення" },
                     description = description.ifBlank { "Опис відсутній" },
-                    photosList = uploadedPhotos,
+                    photosList = existingPhotosOnServer,
                     localization = address,
                     price = price.toDoubleOrNull() ?: 0.0,
                     area = area.toDoubleOrNull() ?: 0.0,
                     rooms = countBedrooms,
-                    category = categoryString,
+                    category = selectedType.name,
                     subcategory = "RENT",
                     parkingType = parkingType.code,
                     petsAllowed = allowedPets,
@@ -222,72 +224,68 @@ class CreateListingScreenModel(
                     status = "MODERATION"
                 )
 
-                // Відправляємо Оголошення (Отримуємо ID від сервера)
-                val createdPropertyId = withTimeoutOrNull(30.seconds) {
+                println("ВІДПРАВКА НА СЕРВЕР: idProperty = ${request.idProperty}")
+
+                // Відправляємо Оголошення (Отримуємо об'єкт відповіді від сервера)
+                val serverResponse = withTimeoutOrNull(30.seconds) {
                     apiService.createProperty(request, uploadedPhotos, userToken)
                 }
 
-                if (createdPropertyId != null) {
-                    // Відправляємо фотографії, якщо вони є
-                    var imagesUploadSuccess = true
-                    if (uploadedPhotos.isNotEmpty()) {
-                        imagesUploadSuccess = withTimeoutOrNull(30.seconds) {
-                            apiService.uploadImage(
-                                propertyId = createdPropertyId,
-                                photoPaths =  uploadedPhotos,
-                                token = userToken
-                            )
-                        } ?: false // Якщо тайм-аут, вважаємо, що завантаження не вдалося
-                    }
-                    if (imagesUploadSuccess) {
-                        // Отримуємо поточний
-                        val currentId = listingId ?: return@launch
-                        // Створюємо локальну аналітику, якщо сервер прийняв оголошення
-                        val myListingEntity = MyListingEntity(
-                            localId = currentId,
-                            serverId = createdPropertyId,
-                            listingStatus = ListingStatus.MODERATION,
+                if (serverResponse != null && serverResponse.idProperty != null) {
+                    // Отримуємо поточний
+                    val currentId = listingId ?: return@launch
 
-                            title = title,
-                            description = description,
-                            address = address,
-                            area = area,
-                            price = price,
-                            bedrooms = countBedrooms,
-                            bathrooms = countBathrooms,
-                            floorNumber = floorNumber,
-                            propertyType = selectedType,
+                    this@CreateListingScreenModel.serverId = serverResponse.idProperty
+                    // Створюємо локальну аналітику, якщо сервер прийняв оголошення
+                    val myListingEntity = MyListingEntity(
+                        localId = currentId,
+                        serverId = serverResponse.idProperty, // записуємо той самий ID, що отримали з сервера
+                        listingStatus = ListingStatus.MODERATION,
 
-                            allowedPets = allowedPets,
-                            parkingType = parkingType,
-                            isFurnished = isFurnished,
-                            isBalcony = isBalcony,
-                            isCondition = isCondition,
-                            gymIsSelect = gymIsSelect,
-                            poolIsSelect = poolIsSelect,
-                            elevatorIsSelect = elevatorIsSelect,
-                            securityIsSelect = securityIsSelect,
-                            verificationMethod = verificationMethod,
-                            photosUris = uploadedPhotos.joinToString(","),
+                        title = title,
+                        description = description,
+                        address = address,
+                        area = area,
+                        price = price,
+                        bedrooms = countBedrooms,
+                        bathrooms = countBathrooms,
+                        floorNumber = floorNumber,
+                        propertyType = selectedType,
 
-                            likesNumber = 0,
-                            viewsNumber = 0,
-                            rejectsNumber = 0,
-                            goToContactsNumber = 0,
-                            createAt = Clock.System.now().toString(),
-                            updateAt = Clock.System.now().toString()
-                        )
-                        dao.saveListing(myListingEntity)
+                        allowedPets = allowedPets,
+                        parkingType = parkingType,
+                        isFurnished = isFurnished,
+                        isBalcony = isBalcony,
+                        isCondition = isCondition,
+                        gymIsSelect = gymIsSelect,
+                        poolIsSelect = poolIsSelect,
+                        elevatorIsSelect = elevatorIsSelect,
+                        securityIsSelect = securityIsSelect,
+                        verificationMethod = verificationMethod,
+                        
+                        // Записуємо нові шляхи від сервера, якщо вони є. Інакше залишаємо локальні
+                        photosUris = if (serverResponse.images.isNotEmpty()) {
+                            serverResponse.images.joinToString(",") { "${PropertyApiService.BASE_URL}/uploads/$it" }
+                        } else {
+                            uploadedPhotos.joinToString(",")
+                        },
 
-                        println("Оголошення створено та фото створено і відправлено на модерацію")
-                        _snackbarEvent.send("Оголошення створено та фото створено і відправлено на модерацію")
-                        onSuccess()
+                        likesNumber = 0,
+                        viewsNumber = 0,
+                        rejectsNumber = 0,
+                        goToContactsNumber = 0,
+                        createAt = Clock.System.now().toString(),
+                        updateAt = Clock.System.now().toString()
+                    )
+                    dao.saveListing(myListingEntity)
 
-                    }else{
-                        _snackbarEvent.send("Оголошення створено, але не вдалося завантажити фото. Спробуйте пізніше.")
-                    }
+                    println(serverResponse.message)
+                    println(serverResponse.images)
+                    _snackbarEvent.send(serverResponse.message)
+                    onSuccess()
+
                 } else {
-                    _snackbarEvent.send("Сервер не відповідає. Перевірте з'єднання та спробуйте ще раз")
+                    _snackbarEvent.send("Сервер не відповідає або сталася помилка. Спробуйте ще раз.")
                 }
             } catch (e: Exception) {
                 println("Помилка мережі: ${e.message}")

@@ -16,6 +16,7 @@ import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.koin.koinScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import com.nazar_protasov.swipehome.network.PropertyApiService
 import com.nazar_protasov.swipehome.ui.screens.settings.analystics.AnalyticsScreen
 import com.nazar_protasov.swipehome.ui.screens.settings.listing.components.ListingCard
 import com.nazar_protasov.swipehome.ui.screens.settings.listing.components.ListingItem
@@ -40,7 +41,13 @@ class MyListingsScreen : Screen {
         // Мапимо дані з ДБ у формат для карток
         val listings = listingsData.map { data ->
 
-            val photosList = if (data.photosUris.isNotBlank()) data.photosUris.split(",") else emptyList()
+            val photosList = if (data.photosUris.isNotBlank()) {
+                data.photosUris.split(",").map { path ->
+                    if (path.startsWith("http") || path.startsWith("file://")) path
+                    else "${PropertyApiService.BASE_URL}/uploads/$path"
+                }
+            } else emptyList()
+            
             val displayTitle = when {
                 data.title.isNotBlank() && data.listingStatus == ListingStatus.DRAFT -> "Чернетка: ${data.title}"
                 data.title.isNotBlank() -> data.title

@@ -15,8 +15,8 @@ data class Property(
 )
 
 data class PropertyDetails(
-    val id_property: Int? = null,
-    val id_owner: Int,
+    val idProperty: Int? = null,
+    val idOwner: Int,
     val title: String,
     val description: String,
     val localization: String,
@@ -26,11 +26,11 @@ data class PropertyDetails(
     val category: String,
     @SerialName("subcategory") val subCategory: String,
     val parking: String,
-    val pets_allowed: Boolean,
+    val petsAllowed: Boolean,
     val elevator: Boolean,
     val furniture: Boolean,
-    val building_type: String,
+    val buildingType: String,
     val status: String,
     val imagesUrl: List<String>? = null,
-    val creates_at: String? = null
+    val createsAt: String? = null
 )

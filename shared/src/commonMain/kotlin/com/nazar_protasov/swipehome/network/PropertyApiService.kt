@@ -54,7 +54,7 @@ fun PropertyDTO.toUIProperty(): Property {
 
     val imageUrls = if (rawImages.isNotEmpty()) {
         // Додаємо /uploads/, оскільки сервер зазвичай віддає статику за цим префіксом
-        rawImages.map{ "${PropertyApiService.BASE_URL}/uploads$it" }
+        rawImages.map{ "${PropertyApiService.BASE_URL}/uploads/$it" }
     } else {
         listOf("${PropertyApiService.BASE_URL}/uploads/") // Заглушка якщо фото немає
     }
@@ -79,9 +79,9 @@ fun PropertyDTO.toUIDetailsProperty(): PropertyDetails {
 
     val imageUrls = if (rawImages.isNotEmpty()) {
         // Додаємо /uploads/, оскільки сервер зазвичай віддає статику за цим префіксом
-        rawImages.map{ "${PropertyApiService.BASE_URL}/uploads$it" }
+        rawImages.map{ "${PropertyApiService.BASE_URL}/uploads/$it" }
     } else {
-        listOf("${PropertyApiService.BASE_URL}/uploads/") // Заглушка якщо фото немає
+        listOf("${PropertyApiService.BASE_URL}/uploads/photo_not_found.jpg") // Заглушка якщо фото немає
     }
 
     val formattedPrice = "$${this.price}"
@@ -89,8 +89,8 @@ fun PropertyDTO.toUIDetailsProperty(): PropertyDetails {
     val formatedCreatedAt = this.createsAt?.split("T")?.get(0) ?: ""
 
     return PropertyDetails(
-        id_property = this.idProperty ?: 0,
-        id_owner = this.idOwner,
+        idProperty = this.idProperty ?: 0,
+        idOwner = this.idOwner,
         title = this.title,
         description = this.description,
         localization = this.localization,
@@ -100,13 +100,13 @@ fun PropertyDTO.toUIDetailsProperty(): PropertyDetails {
         category = this.category,
         subCategory = this.subCategory,
         parking = this.parking,
-        pets_allowed = this.petsAllowed,
+        petsAllowed = this.petsAllowed,
         elevator = this.elevator,
         furniture = this.furniture,
-        building_type = this.buildingType,
+        buildingType = this.buildingType,
         status = this.status,
         imagesUrl = imageUrls,
-        creates_at = formatedCreatedAt
+        createsAt = formatedCreatedAt
     )
 }
 
@@ -140,7 +140,7 @@ class PropertyApiService(private val client: io.ktor.client.HttpClient){
         }
     }
 
-    suspend fun createProperty(request: CreatePropertyRequest, photoPaths: List<String>, token: String): String? {
+    suspend fun createProperty(request: CreatePropertyRequest, photoPaths: List<String>, token: String): CreatePropertyResponse? {
         return try {
            val response = client.post("${BASE_URL}/properties/create"){
                header("Authorization", "Bearer $token")
@@ -157,21 +157,23 @@ class PropertyApiService(private val client: io.ktor.client.HttpClient){
                         append("is_main", "true")
                     }
 
-                    // Додаємо файли
+                    // Додаємо файли (тільки нові локальні фотографії)
                     photoPaths.forEachIndexed { index, path ->
-                        val imagesBytes = readBytesFromCache(path)
-                        append("is_main", imagesBytes, Headers.build {
-                            append(HttpHeaders.ContentType, "image/jpeg")
-                            append(HttpHeaders.ContentDisposition, "form-data; name=\"image\"; filename=\"photo_$index.jpg\"")
-                        })
+                        // Відфільтровуємо шляхи, які вже є URL-адресами з сервера
+                        if (!path.startsWith("http")) {
+                            val imagesBytes = readBytesFromCache(path)
+                            append("image", imagesBytes, Headers.build {
+                                append(HttpHeaders.ContentType, "image/jpeg")
+                                append(HttpHeaders.ContentDisposition, "form-data; name=\"image\"; filename=\"photo_$index.jpg\"")
+                            })
+                        }
                     }
                 })
                 )
            }
 
             if(response.status.isSuccess()) {
-                val responseBody = response.body<CreatePropertyResponse>()
-                responseBody.idProperty
+                response.body<CreatePropertyResponse>()
             }else{
                 val errorBody = response.body<String>()
                 println("Помилка відправки оголошення: ${response.status} - $errorBody")

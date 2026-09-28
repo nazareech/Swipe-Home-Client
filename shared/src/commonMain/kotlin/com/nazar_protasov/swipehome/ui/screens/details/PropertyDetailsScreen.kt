@@ -310,7 +310,7 @@ data class PropertyDetailsScreen(val property: PropertyDetails) : Screen {
                                 .padding(horizontal = 12.dp, vertical = 6.dp)
                         ) {
                             Text(
-                                property.building_type,
+                                property.buildingType,
                                 color = SwipeHomeTheme.colors.primary,
                                 style = SwipeHomeTheme.typography.caption,
                                 fontWeight = FontWeight.Bold

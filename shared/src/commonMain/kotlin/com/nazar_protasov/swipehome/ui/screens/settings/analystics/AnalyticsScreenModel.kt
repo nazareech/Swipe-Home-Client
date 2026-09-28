@@ -9,6 +9,7 @@ import com.nazar_protasov.swipehome.data.local.entity.SwipeHomeDao
 import com.nazar_protasov.swipehome.ui.screens.settings.listing.components.ListingStatus
 import cafe.adriel.voyager.core.model.screenModelScope
 import com.nazar_protasov.swipehome.data.local.entity.MyListingEntity
+import com.nazar_protasov.swipehome.network.PropertyApiService
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
@@ -47,7 +48,11 @@ class AnalyticsScreenModel(
                 // Розпаковуємо рядок фотографій назад у список
                 this@AnalyticsScreenModel.uploadedPhotos.clear()
                 if (data.photosUris.isNotBlank()){
-                    this@AnalyticsScreenModel.uploadedPhotos.addAll(data.photosUris.split(","))
+                    val photos = data.photosUris.split(",").map { path ->
+                        if (path.startsWith("http") || path.startsWith("file://")) path
+                        else "${PropertyApiService.BASE_URL}/uploads/$path"
+                    }
+                    this@AnalyticsScreenModel.uploadedPhotos.addAll(photos)
                 }
 
                 this@AnalyticsScreenModel.likesNumber = data.likesNumber

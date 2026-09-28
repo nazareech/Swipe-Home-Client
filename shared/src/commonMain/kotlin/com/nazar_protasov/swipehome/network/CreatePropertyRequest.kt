@@ -4,6 +4,7 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class CreatePropertyRequest(
+    val idProperty: String? = null,
     val title: String,
     val description: String,
     val photosList: List<String>,

@@ -19,6 +19,11 @@
     <string name="parking_state_none">Немає</string>
     <string name="parking_state_protected">Під охороною</string>
 
+    <!-- Стани для оренди -->
+    <string name="property_type_apartment">Квартира</string>
+    <string name="property_type_house">Будинок</string>
+    <string name="property_type_studio">Студія</string>
+
     <!--    Екран Онбординг-->
     <string name="onboarding_title_1">Свайпни вправо, щоб зберегти\nбудинок своєї мрії</string>
     <string name="onboarding_description_1">Легко переглядайте підібрані об’єкти нерухомості. Сподобалося? Проведіть пальцем вправо, щоб додати його до обраного.</string>
