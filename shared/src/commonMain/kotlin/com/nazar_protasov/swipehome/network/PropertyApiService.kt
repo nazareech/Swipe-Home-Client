@@ -5,6 +5,7 @@ import com.nazar_protasov.swipehome.ui.models.Property
 import com.nazar_protasov.swipehome.ui.models.PropertyDetails
 import com.nazar_protasov.swipehome.ui.utils.readBytesFromCache
 import io.ktor.client.call.body
+import io.ktor.client.request.delete
 import io.ktor.client.request.forms.MultiPartFormDataContent
 import io.ktor.client.request.forms.formData
 import io.ktor.client.request.header
@@ -47,6 +48,10 @@ data class PropertyDTO(
     @SerialName("creates_at") val createsAt: String? = null
 )
 
+@Serializable
+data class MessageResponse(
+    val message: String
+)
 // Функція-розширення для мапінгу
 fun PropertyDTO.toUIProperty(): Property {
     // Формуємо повний URL для зображення
@@ -185,6 +190,29 @@ class PropertyApiService(private val client: io.ktor.client.HttpClient){
         }
     }
 
+    suspend fun deleteProperty(idProperty: String, token: String): String? {
+        return try {
+            val url = "${BASE_URL}/properties/${idProperty}"
+            println("Спроба видалення оголошення. URL: $url")
+            val response = client.delete(url) {
+                header("Authorization", "Bearer $token")
+            }
+
+            println("Відповідь сервера при видаленні: ${response.status}")
+            if(response.status.isSuccess()) {
+                val text = response.body<String>() // Читаємо відповідь як текст, щоб уникнути помилки парсингу (вічного null)
+                // Якщо сервер повертає JSON, спробуємо знайти в ньому повідомлення вручну, або просто повернемо весь текст
+                text
+            } else {
+                val errorBody = response.body<String>()
+                println("Помилка видалення оголошення: ${response.status} - $errorBody")
+                null
+            }
+        } catch (e: Exception) {
+            println("Error deleting property: ${e.message}")
+            null
+        }
+    }
     suspend fun uploadImage(propertyId: String, photoPaths: List<String>,  token: String): Boolean {
         return try {
             val response = client.post("${BASE_URL}/properties/images/upload") {

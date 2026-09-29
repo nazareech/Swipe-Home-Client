@@ -107,8 +107,8 @@ class MyListingsScreen : Screen {
                             )
                         },
                         onDeleteClick = {
-                            screenModelListing.deleteDraft(
-                                id = listing.id,
+                            screenModelListing.deleteListing(
+                                targetListingId = listing.id,
                                 onSuccess = {/*TODO: Зробити спиливаюче сповіщення TOST з інформацією про видалення*/}
                             )
                         }

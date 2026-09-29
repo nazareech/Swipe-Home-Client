@@ -120,14 +120,6 @@ class CreateListingScreenModel(
         }
     }
 
-    // Видалення чернетки (кнопка "Видалити" в TopBar)
-    fun deleteDraft(id: String, onSuccess: () -> Unit){
-        screenModelScope.launch {
-            dao.deleteCardById(id)
-            onSuccess()
-        }
-    }
-
     // Внутрішня функція, яка гарантує що код виконається і дочекається результату
     private suspend fun saveDraftInternal(){
         // Якщо це нова чернетка, генеруємо ID. Якщо вже редагуємо - залишаємо старий.
@@ -292,6 +284,65 @@ class CreateListingScreenModel(
                 _snackbarEvent.send("Помилка з'єднання: ${e.getLocalizedMessage()}")
             } finally {
                 isLoading = false
+            }
+        }
+    }
+
+    // Видалення чернетки (кнопка "Видалити" в TopBar)
+    fun deleteListing(targetListingId: String? = null, onSuccess: () -> Unit) {
+        // Якщо вже відправляється запит, повертаємось
+        if (isLoading) return
+
+        screenModelScope.launch {
+            isLoading = true
+            try {
+                println("Починаємо видалення. targetListingId = $targetListingId, поточний listingId = $listingId")
+                
+                // Визначаємо, який ID видаляти: той що передали (зі списку), або поточний відкритий
+                val idToDelete = targetListingId ?: listingId 
+                if (idToDelete == null) {
+                    println("Немає ID для видалення!")
+                    return@launch
+                }
+
+                // Дістаємо картку з бази, щоб знати її serverId
+                val card = dao.getCardById(idToDelete) 
+                if (card == null) {
+                    println("Картку з ID $idToDelete не знайдено в локальній базі!")
+                    return@launch
+                }
+                
+                val serverIdToDelete = card.serverId
+                println("serverIdToDelete = $serverIdToDelete")
+
+                if(serverIdToDelete.isNullOrBlank()) {
+                    dao.deleteCardById(id = idToDelete)
+                    _snackbarEvent.send("Чернетку успішно видалено.")
+                } else {
+                    /*TODO: Зробити токен у вигляді змінної*/
+                    val userToken = "d0d20eeb-2c54-4363-9b7b-0631ae0f9892"
+
+                    println("Відправляємо запит на сервер для видалення ID $serverIdToDelete")
+                    // Відправляємо Запит видалення (Отримуємо об'єкт відповіді від сервера)
+                    val serverResponse = withTimeoutOrNull(30.seconds) {
+                        apiService.deleteProperty(serverIdToDelete, userToken)
+                    }
+                    if (serverResponse != null) {
+                        println("Відповідь сервера: $serverResponse")
+                        // Видаляємо локально, бо сервер успішно видалив (або змінив статус)
+                        dao.deleteCardById(id = idToDelete)
+                        _snackbarEvent.send("Успішно видалено: $serverResponse")
+                    } else {
+                        println("Відповідь сервера null (помилка або таймаут)")
+                        _snackbarEvent.send("Помилка при видаленні з сервера.")
+                    }
+                }
+            } catch (e: Exception) {
+                println("Помилка мережі при видаленні: ${e.message}")
+                _snackbarEvent.send("Помилка з'єднання: ${e.getLocalizedMessage()}")
+            } finally {
+                isLoading = false
+                onSuccess()
             }
         }
     }
