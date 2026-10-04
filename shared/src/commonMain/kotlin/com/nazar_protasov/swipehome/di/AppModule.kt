@@ -45,6 +45,6 @@ val appModule: Module = module {
     single { HomeScreenModel(get()) }
     factory { SearchHubScreenModel() }
     factory { CreateListingScreenModel(get(), get()) }
-    factory { MyListingsScreenModel(get()) }
+    factory { MyListingsScreenModel(get(), get()) }
     factory { AnalyticsScreenModel(get()) }
 }

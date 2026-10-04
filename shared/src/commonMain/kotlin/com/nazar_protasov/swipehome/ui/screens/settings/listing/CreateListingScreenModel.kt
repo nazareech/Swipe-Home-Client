@@ -223,7 +223,7 @@ class CreateListingScreenModel(
                     apiService.createProperty(request, uploadedPhotos, userToken)
                 }
 
-                if (serverResponse != null && serverResponse.idProperty != null) {
+                if (serverResponse?.idProperty != null) {
                     // Отримуємо поточний
                     val currentId = listingId ?: return@launch
 

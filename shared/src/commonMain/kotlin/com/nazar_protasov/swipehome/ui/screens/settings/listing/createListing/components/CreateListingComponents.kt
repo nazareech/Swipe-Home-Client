@@ -392,7 +392,6 @@ fun CustomInputField(label: String, value: String, onValueChange: (String) -> Un
 }
 
 // --- ДЕТАЛІ ТА ОСОБЛИВОСТІ
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun Step2Details(
     title: String, onTitleChange: (String) -> Unit,

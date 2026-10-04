@@ -15,8 +15,8 @@ data class Property(
 )
 
 data class PropertyDetails(
-    val idProperty: Int? = null,
-    val idOwner: Int,
+    val idProperty: String? = null,
+    val idOwner: String,
     val title: String,
     val description: String,
     val localization: String,

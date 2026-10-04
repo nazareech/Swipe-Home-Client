@@ -8,6 +8,7 @@ import io.ktor.client.call.body
 import io.ktor.client.request.delete
 import io.ktor.client.request.forms.MultiPartFormDataContent
 import io.ktor.client.request.forms.formData
+import io.ktor.client.request.get
 import io.ktor.client.request.header
 import io.ktor.client.request.post
 import io.ktor.client.request.setBody
@@ -20,6 +21,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import mymultiplatformproject.shared.generated.resources.Res
 
 @Serializable
 data class PropertyResponseDTO(
@@ -28,8 +30,8 @@ data class PropertyResponseDTO(
 
 @Serializable
 data class PropertyDTO(
-    val idProperty: Int? = null,
-    val idOwner: Int,
+    val idProperty: String? = null,
+    val idOwner: String,
     val title: String,
     val description: String,
     val localization: String,
@@ -94,8 +96,8 @@ fun PropertyDTO.toUIDetailsProperty(): PropertyDetails {
     val formatedCreatedAt = this.createsAt?.split("T")?.get(0) ?: ""
 
     return PropertyDetails(
-        idProperty = this.idProperty ?: 0,
-        idOwner = this.idOwner,
+        idProperty = this.idProperty?.toString() ?: "",
+        idOwner = this.idOwner.toString(),
         title = this.title,
         description = this.description,
         localization = this.localization,
@@ -135,6 +137,24 @@ class PropertyApiService(private val client: io.ktor.client.HttpClient){
 
                 // Передаємо тіло запиту (DTO автоматично конвертується на JSON)
                 setBody(filterRequest)
+            }.body()
+
+            // Повертаємо список DTO як є
+            response.properties
+        } catch (e: Exception) {
+            println("Error fetching properties: ${e.message}")
+            emptyList() // Повертаємо пустий список у разі помилки
+        }
+    }
+
+    suspend fun fetchOwnProperties(
+        token: String
+    ): List<PropertyDTO> {
+        return try {
+            // Робимо GET-запит на бекенд
+            val response: PropertyResponseDTO = client.get("${BASE_URL}/own/properties"){
+                // Додаємо Authorization заголовок
+                header("Authorization", "Bearer $token")
             }.body()
 
             // Повертаємо список DTO як є
