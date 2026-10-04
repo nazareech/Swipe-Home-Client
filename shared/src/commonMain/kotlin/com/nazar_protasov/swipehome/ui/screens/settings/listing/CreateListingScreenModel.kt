@@ -20,9 +20,8 @@ import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeoutOrNull
 import kotlin.random.Random
-import kotlin.time.Clock
+import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
-import kotlin.time.ExperimentalTime
 import kotlin.time.TimeSource
 
 class CreateListingScreenModel(
@@ -68,11 +67,13 @@ class CreateListingScreenModel(
     var isLoading by mutableStateOf(false)
     private set // UI може читати, але не змінювати
 
+    /*TODO: Зробити завантаження токену */
+    val userToken = "d0d20eeb-2c54-4363-9b7b-0631ae0f9892"
+
     // Завантаження існуючої чернетки
     fun loadDraft(draftId: String) {
         screenModelScope.launch {
             val draft = dao.getCardById(draftId)
-
             if (draft != null){
                 this@CreateListingScreenModel.listingId = draft.localId
                 this@CreateListingScreenModel.serverId = draft.serverId
@@ -105,35 +106,90 @@ class CreateListingScreenModel(
                     }
                     this@CreateListingScreenModel.uploadedPhotos.addAll(photos)
                 }
-
                 // Можна додати логіку визначення CurrentStep
                 // На основі того, які дані вже заповнені
             }
         }
     }
 
-    // Збереження чернетки (кнопка "Зберегти" в TopBar)
-    fun saveDraft(onSuccess: () -> Unit){
-        screenModelScope.launch {
-            saveDraftInternal()
-            onSuccess()
+    // Універсальна функція для синхронізації
+    private suspend fun syncWithServer(
+        targetStatus: ListingStatus,
+        timeoutSeconds: Int
+    ) : Boolean {
+        return try {
+            // Відділяємо старі (вже на сервері) фотографії
+            val existingPhotosOnServer = uploadedPhotos
+                .filter { it.startsWith("http") }
+                .map { it.substringAfter("/uploads/") } // Передаємо бекенду тільки відносні шляхи
+
+            // Готуємо дані для відправки на сервер
+            val request = CreatePropertyRequest(
+                idProperty = this@CreateListingScreenModel.serverId,
+                title = title.ifBlank { if (targetStatus == ListingStatus.DRAFT) "Чернетка" else "Нове оголошення" },
+                description = description.ifBlank { if (targetStatus == ListingStatus.DRAFT) "" else "Опис відсутній" },
+                photosList = existingPhotosOnServer,
+                localization = address,
+                price = price.toDoubleOrNull() ?: 0.0,
+                area = area.toDoubleOrNull() ?: 0.0,
+                rooms = countBedrooms,
+                category = selectedType.name,
+                subcategory = "RENT", // TODO: Додати у меню створення оголошення
+                parkingType = parkingType.code,
+                petsAllowed = allowedPets,
+                elevator = elevatorIsSelect,
+                furniture = isFurnished,
+                buildingType = "APARTMENT", // TODO: Додати у меню створення оголошення
+                status = targetStatus.name
+            )
+
+            println("ВІДПРАВКА НА СЕРВЕР: idProperty = ${request.idProperty}")
+
+            // Відправляємо Оголошення (Отримуємо об'єкт відповіді від сервера)
+            val serverResponse = withTimeoutOrNull(timeoutSeconds.seconds) {
+                apiService.createProperty(request, uploadedPhotos, userToken)
+            }
+            if (serverResponse?.idProperty != null){
+                this@CreateListingScreenModel.serverId = serverResponse.idProperty
+
+                // Оновлюємо шляхи до фотографій, якщо сервер повернув нові
+                if (serverResponse.images.isNotEmpty()){
+                    uploadedPhotos.clear()
+                    uploadedPhotos.addAll(serverResponse.images.map { "${PropertyApiService.BASE_URL}/uploads/$it" })
+                }
+
+                if (targetStatus == ListingStatus.MODERATION) {
+                    _snackbarEvent.send(serverResponse.message)
+                }
+                true
+            } else {
+                if (targetStatus == ListingStatus.MODERATION) {
+                    _snackbarEvent.send("Сервер не відповідає або сталася помилка. Спробуйте ще раз.")
+                }
+                false
+            }
+        } catch (e: Exception) {
+            println("Помилка синхронізації з сервером (sync): ${e.message}")
+            if (targetStatus == ListingStatus.MODERATION) {
+                _snackbarEvent.send("Помилка з'єднання: ${e.getLocalizedMessage()}")
+            }
+            false
         }
     }
 
     // Внутрішня функція, яка гарантує що код виконається і дочекається результату
-    private suspend fun saveDraftInternal(){
+    private suspend fun saveLocalState(localStaus: ListingStatus){
         // Якщо це нова чернетка, генеруємо ID. Якщо вже редагуємо - залишаємо старий.
         val currentDraftId = listingId ?: Random.nextInt(100000).toString()
 
-        // Room не вміє автоматично зберігати списки (List<String>)
-        // Тому конвертуємо список фото у рядок, розділений комами.
-        val photosString = uploadedPhotos.joinToString(",")
+        // Зберігаємо ID, щоб наступне натискання "Зберегти" оновило цей самий запис, а не створило новий
+        listingId = currentDraftId
 
         // Пакуємо всі наші стани в Entity
         val myListingEntity = MyListingEntity(
             localId = currentDraftId,
             serverId = this@CreateListingScreenModel.serverId,
-            listingStatus = ListingStatus.DRAFT,
+            listingStatus = localStaus,
 
             title = title,
             description = description,
@@ -155,7 +211,9 @@ class CreateListingScreenModel(
             elevatorIsSelect = elevatorIsSelect,
             securityIsSelect = securityIsSelect,
             verificationMethod = verificationMethod,
-            photosUris = photosString,
+            // Room не вміє автоматично зберігати списки (List<String>)
+            // Тому конвертуємо список фото у рядок, розділений комами.
+            photosUris = uploadedPhotos.joinToString(","),
 
             likesNumber = 0,
             viewsNumber = 0,
@@ -167,13 +225,37 @@ class CreateListingScreenModel(
 
         // Відправляємо в локальну базу даних
         dao.saveListing(myListingEntity)
+    }
 
-        // Зберігаємо ID, щоб наступне натискання "Зберегти" оновило цей самий запис, а не створило новий
-        listingId = currentDraftId
+    // Збереження чернетки (кнопка "Зберегти" в TopBar)
+    fun saveDraft(onSuccess: () -> Unit){
+        if (isLoading) return
+
+        screenModelScope.launch {
+            // Вмикаємо завантаження
+            isLoading = true
+
+            // Локально зберігаємо, щоб нічого не втратити
+            saveLocalState(ListingStatus.DRAFT)
+
+            // Намагаємося відправити на сервер як чернетку (10 секунд)
+            // Якщо не вийде - копія вде збережена локально
+            val syncSuccess = syncWithServer(targetStatus = ListingStatus.DRAFT, timeoutSeconds = 10)
+
+            // Якщо сервер прийняв і повернув нові зображення, зберігаємо їх локально ще раз
+            if (syncSuccess){
+                saveLocalState(ListingStatus.DRAFT)
+            }
+            _snackbarEvent.send("Чернетку збережено")
+            // Даємо SnackBar 1-2 секунди повисіти на екрані, перш ніж закрити його
+            kotlinx.coroutines.delay(1500.milliseconds)
+            onSuccess()
+
+            isLoading = false
+        }
     }
 
     // Фінальна відправка на сервер
-    @OptIn(ExperimentalTime::class)
     fun submitListing(onSuccess: () -> Unit) {
         // Якщо вже відправляється запит, повертаємось
         if (isLoading) return
@@ -182,109 +264,20 @@ class CreateListingScreenModel(
             // Вмикаємо завантаження
             isLoading = true
 
-            try {
-                val currentId = listingId ?: Random.nextInt(100000).toString()
-                listingId = currentId
+            // Зберігаємо всі введені дані локально перед відправкою (щоб нічого не загубилось)
+            saveLocalState(ListingStatus.DRAFT)
 
-                /*TODO: Зробити токен у вигляді змінної*/
-                val userToken = "d0d20eeb-2c54-4363-9b7b-0631ae0f9892"
+            // Намагаємося відправити на сервер як MODERATION (30 секунд)
+            val syncSuccess = syncWithServer(targetStatus = ListingStatus.MODERATION, timeoutSeconds = 30)
 
-                // Зберігаємо всі введені дані локально востаннє (щоб нічого не загубилось)
-                saveDraftInternal()
-
-                // Відділяємо старі (вже на сервері) фотографії
-                val existingPhotosOnServer = uploadedPhotos.filter { it.startsWith("http") }
-                    .map { it.substringAfter("/uploads/") } // Передаємо бекенду тільки відносні шляхи
-
-                // Готуємо дані для відправки на сервер
-                val request = CreatePropertyRequest(
-                    idProperty = this@CreateListingScreenModel.serverId,
-                    title = title.ifBlank { "Нове оголошення" },
-                    description = description.ifBlank { "Опис відсутній" },
-                    photosList = existingPhotosOnServer,
-                    localization = address,
-                    price = price.toDoubleOrNull() ?: 0.0,
-                    area = area.toDoubleOrNull() ?: 0.0,
-                    rooms = countBedrooms,
-                    category = selectedType.name,
-                    subcategory = "RENT",
-                    parkingType = parkingType.code,
-                    petsAllowed = allowedPets,
-                    elevator = elevatorIsSelect,
-                    furniture = isFurnished,
-                    buildingType = "APARTMENT",
-                    status = "MODERATION"
-                )
-
-                println("ВІДПРАВКА НА СЕРВЕР: idProperty = ${request.idProperty}")
-
-                // Відправляємо Оголошення (Отримуємо об'єкт відповіді від сервера)
-                val serverResponse = withTimeoutOrNull(30.seconds) {
-                    apiService.createProperty(request, uploadedPhotos, userToken)
-                }
-
-                if (serverResponse?.idProperty != null) {
-                    // Отримуємо поточний
-                    val currentId = listingId ?: return@launch
-
-                    this@CreateListingScreenModel.serverId = serverResponse.idProperty
-                    // Створюємо локальну аналітику, якщо сервер прийняв оголошення
-                    val myListingEntity = MyListingEntity(
-                        localId = currentId,
-                        serverId = serverResponse.idProperty, // записуємо той самий ID, що отримали з сервера
-                        listingStatus = ListingStatus.MODERATION,
-
-                        title = title,
-                        description = description,
-                        address = address,
-                        area = area,
-                        price = price,
-                        bedrooms = countBedrooms,
-                        bathrooms = countBathrooms,
-                        floorNumber = floorNumber,
-                        propertyType = selectedType,
-
-                        allowedPets = allowedPets,
-                        parkingType = parkingType,
-                        isFurnished = isFurnished,
-                        isBalcony = isBalcony,
-                        isCondition = isCondition,
-                        gymIsSelect = gymIsSelect,
-                        poolIsSelect = poolIsSelect,
-                        elevatorIsSelect = elevatorIsSelect,
-                        securityIsSelect = securityIsSelect,
-                        verificationMethod = verificationMethod,
-                        
-                        // Записуємо нові шляхи від сервера, якщо вони є. Інакше залишаємо локальні
-                        photosUris = if (serverResponse.images.isNotEmpty()) {
-                            serverResponse.images.joinToString(",") { "${PropertyApiService.BASE_URL}/uploads/$it" }
-                        } else {
-                            uploadedPhotos.joinToString(",")
-                        },
-
-                        likesNumber = 0,
-                        viewsNumber = 0,
-                        rejectsNumber = 0,
-                        goToContactsNumber = 0,
-                        createAt = Clock.System.now().toString(),
-                        updateAt = Clock.System.now().toString()
-                    )
-                    dao.saveListing(myListingEntity)
-
-                    println(serverResponse.message)
-                    println(serverResponse.images)
-                    _snackbarEvent.send(serverResponse.message)
-                    onSuccess()
-
-                } else {
-                    _snackbarEvent.send("Сервер не відповідає або сталася помилка. Спробуйте ще раз.")
-                }
-            } catch (e: Exception) {
-                println("Помилка мережі: ${e.message}")
-                _snackbarEvent.send("Помилка з'єднання: ${e.getLocalizedMessage()}")
-            } finally {
-                isLoading = false
+            // Якщо сервер прийняв оголошення
+            if (syncSuccess){
+                saveLocalState(ListingStatus.MODERATION)
+                onSuccess()
             }
+
+            isLoading = false
+
         }
     }
 }
