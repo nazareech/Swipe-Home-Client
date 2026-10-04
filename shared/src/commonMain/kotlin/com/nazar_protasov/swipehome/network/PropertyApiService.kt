@@ -21,7 +21,6 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import mymultiplatformproject.shared.generated.resources.Res
 
 @Serializable
 data class PropertyResponseDTO(
@@ -50,10 +49,6 @@ data class PropertyDTO(
     @SerialName("creates_at") val createsAt: String? = null
 )
 
-@Serializable
-data class MessageResponse(
-    val message: String
-)
 // Функція-розширення для мапінгу
 fun PropertyDTO.toUIProperty(): Property {
     // Формуємо повний URL для зображення
@@ -69,7 +64,7 @@ fun PropertyDTO.toUIProperty(): Property {
     val formattedPrice = "$${this.price.toInt()}"
 
     return Property(
-        id = this.idProperty?.toString() ?: "0",
+        id = this.idProperty ?: "0",
         imagesUrl = imageUrls,
         price = formattedPrice,
         title = this.title,
@@ -96,8 +91,8 @@ fun PropertyDTO.toUIDetailsProperty(): PropertyDetails {
     val formatedCreatedAt = this.createsAt?.split("T")?.get(0) ?: ""
 
     return PropertyDetails(
-        idProperty = this.idProperty?.toString() ?: "",
-        idOwner = this.idOwner.toString(),
+        idProperty = this.idProperty ?: "",
+        idOwner = this.idOwner,
         title = this.title,
         description = this.description,
         localization = this.localization,
@@ -231,47 +226,6 @@ class PropertyApiService(private val client: io.ktor.client.HttpClient){
         } catch (e: Exception) {
             println("Error deleting property: ${e.message}")
             null
-        }
-    }
-    suspend fun uploadImage(propertyId: String, photoPaths: List<String>,  token: String): Boolean {
-        return try {
-            val response = client.post("${BASE_URL}/properties/images/upload") {
-                header("Authorization", "Bearer $token")
-                setBody(
-                    MultiPartFormDataContent(
-                        formData {
-                            // Передаємо propertyId
-                            append("id_property", propertyId)
-
-                            // Проходимось по всіх фотографіях
-                            photoPaths.forEachIndexed { index, path ->
-                                // Перше фото (index == 0) завжди головне
-                                val isMain = if (index == 0) "true" else "false"
-                                append("is_main", isMain)
-
-                                // Читаємо файл і додаємо його як частину форми
-                                val imagesBytes = readBytesFromCache(path)
-                                append("image", imagesBytes, Headers.build {
-                                    append(HttpHeaders.ContentType, "image/jpeg")
-                                    append(HttpHeaders.ContentDisposition, "form-data; name=\"image\"; filename=\"photo_$index.jpg\"")
-                                })
-                            }
-                        }
-                    )
-                )
-            }
-            if (response.status.isSuccess()) {
-                val responseBody = response.body<UploadImagesResponse>()
-                println("Фото завантажено: ${responseBody.message}")
-                responseBody.images.isNotEmpty()
-            } else {
-                val errorBody = response.body<String>()
-                println("Помилка завантаження фото: ${response.status} - $errorBody")
-                false
-            }
-        } catch (e: Exception) {
-            println("Помилка завантаження фото: ${e.message}")
-            false
         }
     }
 }

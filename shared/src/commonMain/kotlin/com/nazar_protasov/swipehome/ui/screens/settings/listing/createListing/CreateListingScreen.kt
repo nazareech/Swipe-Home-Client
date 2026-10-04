@@ -160,7 +160,6 @@ class CreateListingScreen(val draftId: String? = null) : Screen {
                             3 -> Step3Media(
                                     photos = screenModel.uploadedPhotos,
                                     onAddPhoto = {
-//                                        screenModel.uploadedPhotos.add("https://picsum.photos/200/300?id=${Random.nextInt(100000)}")
                                         // Запускаємо вибір фото з галереї
                                         multipleImagePicker.launch()
                                     },

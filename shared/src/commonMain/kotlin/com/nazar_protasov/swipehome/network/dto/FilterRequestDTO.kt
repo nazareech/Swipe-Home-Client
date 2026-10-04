@@ -27,13 +27,4 @@ data class FilterRequestDTO(
     val elevator: Boolean? = null,
     val furniture: Boolean? = null,
     val balcony: Boolean? = null
-) {
-    companion object {
-        const val CATEGORY_APARTMENT = "APARTMENT"
-        const val CATEGORY_HOUSE = "HOUSE"
-        const val CATEGORY_ROOM = "ROOM"
-
-        const val DEAL_RENT = "RENT"
-        const val DEAL_SALE = "SALE"
-    }
-}
+)

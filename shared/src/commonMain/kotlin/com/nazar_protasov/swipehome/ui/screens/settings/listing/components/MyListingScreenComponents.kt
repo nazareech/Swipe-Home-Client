@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
@@ -110,7 +111,7 @@ fun ListingsTopBar(navigator: Navigator) {
 }
 
 @Composable
-fun ListingsHeader(count: Int){
+fun ListingsHeader(count: Int, isLoading: Boolean){
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -141,7 +142,17 @@ fun ListingsHeader(count: Int){
                 .clickable{/*TODO: Сортування*/},
             contentAlignment = Alignment.Center
         ){
-            Icon(painterResource(Res.drawable.ic_filtres_tune), contentDescription = "Filter", tint = SwipeHomeTheme.colors.neutral)
+            if(isLoading) {
+                CircularProgressIndicator(
+                    color = SwipeHomeTheme.colors.primary
+                )
+            } else {
+                Icon(
+                    painterResource(Res.drawable.ic_filtres_tune),
+                    contentDescription = "Filter",
+                    tint = SwipeHomeTheme.colors.neutral
+                )
+            }
         }
     }
 }

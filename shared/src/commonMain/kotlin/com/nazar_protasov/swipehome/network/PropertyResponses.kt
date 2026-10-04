@@ -10,11 +10,3 @@ data class CreatePropertyResponse(
     val images: List<String> = emptyList()
 )
 
-// Модель відповіді при завантаженні фото
-@Serializable
-data class UploadImagesResponse(
-    val message: String,
-    val images: List<String>
-)
-
-

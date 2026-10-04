@@ -17,10 +17,14 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
@@ -51,11 +55,18 @@ class MyListingsScreen : Screen {
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
         val screenModel: MyListingsScreenModel = koinInject()
-        val screenModelListing = koinScreenModel<CreateListingScreenModel>()
+
+        val snackbarHostState = remember { SnackbarHostState() }
+
+        // Підписуємося на MyListingsScreenModel
+        LaunchedEffect(Unit) {
+            screenModel.snackbarEvent.collect { message ->
+                snackbarHostState.showSnackbar(message)
+            }
+        }
 
         // Підписуємося на нашу базу даних
         val listingsData by screenModel.myListingProperties.collectAsState(initial = emptyList())
-
         // Спостерігаємо за станами (дані для сервера)
         val isLoading by screenModel.isLoading.collectAsState()
 
@@ -100,6 +111,7 @@ class MyListingsScreen : Screen {
         }
 
         Scaffold(
+            snackbarHost = { SnackbarHost(snackbarHostState) },
             topBar = { ListingsTopBar(navigator) },
             containerColor = SwipeHomeTheme.colors.background
         ) { paddingValues ->
@@ -141,7 +153,7 @@ class MyListingsScreen : Screen {
                     verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
                     item {
-                        ListingsHeader(count = listings.size)
+                        ListingsHeader(count = listings.size, isLoading)
                     }
 
                     items(listings) { listing ->
@@ -158,9 +170,8 @@ class MyListingsScreen : Screen {
                                 )
                             },
                             onDeleteClick = {
-                                screenModelListing.deleteListing(
-                                    targetListingId = listing.id,
-                                    onSuccess = {/*TODO: Зробити спиливаюче сповіщення TOST з інформацією про видалення*/ }
+                                screenModel.deleteListing(
+                                    targetListingId = listing.id
                                 )
                             }
                         )
@@ -169,7 +180,7 @@ class MyListingsScreen : Screen {
             }
         }
 
-        if (screenModelListing.isLoading || isLoading){
+        if (screenModel.isDeleting){
             Box(
                 modifier = Modifier
                     .fillMaxSize()
