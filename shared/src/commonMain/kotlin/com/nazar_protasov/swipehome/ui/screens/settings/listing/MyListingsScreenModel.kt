@@ -16,6 +16,7 @@ import com.nazar_protasov.swipehome.ui.screens.settings.listing.createListing.co
 import com.nazar_protasov.swipehome.ui.utils.getLocalizedMessage
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.receiveAsFlow
@@ -82,11 +83,12 @@ class MyListingsScreenModel(private val apiService: PropertyApiService, private 
                         dao.deleteCardById(id = targetListingId)
                         _snackbarEvent.send("Успішно видалено: $serverResponse")
                     } else {
-                        println("Відповідь сервера null (помилка або таймаут)")
+                        println("Відповідь сервера null (помилка або тайм-аут)")
                         _snackbarEvent.send("Помилка при видаленні з сервера.")
                     }
                 }
             } catch (e: Exception) {
+                if (e is CancellationException) throw e
                 println("Помилка мережі при видаленні: ${e.message}")
                 _snackbarEvent.send("Помилка з'єднання: ${e.getLocalizedMessage()}")
             } finally {
@@ -116,7 +118,9 @@ class MyListingsScreenModel(private val apiService: PropertyApiService, private 
                             val currentDraftId = dto.idProperty ?: Random.nextInt(100000).toString()
                             // Room не вміє автоматично зберігати списки (List<String>)
                             // Тому конвертуємо список фото у рядок, розділений комами.
-                            val photosString = dto.imagesMap?.keys?.joinToString(",") ?: ""
+                            // Сортуємо так, щоб головне фото (true) було першим у списку
+                            val photosString = dto.imagesMap?.entries
+                                ?.sortedByDescending { it.value }?.joinToString(",") { it.key } ?: ""
 
                             val currentProperty = MyListingEntity(
                                 localId = currentDraftId,
@@ -184,6 +188,7 @@ class MyListingsScreenModel(private val apiService: PropertyApiService, private 
                     _isLoading.value = false
                 }
             } catch (e: Exception) {
+                if (e is CancellationException) throw e
                 println("Помилка мережі: ${e.message}")
                 _snackbarEvent.send("Помилка з'єднання: ${e.getLocalizedMessage()}")
             } finally {

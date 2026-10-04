@@ -8,6 +8,7 @@ data class CreatePropertyRequest(
     val title: String,
     val description: String,
     val photosList: List<String>,
+    val mainPhoto: String? = null,
     val localization: String,
     val price: Double,
     val area: Double,

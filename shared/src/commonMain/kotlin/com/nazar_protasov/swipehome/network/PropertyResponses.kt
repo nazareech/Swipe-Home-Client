@@ -7,6 +7,8 @@ import kotlinx.serialization.Serializable
 data class CreatePropertyResponse(
     val message: String,
     val idProperty: String? = null,
-    val images: List<String> = emptyList()
+    val mainImage: String? = null,
+    val images: List<String> = emptyList(),
+    val imagesMap: Map<String, Boolean>? = null
 )
 

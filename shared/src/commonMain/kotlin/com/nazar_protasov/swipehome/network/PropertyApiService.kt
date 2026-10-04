@@ -17,6 +17,7 @@ import io.ktor.http.Headers
 import io.ktor.http.HttpHeaders
 import io.ktor.http.contentType
 import io.ktor.http.isSuccess
+import kotlinx.coroutines.CancellationException
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
@@ -51,8 +52,8 @@ data class PropertyDTO(
 
 // Функція-розширення для мапінгу
 fun PropertyDTO.toUIProperty(): Property {
-    // Формуємо повний URL для зображення
-    val rawImages = this.imagesMap?.keys?.toList() ?: emptyList()
+    // Формуємо повний URL для зображення, гарантуючи, що головне фото (true) перше
+    val rawImages = this.imagesMap?.entries?.sortedByDescending { it.value }?.map { it.key } ?: emptyList()
 
     val imageUrls = if (rawImages.isNotEmpty()) {
         // Додаємо /uploads/, оскільки сервер зазвичай віддає статику за цим префіксом
@@ -76,8 +77,8 @@ fun PropertyDTO.toUIProperty(): Property {
 }
 // Функція-розширення для мапінгу
 fun PropertyDTO.toUIDetailsProperty(): PropertyDetails {
-    // Формуємо повний URL для зображення
-    val rawImages = this.imagesMap?.keys?.toList() ?: emptyList()
+    // Формуємо повний URL для зображення, гарантуючи, що головне фото (true) перше
+    val rawImages = this.imagesMap?.entries?.sortedByDescending { it.value }?.map { it.key } ?: emptyList()
 
     val imageUrls = if (rawImages.isNotEmpty()) {
         // Додаємо /uploads/, оскільки сервер зазвичай віддає статику за цим префіксом
@@ -137,6 +138,7 @@ class PropertyApiService(private val client: io.ktor.client.HttpClient){
             // Повертаємо список DTO як є
             response.properties
         } catch (e: Exception) {
+            if (e is CancellationException) throw e
             println("Error fetching properties: ${e.message}")
             emptyList() // Повертаємо пустий список у разі помилки
         }
@@ -155,6 +157,7 @@ class PropertyApiService(private val client: io.ktor.client.HttpClient){
             // Повертаємо список DTO як є
             response.properties
         } catch (e: Exception) {
+            if (e is CancellationException) throw e
             println("Error fetching properties: ${e.message}")
             emptyList() // Повертаємо пустий список у разі помилки
         }
@@ -200,6 +203,7 @@ class PropertyApiService(private val client: io.ktor.client.HttpClient){
                 null
             }
         } catch (e: Exception) {
+            if (e is CancellationException) throw e
             println("Помилка відправки оголошення: ${e.message}")
             null
         }
@@ -224,6 +228,7 @@ class PropertyApiService(private val client: io.ktor.client.HttpClient){
                 null
             }
         } catch (e: Exception) {
+            if (e is CancellationException) throw e
             println("Error deleting property: ${e.message}")
             null
         }

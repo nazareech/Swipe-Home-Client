@@ -16,6 +16,7 @@ import com.nazar_protasov.swipehome.ui.screens.settings.listing.createListing.co
 import com.nazar_protasov.swipehome.ui.screens.settings.listing.createListing.components.VerificationMethods
 import com.nazar_protasov.swipehome.ui.utils.getLocalizedMessage
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeoutOrNull
@@ -129,6 +130,7 @@ class CreateListingScreenModel(
                 title = title.ifBlank { if (targetStatus == ListingStatus.DRAFT) "Чернетка" else "Нове оголошення" },
                 description = description.ifBlank { if (targetStatus == ListingStatus.DRAFT) "" else "Опис відсутній" },
                 photosList = existingPhotosOnServer,
+                mainPhoto = uploadedPhotos.firstOrNull(),
                 localization = address,
                 price = price.toDoubleOrNull() ?: 0.0,
                 area = area.toDoubleOrNull() ?: 0.0,
@@ -150,12 +152,37 @@ class CreateListingScreenModel(
                 apiService.createProperty(request, uploadedPhotos, userToken)
             }
             if (serverResponse?.idProperty != null){
+                println("Відповідь сервера: $serverResponse")
                 this@CreateListingScreenModel.serverId = serverResponse.idProperty
 
                 // Оновлюємо шляхи до фотографій, якщо сервер повернув нові
-                if (serverResponse.images.isNotEmpty()){
+                if (!serverResponse.imagesMap.isNullOrEmpty()) {
                     uploadedPhotos.clear()
-                    uploadedPhotos.addAll(serverResponse.images.map { "${PropertyApiService.BASE_URL}/uploads/$it" })
+                    val sortedImages = serverResponse.imagesMap.entries
+                        .sortedByDescending { it.value } // Головне фото (true) буде першим
+                        .map { it.key }
+                    uploadedPhotos.addAll(sortedImages.map { "${PropertyApiService.BASE_URL}/uploads/$it" })
+                } else if (serverResponse.images.isNotEmpty()) {
+                    // Fallback на випадок якщо imagesMap немає, але є images
+                    
+                    // Якщо сервер надіслав mainImage, беремо його. 
+                    // Якщо ні, використовуємо старе локальне головне фото.
+                    val mainPhotoIdentifier = serverResponse.mainImage 
+                        ?: uploadedPhotos.firstOrNull()?.substringAfterLast("/")
+                    
+                    uploadedPhotos.clear()
+                    val newImagesList = serverResponse.images.toMutableList()
+                    
+                    // Якщо головне фото знайдено у списку (якщо сервер прислав повний шлях, витягуємо тільки назву)
+                    if (mainPhotoIdentifier != null) {
+                        val mainPhotoInList = newImagesList.find { it.contains(mainPhotoIdentifier) }
+                        if (mainPhotoInList != null) {
+                            newImagesList.remove(mainPhotoInList)
+                            newImagesList.add(0, mainPhotoInList)
+                        }
+                    }
+                    
+                    uploadedPhotos.addAll(newImagesList.map { "${PropertyApiService.BASE_URL}/uploads/$it" })
                 }
 
                 if (targetStatus == ListingStatus.MODERATION) {
@@ -169,6 +196,7 @@ class CreateListingScreenModel(
                 false
             }
         } catch (e: Exception) {
+            if (e is CancellationException) throw e
             println("Помилка синхронізації з сервером (sync): ${e.message}")
             if (targetStatus == ListingStatus.MODERATION) {
                 _snackbarEvent.send("Помилка з'єднання: ${e.getLocalizedMessage()}")
@@ -270,14 +298,16 @@ class CreateListingScreenModel(
             // Намагаємося відправити на сервер як MODERATION (30 секунд)
             val syncSuccess = syncWithServer(targetStatus = ListingStatus.MODERATION, timeoutSeconds = 30)
 
+            // Вимикаємо крутилку ДО затримки й переходу
+            isLoading = false
+
             // Якщо сервер прийняв оголошення
             if (syncSuccess){
                 saveLocalState(ListingStatus.MODERATION)
+                // Даємо SnackBar 1-2 секунди повисіти на екрані, перш ніж закрити його
+                kotlinx.coroutines.delay(1500.milliseconds)
                 onSuccess()
             }
-
-            isLoading = false
-
         }
     }
 }

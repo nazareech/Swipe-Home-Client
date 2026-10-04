@@ -57,7 +57,9 @@ enum class ListingStatus {
     ACTIVE,
     MODERATION,
     DRAFT,
-    HIDDEN
+    HIDDEN,
+
+    DELETED
 }
 
 data class ListingItem(
@@ -338,6 +340,7 @@ fun StatusBadge(status: ListingStatus){
         ListingStatus.MODERATION -> Triple(SwipeHomeTheme.colors.secondary, SwipeHomeTheme.colors.onSurfaceSecondary, "В модерації")
         ListingStatus.DRAFT -> Triple(SwipeHomeTheme.colors.surface, SwipeHomeTheme.colors.onSurfaceSecondary, "Чернетка")
         ListingStatus.HIDDEN -> Triple(SwipeHomeTheme.colors.error, SwipeHomeTheme.colors.neutral, "Прихований")
+        ListingStatus.DELETED -> Triple(SwipeHomeTheme.colors.error, SwipeHomeTheme.colors.neutral, "Видалений")
     }
 
     Row(
