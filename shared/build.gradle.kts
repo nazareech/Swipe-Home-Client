@@ -2,7 +2,7 @@ import androidx.room.gradle.RoomExtension
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
-    alias(libs.plugins.androidLibrary) // Використовуємо стабільний Android-плагін
+    alias(libs.plugins.androidLibrary)
     alias(libs.plugins.composeMultiplatform)
     alias(libs.plugins.composeCompiler)
     alias(libs.plugins.kotlin.serialization)
@@ -16,7 +16,6 @@ kotlin {
 
     // 1. Стандартна реєстрація Android-таргету
     androidTarget()
-
     // 2. Налаштування для iOS
     listOf(
         iosArm64(),
@@ -68,6 +67,10 @@ kotlin {
             // Room Database
             implementation(libs.androidx.room.runtime)
             implementation(libs.sqlite.bundled)
+
+            // DataStore
+            implementation(libs.androidx.datastore.core)
+            implementation(libs.androidx.datastore.preferences.core)
         }
 
         commonTest.dependencies {
@@ -87,10 +90,10 @@ kotlin {
 // 4. Окремий блок для конфігурації Android-модуля
 android {
     namespace = "com.nazar_protasov.swipehome.shared"
-    compileSdk = libs.versions.android.compileSdk.get().toInt()
+    compileSdk = libs.versions.androidCompileSdk.get().toInt()
 
     defaultConfig {
-        minSdk = libs.versions.android.minSdk.get().toInt()
+        minSdk = libs.versions.androidMinSdk.get().toInt()
     }
 
     compileOptions {

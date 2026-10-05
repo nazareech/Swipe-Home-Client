@@ -394,7 +394,7 @@ class RegisterScreen: Screen {
                 label = { Text(stringResource(Res.string.reg_email_label)) },
                 placeholder = { Text(stringResource(Res.string.reg_email_placeholder)) },
                 modifier = Modifier.fillMaxWidth(),
-                singleLine = true,
+
                 shape = SwipeHomeTheme.shapes.smallShape
             )
         }
@@ -441,7 +441,7 @@ class RegisterScreen: Screen {
                 label = { Text(stringResource(Res.string.email_login_label)) },
                 placeholder = { Text(stringResource(Res.string.reg_email_placeholder)) },
                 modifier = Modifier.fillMaxWidth(),
-                singleLine = true,
+
                 shape = SwipeHomeTheme.shapes.smallShape
             )
 
@@ -490,9 +490,10 @@ class RegisterScreen: Screen {
                 OutlinedTextField(
                     value = password,
                     onValueChange = onPasswordChange,
+                    label = { Text(stringResource(Res.string.password_label)) },
                     placeholder = { Text(stringResource(Res.string.reg_password_placeholder)) },
                     modifier = Modifier.fillMaxWidth(),
-                    singleLine = true,
+
                     shape = SwipeHomeTheme.shapes.smallShape,
                     visualTransformation = if (passwordVisible) VisualTransformation.None else PasswordVisualTransformation(),
                     trailingIcon = {
@@ -650,7 +651,7 @@ class RegisterScreen: Screen {
                 label = { Text(stringResource(Res.string.reg_name)) },
                 placeholder = { Text(stringResource(Res.string.reg_name)) },
                 modifier = Modifier.fillMaxWidth(),
-                singleLine = true,
+
                 shape = SwipeHomeTheme.shapes.smallShape
             )
             Spacer(modifier = Modifier.height(16.dp))
@@ -667,7 +668,7 @@ class RegisterScreen: Screen {
                 label = { Text(stringResource(Res.string.reg_last_name)) },
                 placeholder = { Text(stringResource(Res.string.reg_last_name)) },
                 modifier = Modifier.fillMaxWidth(),
-                singleLine = true,
+
                 shape = SwipeHomeTheme.shapes.smallShape
             )
         }
@@ -719,72 +720,75 @@ class RegisterScreen: Screen {
             )
             Spacer(modifier = Modifier.height(8.dp))
 
-            OutlinedTextField(
-                value = phone,
-                onValueChange = { input ->
-                    // Фільтруємо тільки цифри та обмежуємо максимум 9 символами
-                    val digitsOnly = input.filter { it.isDigit() }
-                    if (digitsOnly.length <= maxDigits) onPhoneChange(digitsOnly)
-                },
-                // Динамічний плейсхолдер
-                placeholder = { Text(currentMask) },
-                modifier = Modifier.fillMaxWidth(),
-                singleLine = true,
-                shape = SwipeHomeTheme.shapes.smallShape,
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
-                // Підключаємо кастомне трансформування для форматування пробілів для номера
-                visualTransformation = PhoneVisualTransformation(currentMask),
-                // Додаємо красивий дизайн префікса країни з випадаючим списком
-                leadingIcon = {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier
-                            .clickable { isDropdownExpanded = true }
-                            .padding(start = 16.dp, end = 8.dp, top = 8.dp, bottom = 8.dp)
-                    ){
-                        Text(
-                            text = countryCode,
-                            style = SwipeHomeTheme.typography.label,
-                            fontWeight = FontWeight.Bold,
-                            color = SwipeHomeTheme.colors.neutral
-                        )
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Icon(
-                            painterResource(Res.drawable.ic_arrow_triangle_down),
-                            contentDescription = null,
-                            modifier = Modifier.size(10.dp),
-                            tint = SwipeHomeTheme.colors.onSurfaceSecondary
-                        )
-                        Spacer(modifier = Modifier.width(12.dp))
+            Box {
+                OutlinedTextField(
+                    value = phone,
+                    onValueChange = { input ->
+                        // Фільтруємо тільки цифри та обмежуємо максимум 9 символами
+                        val digitsOnly = input.filter { it.isDigit() }
+                        if (digitsOnly.length <= maxDigits) onPhoneChange(digitsOnly)
+                    },
+                    label = { Text(stringResource(Res.string.reg_phone_number)) },
+                    // Динамічний плейсхолдер
 
-                        Box(
+                    modifier = Modifier.fillMaxWidth(),
+
+                    shape = SwipeHomeTheme.shapes.smallShape,
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
+                    // Підключаємо кастомне трансформування для форматування пробілів для номера
+                    visualTransformation = PhoneVisualTransformation(currentMask),
+                    // Додаємо красивий дизайн префікса країни з випадаючим списком
+                    leadingIcon = {
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
                             modifier = Modifier
-                                .width(1.dp)
-                                .height(24.dp)
-                                .background(SwipeHomeTheme.colors.outline)
-                        )
-
-                        // Саме меню вибору
-                        DropdownMenu(
-                            expanded = isDropdownExpanded,
-                            onDismissRequest = { isDropdownExpanded = false },
-                            modifier = Modifier.background(SwipeHomeTheme.colors.surface)
+                                .clickable { isDropdownExpanded = true }
+                                .padding(start = 16.dp, end = 8.dp, top = 8.dp, bottom = 8.dp)
                         ){
-                            availableCountryCodes.forEach { code ->
-                                DropdownMenuItem(
-                                    text = { Text(text = code, color = SwipeHomeTheme.colors.onSurface) },
-                                    onClick = {
-                                        // При зміні країни очищаємо введений номер
-                                        if(code != countryCode) onPhoneChange("")
-                                        onCountryCodeChange(code)
-                                        isDropdownExpanded = false
-                                    }
-                                )
-                            }
+                            Text(
+                                text = countryCode,
+                                style = SwipeHomeTheme.typography.label,
+                                fontWeight = FontWeight.Bold,
+                                color = SwipeHomeTheme.colors.neutral
+                            )
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Icon(
+                                painterResource(Res.drawable.ic_arrow_triangle_down),
+                                contentDescription = null,
+                                modifier = Modifier.size(10.dp),
+                                tint = SwipeHomeTheme.colors.onSurfaceSecondary
+                            )
+                            Spacer(modifier = Modifier.width(12.dp))
+
+                            Box(
+                                modifier = Modifier
+                                    .width(1.dp)
+                                    .height(24.dp)
+                                    .background(SwipeHomeTheme.colors.outline)
+                            )
                         }
                     }
+                )
+
+                // Саме меню вибору
+                DropdownMenu(
+                    expanded = isDropdownExpanded,
+                    onDismissRequest = { isDropdownExpanded = false },
+                    modifier = Modifier.background(SwipeHomeTheme.colors.surface)
+                ){
+                    availableCountryCodes.forEach { code ->
+                        DropdownMenuItem(
+                            text = { Text(text = code, color = SwipeHomeTheme.colors.onSurface) },
+                            onClick = {
+                                // При зміні країни очищаємо введений номер
+                                if(code != countryCode) onPhoneChange("")
+                                onCountryCodeChange(code)
+                                isDropdownExpanded = false
+                            }
+                        )
+                    }
                 }
-            )
+            }
 
             Spacer(modifier = Modifier.height(24.dp))
 

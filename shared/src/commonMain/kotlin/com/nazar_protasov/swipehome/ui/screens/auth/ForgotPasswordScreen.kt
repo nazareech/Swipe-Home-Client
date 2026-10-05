@@ -467,6 +467,7 @@ class ForgotPasswordScreen : Screen {
             OutlinedTextField(
                 value = newPassword,
                 onValueChange = onNewPasswordChange,
+                label = { Text(stringResource(Res.string.fogot_paswd_new_password_label)) },
                 placeholder = { Text(stringResource(Res.string.fogot_paswd_new_password_placeholder)) },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
@@ -529,6 +530,7 @@ class ForgotPasswordScreen : Screen {
             OutlinedTextField(
                 value = confirmPassword,
                 onValueChange = onConfirmPasswordChange,
+                label = { Text(stringResource(Res.string.fogot_paswd_confirm_password_label)) },
                 placeholder = { Text(stringResource(Res.string.fogot_paswd_confirm_password_placeholder)) },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,
