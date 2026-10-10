@@ -18,6 +18,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.BottomSheetDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -25,8 +26,12 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -35,6 +40,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
@@ -65,6 +71,7 @@ import mymultiplatformproject.shared.generated.resources.ic_lightbulb_outline
 import mymultiplatformproject.shared.generated.resources.ic_security_key
 import mymultiplatformproject.shared.generated.resources.ic_security_restore
 import org.jetbrains.compose.resources.painterResource
+import org.koin.compose.koinInject
 
 class EditProfileScreen : Screen {
     @OptIn(ExperimentalMaterial3Api::class)
@@ -73,23 +80,62 @@ class EditProfileScreen : Screen {
         val navigator = LocalNavigator.currentOrThrow
         val scrollState = rememberScrollState()
 
-        var firstName by remember { mutableStateOf("Nazar") }
-        var lastName by remember { mutableStateOf("Protasov") }
-        var aboutMe by remember { mutableStateOf("Lol Kek Cheburek") }
+        val screenModel: EditProfileScreenModel = koinInject()
+
+        val snackbarHostState = remember { SnackbarHostState() }
+
+        // Підписуємося на EditProfileScreenModel
+        LaunchedEffect(Unit) {
+            screenModel.snackbarEvent.collect { message ->
+                snackbarHostState.showSnackbar(message)
+            }
+        }
+
+        // Спостерігаємо за станами (дані для сервера)
+        val isLoading by screenModel.isLoading.collectAsState()
+        val userProfile by screenModel.userProfile.collectAsState()
+
+        var login by remember { mutableStateOf("") }
+        var firstName by remember { mutableStateOf("") }
+        var lastName by remember { mutableStateOf("") }
+        var aboutMe by remember { mutableStateOf("") }
 
         /*TODO: треба буде витягнути сі дані користувача*/
-        var phone by rememberSaveable { mutableStateOf("795029495") }
+        var phone by rememberSaveable { mutableStateOf("") }
         var countryCode by rememberSaveable { mutableStateOf("+48") } // Код за замовчуванням
-        var email by rememberSaveable { mutableStateOf("nzrprotasov@gmail.com") }
-
+        var email by rememberSaveable { mutableStateOf("") }
         var showPhotoBottomSheet by remember { mutableStateOf(false) }
 
+        // Заповнення даних при завантаженні
+        LaunchedEffect(userProfile) {
+            userProfile?.let { profile ->
+                login = profile.login
+                firstName = profile.firstName
+                lastName = profile.lastName
+                aboutMe = profile.aboutInfo
+                phone = profile.phone
+                email = profile.email
+            }
+        }
+
         Scaffold(
+            snackbarHost = { SnackbarHost(snackbarHostState) },
             topBar = {
                 EditProfileTopBar(
                     onBackClicked = { navigator.pop() },
-                    onSaveClick = { /*TODO: Логіка збереження*/ })
-                     },
+                    onSaveClick = {
+                        screenModel.saveProfileInfo(
+                            login = login,
+                            firstName = firstName,
+                            lastName = lastName,
+                            aboutInfo = aboutMe,
+                            fullPhone = "$countryCode $phone", // Збираємо повний номер телефону
+                            email = email,
+                            onSuccess = { navigator.pop() }
+                        )
+                    }
+                )
+            },
             containerColor = SwipeHomeTheme.colors.background
         ) { paddingValues ->
             Column(
@@ -98,25 +144,58 @@ class EditProfileScreen : Screen {
                     .padding(paddingValues)
                     .verticalScroll(scrollState)
             ) {
+                // Показуємо індикатор завантаження
+                if (isLoading) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(SwipeHomeTheme.colors.background.copy(alpha = 0.4f))
+                            .pointerInput(Unit) {},
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator(
+                            color = SwipeHomeTheme.colors.primary
+                        )
+                    }
+                }
+
                 // Фото профілю
                 Box(
                     modifier = Modifier.fillMaxWidth().padding(vertical = 24.dp),
                     contentAlignment = Alignment.Center
-                ){
+                ) {
                     EditableProfileAvatar(onClick = { showPhotoBottomSheet = true })
                 }
 
                 // Особиста інформація
                 SectionCard {
-                    SectionTitle(painterResource(Res.drawable.ic_id_card),  title = "Особиста інформація", tint = SwipeHomeTheme.colors.primary)
+                    SectionTitle(
+                        painterResource(Res.drawable.ic_id_card),
+                        title = "Особиста інформація",
+                        tint = SwipeHomeTheme.colors.primary
+                    )
 
-                    CustomTextFiles(label = "Ім'я", value = firstName, onValueChange = { firstName = it }, bgColor = SwipeHomeTheme.colors.outline)
-                    CustomTextFiles(label = "Прізвище", value = lastName, onValueChange = { lastName = it }, bgColor = SwipeHomeTheme.colors.outline)
+                    CustomTextFiles(
+                        label = "Ім'я",
+                        value = firstName,
+                        onValueChange = { firstName = it },
+                        bgColor = SwipeHomeTheme.colors.outline
+                    )
+                    CustomTextFiles(
+                        label = "Прізвище",
+                        value = lastName,
+                        onValueChange = { lastName = it },
+                        bgColor = SwipeHomeTheme.colors.outline
+                    )
 
                     Column(
-                        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp)
+                        modifier = Modifier.fillMaxWidth()
+                            .padding(horizontal = 16.dp, vertical = 8.dp)
                     ) {
-                        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
                             Text(
                                 text = "Про себe",
                                 style = SwipeHomeTheme.typography.caption,
@@ -149,10 +228,17 @@ class EditProfileScreen : Screen {
 
                 // Контакти
                 SectionCard {
-                    SectionTitle(painterResource(Res.drawable.ic_contact_card), title = "Контакти", tint = SwipeHomeTheme.colors.primary)
+                    SectionTitle(
+                        painterResource(Res.drawable.ic_contact_card),
+                        title = "Контакти",
+                        tint = SwipeHomeTheme.colors.primary
+                    )
 
                     // Телефон (ready-only стиль)
-                    Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp)) {
+                    Column(
+                        modifier = Modifier.fillMaxWidth()
+                            .padding(horizontal = 16.dp, vertical = 8.dp)
+                    ) {
                         Text(
                             "Номер телефону",
                             style = SwipeHomeTheme.typography.caption,
@@ -176,7 +262,8 @@ class EditProfileScreen : Screen {
                             onValueChange = { input ->
                                 // Фільтруємо тільки цифри та обмежуємо максимум 9 символами
                                 val digitsOnly = input.filter { it.isDigit() }
-                                if (digitsOnly.length <= maxDigits) phone = digitsOnly // оновлюємо стан phone з екраном
+                                if (digitsOnly.length <= maxDigits) phone =
+                                    digitsOnly // оновлюємо стан phone з екраном
                             },
                             // Динамічний плейсхолдер
                             placeholder = { Text(currentMask) },
@@ -254,8 +341,16 @@ class EditProfileScreen : Screen {
                     }
 
                     // Email (ready-only стиль)
-                    Column(modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp, vertical = 8.dp)){
-                        Text("Email адреса", style = SwipeHomeTheme.typography.caption, fontWeight = FontWeight.Bold, color = SwipeHomeTheme.colors.onSurfaceSecondary)
+                    Column(
+                        modifier = Modifier.fillMaxWidth()
+                            .padding(horizontal = 16.dp, vertical = 8.dp)
+                    ) {
+                        Text(
+                            "Email адреса",
+                            style = SwipeHomeTheme.typography.caption,
+                            fontWeight = FontWeight.Bold,
+                            color = SwipeHomeTheme.colors.onSurfaceSecondary
+                        )
                         Spacer(modifier = Modifier.height(4.dp))
                         // Поле Email
                         OutlinedTextField(
@@ -304,7 +399,11 @@ class EditProfileScreen : Screen {
                                 .padding(16.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Box(modifier = Modifier.size(45.dp).clip(CircleShape).background(SwipeHomeTheme.colors.surface), contentAlignment = Alignment.Center) {
+                            Box(
+                                modifier = Modifier.size(45.dp).clip(CircleShape)
+                                    .background(SwipeHomeTheme.colors.surface),
+                                contentAlignment = Alignment.Center
+                            ) {
                                 Icon(
                                     painterResource(Res.drawable.ic_security_key),
                                     contentDescription = null,
@@ -363,7 +462,7 @@ class EditProfileScreen : Screen {
                     ModalBottomSheet(
                         onDismissRequest = { showPhotoBottomSheet = false },
                         containerColor = SwipeHomeTheme.colors.background,
-                        dragHandle = { BottomSheetDefaults.DragHandle()}
+                        dragHandle = { BottomSheetDefaults.DragHandle() }
                     ) {
                         PhotoBottomSheetContent(onDismiss = { showPhotoBottomSheet = false })
                     }

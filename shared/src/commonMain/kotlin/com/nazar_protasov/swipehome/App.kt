@@ -22,7 +22,7 @@ import com.nazar_protasov.swipehome.ui.screens.OnboardingScreen
 import com.nazar_protasov.swipehome.ui.screens.SplashScreen
 import com.nazar_protasov.swipehome.ui.screens.details.PropertyDetailsScreen
 import com.nazar_protasov.swipehome.ui.screens.home.filter.FilterScreen
-import com.nazar_protasov.swipehome.ui.screens.settings.listing.MyListingsScreen
+import com.nazar_protasov.swipehome.ui.screens.settings.profile.ProfileTab
 import com.nazar_protasov.swipehome.ui.theme.SwipeHomeTheme
 import org.koin.compose.KoinApplication
 
@@ -40,10 +40,10 @@ fun App() {
         modules(appModule)
     }) {
         SwipeHomeTheme {
-            val isDebug = false
+            val isDebug = true
 
             if (isDebug){
-                Navigator(MyListingsScreen())
+                Navigator(ProfileTab())
             } else {
                 // Navigator починає роботу з SplashScreen
                 Navigator(SplashScreen()) { navigator ->

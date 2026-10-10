@@ -114,7 +114,7 @@ fun PropertyDTO.toUIDetailsProperty(): PropertyDetails {
 
 class PropertyApiService(private val client: io.ktor.client.HttpClient){
     companion object {
-        const val BASE_URL = "http://192.168.1.3:8080"
+        const val BASE_URL = "http://192.168.1.6:8080"
     }
 
     suspend fun fetchProperties(
@@ -159,6 +159,47 @@ class PropertyApiService(private val client: io.ktor.client.HttpClient){
             if (e is CancellationException) throw e
             println("Error fetching properties: ${e.message}")
             emptyList() // Повертаємо пустий список у разі помилки
+        }
+    }
+    suspend fun fetchProfileInfo(
+        token: String
+    ): CreateUserInfoResponses? {
+        return try {
+            // Робимо GET-запит на бекенд
+            val response = client.get("${BASE_URL}/users/get/information"){
+                // Додаємо Authorization заголовок
+                header("Authorization", "Bearer $token")
+            }
+
+            if (response.status.isSuccess()) {
+                response.body<CreateUserInfoResponses>()
+            } else {
+                println("Error fetching profile info: ${response.status}")
+                null
+            }
+
+        } catch (e: Exception) {
+            if (e is CancellationException) throw e
+            println("Error fetching profile: ${e.message}")
+            null // Повертаємо пустий список у разі помилки
+        }
+    }
+    suspend fun updatedProfile(token: String, profileRequest: UpdateProfileRequest): Boolean{
+        return try {
+            val response = client.post("${BASE_URL}/users/profile/update"){
+                // Додаємо Content-Type: application/json
+                contentType(ContentType.Application.Json)
+                // Додаємо Authorization заголовок
+                header("Authorization", "Bearer $token")
+                // Передаємо тіло запиту (DTO автоматично конвертується на JSON)
+                setBody(profileRequest)
+            }
+
+            response.status.isSuccess()
+        } catch (e: Exception) {
+            if (e is CancellationException) throw e
+            println("Помилка відправки оголошення: ${e.message}")
+            false
         }
     }
 

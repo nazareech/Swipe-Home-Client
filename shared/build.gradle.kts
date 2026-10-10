@@ -71,6 +71,9 @@ kotlin {
             // DataStore
             implementation(libs.androidx.datastore.core)
             implementation(libs.androidx.datastore.preferences.core)
+
+            // Підключаємо Okio
+            implementation(libs.squareup.okio)
         }
 
         commonTest.dependencies {

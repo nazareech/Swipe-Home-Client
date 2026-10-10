@@ -114,7 +114,6 @@ class MyListingsScreen : Screen {
             topBar = { ListingsTopBar(navigator) },
             containerColor = SwipeHomeTheme.colors.background
         ) { paddingValues ->
-            // ПОКАЗУЄМО ІНДИКАТОР ЗАВАНТАЖЕННЯ
            if(listings.isEmpty()) {
                 Column(horizontalAlignment = Alignment.CenterHorizontally, verticalArrangement = Arrangement.Center, modifier = Modifier.fillMaxSize()) {
                     Text(

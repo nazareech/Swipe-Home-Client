@@ -1,14 +1,19 @@
 package com.nazar_protasov.swipehome.di
 
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import com.nazar_protasov.swipehome.data.local.SessionManager
 import com.nazar_protasov.swipehome.data.local.entity.SwipeHomeDao
 import com.nazar_protasov.swipehome.data.local.entity.SwipeHomeDatabase
 import com.nazar_protasov.swipehome.data.local.getRoomDatabase
+import com.nazar_protasov.swipehome.data.local.store.createDataStore
 import com.nazar_protasov.swipehome.network.PropertyApiService
 import com.nazar_protasov.swipehome.ui.screens.home.main.HomeScreenModel
 import com.nazar_protasov.swipehome.ui.screens.hub.SearchHubScreenModel
 import com.nazar_protasov.swipehome.ui.screens.settings.analystics.AnalyticsScreenModel
 import com.nazar_protasov.swipehome.ui.screens.settings.listing.CreateListingScreenModel
 import com.nazar_protasov.swipehome.ui.screens.settings.listing.MyListingsScreenModel
+import com.nazar_protasov.swipehome.ui.screens.settings.editProfile.EditProfileScreenModel
 import io.ktor.client.HttpClient
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.serialization.kotlinx.json.json
@@ -41,10 +46,17 @@ val appModule: Module = module {
         get<SwipeHomeDatabase>().swipeHomeDao() // Використовуємо get(), щоб отримати інстанс із Koin
     }
 
+    // Реєструємо DataStore (один екземпляр на всю програму)
+    single<DataStore<Preferences>> {
+        createDataStore()
+    }
+
     // Моделі екранів (Factory, бо вони створюються заново для нових екранів)
     single { HomeScreenModel(get()) }
     factory { SearchHubScreenModel() }
     factory { CreateListingScreenModel(get(), get()) }
     factory { MyListingsScreenModel(get(), get()) }
     factory { AnalyticsScreenModel(get()) }
+    factory { EditProfileScreenModel(get(), get()) }
+    single { SessionManager(get()) }
 }

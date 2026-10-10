@@ -19,7 +19,10 @@ coil3 = "3.2.0"
 room = "2.8.5"
 sqlite = "2.7.1"
 ksp = "2.3.12"
+# Актуальна стабільна або новіша версія DataStore з підтримкою KMP
 androidx-datastore = "1.2.1"
+# Версія для Okio
+okio = "3.9.0"
 
 [libraries]
 kotlin-test = { module = "org.jetbrains.kotlin:kotlin-test", version.ref = "kotlin" }
@@ -74,6 +77,9 @@ coil-network-ktor = { module = "io.coil-kt.coil3:coil-network-ktor3", version.re
 androidx-datastore-core = { module = "androidx.datastore:datastore-core", version.ref = "androidx-datastore" }
 # Специфічний модуль для збереження пар "ключ-значення" (Preferences)
 androidx-datastore-preferences-core = { module = "androidx.datastore:datastore-preferences-core", version.ref = "androidx-datastore" }
+
+# Сама бібліотека Okio (вона автоматично підтримує Kotlin Multiplatform)
+squareup-okio = { group = "com.squareup.okio", name = "okio", version.ref = "okio" }
 
 [plugins]
 androidApplication = { id = "com.android.application", version.ref = "agp" }
