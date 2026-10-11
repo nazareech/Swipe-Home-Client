@@ -10,6 +10,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -20,6 +21,7 @@ import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabOptions
+import com.nazar_protasov.swipehome.data.local.SessionManager
 import com.nazar_protasov.swipehome.ui.screens.settings.editProfile.EditProfileScreen
 import com.nazar_protasov.swipehome.ui.screens.settings.language.LanguageScreen
 import com.nazar_protasov.swipehome.ui.screens.settings.profile.components.MenuItemData
@@ -52,6 +54,7 @@ import mymultiplatformproject.shared.generated.resources.profile_tab_support
 import mymultiplatformproject.shared.generated.resources.profile_tab_verify_account
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
+import org.koin.compose.koinInject
 
 class ProfileTab : Tab {
     override val key = uniqueScreenKey
@@ -88,6 +91,10 @@ internal object ProfileScreen : Screen {
             rootNavigator = rootNavigator.parent!!
         }
 
+        val sessionManager: SessionManager = koinInject()
+
+        val userProfile = sessionManager.userProfileFlow.collectAsState(initial = null)
+
         // Стан для збереження часу останнього натискання кнопки
         var lastClickMark = remember { TimeSource.Monotonic.markNow() }
 
@@ -108,7 +115,7 @@ internal object ProfileScreen : Screen {
         ) {
             ProfileTopBar()
 
-            ProfileHeader()
+            ProfileHeader(userProfile)
 
             Spacer(modifier = Modifier.height(32.dp))
 

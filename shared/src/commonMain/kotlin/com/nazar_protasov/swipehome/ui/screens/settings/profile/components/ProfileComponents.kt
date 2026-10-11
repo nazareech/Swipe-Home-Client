@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -24,6 +23,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -32,6 +32,8 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
+import com.nazar_protasov.swipehome.network.CreateUserInfoResponses
+import com.nazar_protasov.swipehome.network.PropertyApiService
 import com.nazar_protasov.swipehome.ui.theme.LocalThemeIsDark
 import com.nazar_protasov.swipehome.ui.theme.LocalThemeToggle
 import com.nazar_protasov.swipehome.ui.theme.SwipeHomeTheme
@@ -39,7 +41,6 @@ import mymultiplatformproject.shared.generated.resources.Res
 import mymultiplatformproject.shared.generated.resources.Res.string
 import mymultiplatformproject.shared.generated.resources.btn_next
 import mymultiplatformproject.shared.generated.resources.ic_arrow_next
-import mymultiplatformproject.shared.generated.resources.ic_edit_pencil
 import mymultiplatformproject.shared.generated.resources.ic_logout
 import mymultiplatformproject.shared.generated.resources.ic_moon_outline
 import mymultiplatformproject.shared.generated.resources.ic_theme_light
@@ -68,23 +69,26 @@ fun ProfileTopBar(){
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 16.dp),
+            .padding(horizontal = 16.dp, vertical = 16.dp)
+            .padding(top = 24.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ){
         Spacer(Modifier.width(36.dp))
 
-        Text(stringResource(string.profile_tab_name), style = SwipeHomeTheme.typography.headline)
+        Text(stringResource(string.profile_tab_name), style = SwipeHomeTheme.typography.headline, color = SwipeHomeTheme.colors.neutral)
 
         IconButton(onClick = LocalThemeToggle.current) {
             if (LocalThemeIsDark.current) {
                 Icon(
                     painterResource(Res.drawable.ic_moon_outline),
+                    tint = SwipeHomeTheme.colors.neutral,
                     contentDescription = stringResource(string.profile_tab_toggle_theme_description_dark)
                 )
             }else {
                 Icon(
                     painterResource(Res.drawable.ic_theme_light),
+                    tint = SwipeHomeTheme.colors.neutral,
                     contentDescription = stringResource(string.profile_tab_toggle_theme_description_light)
                 )
             }
@@ -93,15 +97,19 @@ fun ProfileTopBar(){
 }
 
 @Composable
-fun ProfileHeader(){
+fun ProfileHeader(userProfile: State<CreateUserInfoResponses?>){
+
     Column(
         modifier = Modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally
     ){
+        val avatarUrl = "${PropertyApiService.BASE_URL}/${userProfile.value?.avatarUrl}"
+
+        println("Avatar URL: $avatarUrl")
         // Аватарка з градієнтною рамкою редагувати
         Box(contentAlignment = Alignment.BottomEnd){
             AsyncImage(
-                model = "http://",
+                model = avatarUrl,
                 contentDescription = stringResource(string.profile_tab_photo_avatar_description),
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
@@ -109,7 +117,12 @@ fun ProfileHeader(){
                     .clip(CircleShape)
                     .border(
                         width = 3.dp,
-                        brush = Brush.linearGradient(colors = listOf( SwipeHomeTheme.colors.primary, SwipeHomeTheme.colors.neutral)),
+                        brush = Brush.linearGradient(
+                            colors = listOf(
+                                SwipeHomeTheme.colors.primary,
+                                SwipeHomeTheme.colors.neutral
+                            )
+                        ),
                         shape = CircleShape
                     )
             )
@@ -117,9 +130,10 @@ fun ProfileHeader(){
 
         Spacer(modifier = Modifier.height(16.dp))
 
+        val fullName = "${userProfile.value?.firstName} ${userProfile.value?.lastName}"
         // Ім'я та галочка верифікації
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Text("Петро Мафіознік", style = SwipeHomeTheme.typography.headline)
+            Text(fullName , style = SwipeHomeTheme.typography.headline, color = SwipeHomeTheme.colors.neutral)
             Spacer(modifier = Modifier.width(4.dp))
             Icon(painterResource(Res.drawable.ic_user_verified), contentDescription = stringResource(string.profile_tab_verified_description), tint = SwipeHomeTheme.colors.primary, modifier = Modifier.size(20.dp))
         }
@@ -129,6 +143,7 @@ fun ProfileHeader(){
         Text(
             text = stringResource(string.profile_tab_subscription_management),
             style = SwipeHomeTheme.typography.label,
+            color = SwipeHomeTheme.colors.neutral,
             modifier = Modifier.clickable{/*TODO: Екран з підпискою*/} .padding(4.dp)
         )
     }
@@ -230,7 +245,7 @@ fun ProfileActions(){
                 SwipeHomeTheme.colors.error,
                 SwipeHomeTheme.colors.neutral
             ),
-            elevation = ButtonDefaults.buttonElevation(0.dp)
+            elevation = ButtonDefaults.buttonElevation(2.dp)
         ){
             Icon(painterResource(Res.drawable.ic_logout), contentDescription = stringResource(string.profile_tab_logout), tint = SwipeHomeTheme.colors.neutral)
             Spacer(modifier = Modifier.width(8.dp))
@@ -239,10 +254,15 @@ fun ProfileActions(){
         Spacer(modifier = Modifier.height(24.dp))
 
         // Кнопка видалення акаунта
-        Row(
-            modifier = Modifier.clickable{/*TODO: Видалення акаунту*/}.padding(8.dp),
-            horizontalArrangement = Arrangement.Center,
-            verticalAlignment = Alignment.CenterVertically
+        Button(
+            onClick = { /*TODO: Видалення акаунту*/},
+            modifier = Modifier.fillMaxWidth().height(56.dp),
+            shape = SwipeHomeTheme.shapes.mediumShape,
+            colors = ButtonDefaults.buttonColors(
+                SwipeHomeTheme.colors.surface,
+                SwipeHomeTheme.colors.neutral
+            ),
+            elevation = ButtonDefaults.buttonElevation(2.dp)
         ){
             Icon(painterResource(Res.drawable.ic_trash_can), contentDescription = stringResource(string.profile_tab_delete_account), tint = SwipeHomeTheme.colors.error)
             Spacer(modifier = Modifier.width(8.dp))
