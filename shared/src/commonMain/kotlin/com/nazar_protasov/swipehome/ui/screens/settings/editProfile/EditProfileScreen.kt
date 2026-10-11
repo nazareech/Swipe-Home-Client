@@ -17,13 +17,10 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
@@ -35,6 +32,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -47,18 +45,20 @@ import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
+import com.nazar_protasov.swipehome.network.PropertyApiService
 import com.nazar_protasov.swipehome.ui.screens.settings.editProfile.components.CustomTextFiles
 import com.nazar_protasov.swipehome.ui.screens.settings.editProfile.components.EditProfileTopBar
 import com.nazar_protasov.swipehome.ui.screens.settings.editProfile.components.EditableProfileAvatar
 import com.nazar_protasov.swipehome.ui.screens.settings.editProfile.components.IsConfirmData
 import com.nazar_protasov.swipehome.ui.screens.settings.editProfile.components.LinkedAccountItem
-import com.nazar_protasov.swipehome.ui.screens.settings.editProfile.components.PhotoBottomSheetContent
 import com.nazar_protasov.swipehome.ui.screens.settings.editProfile.components.SectionCard
 import com.nazar_protasov.swipehome.ui.screens.settings.editProfile.components.SectionTitle
 import com.nazar_protasov.swipehome.ui.screens.settings.editProfile.components.TipBanner
 import com.nazar_protasov.swipehome.ui.theme.SwipeHomeTheme
 import com.nazar_protasov.swipehome.ui.utils.CountryPhoneCode
 import com.nazar_protasov.swipehome.ui.utils.PhoneVisualTransformation
+import com.preat.peekaboo.image.picker.SelectionMode
+import com.preat.peekaboo.image.picker.rememberImagePickerLauncher
 import mymultiplatformproject.shared.generated.resources.Res
 import mymultiplatformproject.shared.generated.resources.ic_apple_logo
 import mymultiplatformproject.shared.generated.resources.ic_arrow_next
@@ -74,11 +74,11 @@ import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.koinInject
 
 class EditProfileScreen : Screen {
-    @OptIn(ExperimentalMaterial3Api::class)
     @Composable
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
         val scrollState = rememberScrollState()
+        val coroutineScope = rememberCoroutineScope()
 
         val screenModel: EditProfileScreenModel = koinInject()
 
@@ -104,7 +104,7 @@ class EditProfileScreen : Screen {
         var phone by rememberSaveable { mutableStateOf("") }
         var countryCode by rememberSaveable { mutableStateOf("+48") } // Код за замовчуванням
         var email by rememberSaveable { mutableStateOf("") }
-        var showPhotoBottomSheet by remember { mutableStateOf(false) }
+        var photoByteArray by remember { mutableStateOf<ByteArray?>(null) }  // Готовий тип файл для POST-запиту
 
         // Заповнення даних при завантаженні
         LaunchedEffect(userProfile) {
@@ -117,6 +117,25 @@ class EditProfileScreen : Screen {
                 email = profile.email
             }
         }
+
+        // Створюємо лаунчер для галереї
+        val singleImagePicker = rememberImagePickerLauncher(
+            selectionMode = SelectionMode.Single,
+            scope = coroutineScope,
+            onResult = { byteArrays ->
+                // Отримуємо перше вибране фото
+                val selectedPhoto = byteArrays.firstOrNull()
+                if (selectedPhoto != null){
+                    photoByteArray = selectedPhoto
+                    screenModel.updateAvatar(photoByteArray)
+                }
+            }
+        )
+        var fullAvatarUrl = userProfile?.avatarUrl?.let {
+            if (it.startsWith("http")) it else "${PropertyApiService.BASE_URL}/$it"
+        }
+
+        if (fullAvatarUrl == null) fullAvatarUrl = "${PropertyApiService.BASE_URL}/uploads/photo_not_found.jpg"
 
         Scaffold(
             snackbarHost = { SnackbarHost(snackbarHostState) },
@@ -164,7 +183,12 @@ class EditProfileScreen : Screen {
                     modifier = Modifier.fillMaxWidth().padding(vertical = 24.dp),
                     contentAlignment = Alignment.Center
                 ) {
-                    EditableProfileAvatar(onClick = { showPhotoBottomSheet = true })
+                    EditableProfileAvatar(
+                        avatarUrl = fullAvatarUrl,
+                        onEditClick = {
+                            singleImagePicker.launch()
+                        }
+                    )
                 }
 
                 // Особиста інформація
@@ -197,7 +221,7 @@ class EditProfileScreen : Screen {
                             horizontalArrangement = Arrangement.SpaceBetween
                         ) {
                             Text(
-                                text = "Про себe",
+                                text = "Про себе",
                                 style = SwipeHomeTheme.typography.caption,
                                 color = SwipeHomeTheme.colors.onSurfaceSecondary
                             )
@@ -452,19 +476,6 @@ class EditProfileScreen : Screen {
                             false,
                             SwipeHomeTheme.colors.outline
                         )
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(32.dp))
-
-                // Bottom Sheet для фото
-                if (showPhotoBottomSheet) {
-                    ModalBottomSheet(
-                        onDismissRequest = { showPhotoBottomSheet = false },
-                        containerColor = SwipeHomeTheme.colors.background,
-                        dragHandle = { BottomSheetDefaults.DragHandle() }
-                    ) {
-                        PhotoBottomSheetContent(onDismiss = { showPhotoBottomSheet = false })
                     }
                 }
             }

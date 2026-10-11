@@ -148,4 +148,53 @@ class EditProfileScreenModel(
             }
         }
     }
+
+    fun updateAvatar(photoByteArray: ByteArray?){
+        if (_isLoading.value) return
+
+        if (photoByteArray == null) {
+            _snackbarEvent.trySend("Помилка завантаження фото. Спробуйте ще раз")
+            return
+        }
+
+        screenModelScope.launch {
+            _isLoading.value = true
+
+            try {
+                // Отримуємо поточний профіль та змінюємо дані
+                val token = sessionManager.tokenFlow.firstOrNull() ?: return@launch
+
+                // Передаємо токен і нове фото
+                val result = withTimeoutOrNull(10.seconds) {
+                    // TODO: У apiService створити метод updatedProfile
+                    apiService.updatedAvatar(
+                        token = token,
+                        photoBytes = photoByteArray
+                    )
+                }
+
+                if (result != null) {
+
+                    val currentProfile = userProfile.value ?: return@launch
+
+                    val updatedProfile = currentProfile.copy(
+                        avatarUrl = result.avatarUrl
+                    )
+                    // Зберігаємо локально у файл JSON
+                    sessionManager.saveProfile(updatedProfile)
+
+                    _snackbarEvent.send("Аватар успішно оновлено")
+                } else {
+                    _snackbarEvent.send("Помилка завантаження фото. Спробуйте ще раз")
+                }
+
+            } catch (e: Exception) {
+                if (e is CancellationException) throw e
+                println("Помилка мережі: ${e.message}")
+                _snackbarEvent.send("Помилка з'єднання: ${e.getLocalizedMessage()}")
+            } finally {
+                _isLoading.value = false
+            }
+        }
+    }
 }

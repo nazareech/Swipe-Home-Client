@@ -86,7 +86,7 @@ fun EditProfileTopBar(onBackClicked: () -> Unit, onSaveClick: () -> Unit){
 }
 
 @Composable
-fun EditableProfileAvatar(onClick:() -> Unit){
+fun EditableProfileAvatar(avatarUrl: String, onEditClick:() -> Unit){
     Column(
         modifier = Modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally
@@ -94,7 +94,7 @@ fun EditableProfileAvatar(onClick:() -> Unit){
         // Аватарка з градієнтною рамкою редагувати
         Box(contentAlignment = Alignment.BottomEnd) {
             AsyncImage(
-                model = "http://",
+                model = avatarUrl,
                 contentDescription = stringResource(string.profile_tab_photo_avatar_description),
                 contentScale = ContentScale.Crop,
                 modifier = Modifier
@@ -120,7 +120,7 @@ fun EditableProfileAvatar(onClick:() -> Unit){
                     .clip(CircleShape)
                     .background(SwipeHomeTheme.colors.background)
                     .border(2.dp, SwipeHomeTheme.colors.primary, CircleShape)
-                    .clickable { /*TODO Змінити фото*/ },
+                    .clickable { onEditClick() },
                 contentAlignment = Alignment.Center
             ) {
                 Icon(

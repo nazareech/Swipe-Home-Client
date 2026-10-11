@@ -202,6 +202,38 @@ class PropertyApiService(private val client: io.ktor.client.HttpClient){
             false
         }
     }
+    suspend fun updatedAvatar(token: String, photoBytes: ByteArray): UpdateAvatarRespond?{
+        return try {
+            val response = client.post("${BASE_URL}/users/profile/uploadAvatar"){
+                // Додаємо Authorization заголовок
+                header("Authorization", "Bearer $token")
+                // Передаємо тіло запиту (DTO автоматично конвертується на JSON)
+                setBody(MultiPartFormDataContent(formData {
+                    append("avatar", photoBytes, Headers.build {
+                        append(HttpHeaders.ContentType, "image/jpeg")
+                        append(
+                            HttpHeaders.ContentDisposition,
+                            "form-data; name=\"avatar\"; filename=\"avatar.jpg\""
+                        )
+                    })
+                }))
+            }
+
+            if (response.status.isSuccess()) {
+                val result = response.body<UpdateAvatarRespond>()
+                println("Аватар успішно оновлено: ${result.avatarUrl} ")
+                result
+            } else {
+                val errorBody = response.body<String>()
+                println("Помилка відправки фото для аватара: ${response.status} - $errorBody")
+                null
+            }
+        } catch (e: Exception) {
+            if (e is CancellationException) throw e
+            println("Помилка відправки фото для аватара: ${e.message}")
+            null
+        }
+    }
 
     suspend fun createProperty(request: CreatePropertyRequest, photoPaths: List<String>, token: String): CreatePropertyResponse? {
         return try {

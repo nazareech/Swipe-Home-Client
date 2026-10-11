@@ -16,3 +16,7 @@ data class UpdateProfileRequest(
     val lastSeen: String? ,
     val avatarUrl: String?
 )
+@Serializable
+data class UpdateAvatarRespond(
+    val avatarUrl: String
+)
