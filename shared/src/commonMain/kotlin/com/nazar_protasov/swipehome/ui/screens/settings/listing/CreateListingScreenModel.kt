@@ -8,8 +8,10 @@ import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
 import com.nazar_protasov.swipehome.data.local.entity.MyListingEntity
 import com.nazar_protasov.swipehome.data.local.entity.SwipeHomeDao
+import com.nazar_protasov.swipehome.network.API.GeocodingApiService
 import com.nazar_protasov.swipehome.network.CreatePropertyRequest
 import com.nazar_protasov.swipehome.network.PropertyApiService
+import com.nazar_protasov.swipehome.network.dto.NominatimResponse
 import com.nazar_protasov.swipehome.ui.screens.settings.listing.components.ListingStatus
 import com.nazar_protasov.swipehome.ui.screens.settings.listing.createListing.components.ParkingType
 import com.nazar_protasov.swipehome.ui.screens.settings.listing.createListing.components.PropertyType
@@ -17,6 +19,8 @@ import com.nazar_protasov.swipehome.ui.screens.settings.listing.createListing.co
 import com.nazar_protasov.swipehome.ui.utils.getLocalizedMessage
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeoutOrNull
@@ -27,7 +31,8 @@ import kotlin.time.TimeSource
 
 class CreateListingScreenModel(
     private val dao: SwipeHomeDao,
-    private val apiService: PropertyApiService
+    private val apiService: PropertyApiService,
+    private val apiGeocodingService: GeocodingApiService
 ): ScreenModel {
     // ID чернетки, якщо ми редагуємо існуючу, або null, якщо це нове оголошення
     var listingId by mutableStateOf<String?>(null)
@@ -38,6 +43,10 @@ class CreateListingScreenModel(
 
     var selectedType by mutableStateOf(PropertyType.APARTMENT)
     var address by mutableStateOf("")
+    var addressSuggestions by mutableStateOf<List<NominatimResponse>>(emptyList())
+    var isSearchingAddress by mutableStateOf(false)
+    var lat by mutableStateOf(0.0)
+    var lon by mutableStateOf(0.0)
     var area by mutableStateOf("")
     var price by mutableStateOf("")
 
@@ -80,6 +89,8 @@ class CreateListingScreenModel(
                 this@CreateListingScreenModel.serverId = draft.serverId
                 this@CreateListingScreenModel.selectedType = draft.propertyType
                 this@CreateListingScreenModel.address = draft.address
+                this@CreateListingScreenModel.lat = draft.latitude
+                this@CreateListingScreenModel.lon = draft.longitude
                 this@CreateListingScreenModel.area = draft.area
                 this@CreateListingScreenModel.price = draft.price
                 this@CreateListingScreenModel.countBedrooms = draft.bedrooms
@@ -222,6 +233,8 @@ class CreateListingScreenModel(
             title = title,
             description = description,
             address = address,
+            latitude = lat,
+            longitude = lon,
             area = area,
             price = price,
             bedrooms = countBedrooms,
@@ -276,7 +289,7 @@ class CreateListingScreenModel(
             }
             _snackbarEvent.send("Чернетку збережено")
             // Даємо SnackBar 1-2 секунди повисіти на екрані, перш ніж закрити його
-            kotlinx.coroutines.delay(1500.milliseconds)
+            delay(1500.milliseconds)
             onSuccess()
 
             isLoading = false
@@ -305,9 +318,33 @@ class CreateListingScreenModel(
             if (syncSuccess){
                 saveLocalState(ListingStatus.MODERATION)
                 // Даємо SnackBar 1-2 секунди повисіти на екрані, перш ніж закрити його
-                kotlinx.coroutines.delay(1500.milliseconds)
+                delay(1500.milliseconds)
                 onSuccess()
             }
         }
+    }
+
+    private var searchJob: Job? = null
+    // Метод для пошуку адресу
+    fun onAddressInputChanged(query: String){
+        address = query
+        searchJob?.cancel()
+        if (query.trim().length < 3){
+            addressSuggestions = emptyList()
+            return
+        }
+        searchJob = screenModelScope.launch {
+            delay(500.milliseconds)
+            isSearchingAddress = true
+            addressSuggestions = apiGeocodingService.getCoordinates(query)
+            isSearchingAddress = false
+        }
+    }
+
+    fun onAddressSelected(item : NominatimResponse){
+        address = item.displayName
+        lat = item.lat.toDoubleOrNull() ?: 0.0
+        lon = item.lon.toDoubleOrNull() ?: 0.0
+        addressSuggestions = emptyList()
     }
 }

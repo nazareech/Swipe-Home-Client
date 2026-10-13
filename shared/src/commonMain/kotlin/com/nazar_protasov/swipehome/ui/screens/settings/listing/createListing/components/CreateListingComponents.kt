@@ -29,6 +29,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
@@ -68,6 +69,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil3.compose.AsyncImage
+import com.nazar_protasov.swipehome.network.dto.NominatimResponse
 import com.nazar_protasov.swipehome.ui.theme.SwipeHomeTheme
 import mymultiplatformproject.shared.generated.resources.Res
 import mymultiplatformproject.shared.generated.resources.Res.string
@@ -248,10 +250,18 @@ fun WizardBottomBar(currentStep: Int, totalSteps: Int, onSaveClick: () -> Unit, 
 @Composable
 fun Step1BasicInfo(
     selectedType: PropertyType, onTypeSelected: (PropertyType) -> Unit,
-    address: String, onAddressChange: (String) -> Unit,
+
+    address: String,
+    onAddressSearchInput: (String) -> Unit, // Викликається, коли користувач вводить адресу
+    addressSuggestions: List<NominatimResponse>, // Список пропозицій для адреси
+    onAddressSelected: (NominatimResponse) -> Unit, // Викликаємо коли користувач обрав адресу з пропозицій
+
     area: String, onAreaChange: (String) -> Unit,
     price: String, onPriceChange: (String) -> Unit
 ){
+    // Стан для контролю видимості випадаючого списку
+    var isDropdownVisible by remember { mutableStateOf(false) }
+
     Column {
         Text("Який тип вашої нерухомості?", style = SwipeHomeTheme.typography.headline, fontWeight = FontWeight.Bold, lineHeight = 34.sp)
         Spacer(modifier = Modifier.height(8.dp))
@@ -283,27 +293,75 @@ fun Step1BasicInfo(
             }
         }
         Spacer(modifier = Modifier.height(8.dp))
-        OutlinedTextField(
-            value = address,
-            onValueChange = onAddressChange,
-            leadingIcon = { Icon(painterResource(Res.drawable.ic_location_pin), contentDescription = null, tint = SwipeHomeTheme.colors.neutral) },
-            trailingIcon = {
-                Box(modifier = Modifier.padding(end = 8.dp).clip(SwipeHomeTheme.shapes.mediumShape).background(SwipeHomeTheme.colors.surface).padding(8.dp, 4.dp)){
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        Icon(
-                            painterResource(Res.drawable.ic_location_pin),
-                            contentDescription = null,
-                            tint = SwipeHomeTheme.colors.neutral
-                        )
-                        Spacer(modifier = Modifier.width(4.dp))
-                        Text("Google Places", style = SwipeHomeTheme.typography.caption, color = SwipeHomeTheme.colors.neutral)
+
+        Box {
+            OutlinedTextField(
+                value = address,
+                onValueChange = { newValue ->
+                    onAddressSearchInput(newValue)
+                    isDropdownVisible = newValue.length > 2
+                },
+                leadingIcon = {
+                    Icon(
+                        painterResource(Res.drawable.ic_location_pin),
+                        contentDescription = null,
+                        tint = SwipeHomeTheme.colors.neutral
+                    )
+                },
+                trailingIcon = {
+                    Box(
+                        modifier = Modifier.padding(end = 8.dp)
+                            .clip(SwipeHomeTheme.shapes.mediumShape)
+                            .background(SwipeHomeTheme.colors.surface).padding(8.dp, 4.dp)
+                    ) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(
+                                painterResource(Res.drawable.ic_location_pin),
+                                contentDescription = null,
+                                tint = SwipeHomeTheme.colors.neutral
+                            )
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Text(
+                                "OSM Search",
+                                style = SwipeHomeTheme.typography.caption,
+                                color = SwipeHomeTheme.colors.neutral
+                            )
+                        }
                     }
+                },
+                modifier = Modifier.fillMaxWidth(),
+                shape = SwipeHomeTheme.shapes.mediumShape,
+                colors = OutlinedTextFieldDefaults.colors(
+                    focusedBorderColor = SwipeHomeTheme.colors.primary,
+                    unfocusedBorderColor = SwipeHomeTheme.colors.neutral
+                )
+            )
+
+            // Випадний список
+            DropdownMenu(
+                expanded = isDropdownVisible && addressSuggestions.isNotEmpty(),
+                onDismissRequest = { isDropdownVisible = false },
+                modifier = Modifier
+                    .fillMaxWidth(0.9f)
+                    .background(SwipeHomeTheme.colors.background)
+            ){
+                addressSuggestions.forEach { suggestion ->
+                    DropdownMenuItem(
+                        text = {
+                            Text(
+                                text = suggestion.displayName,
+                                style = SwipeHomeTheme.typography.caption,
+                                color = SwipeHomeTheme.colors.neutral
+                            )
+                        },
+                        onClick = {
+                            onAddressSelected(suggestion) // Передаємо обраний варіант
+                            isDropdownVisible = false // Ховаємо список
+                        },
+                    )
                 }
-           },
-           modifier = Modifier.fillMaxWidth(),
-           shape = SwipeHomeTheme.shapes.mediumShape,
-           colors = OutlinedTextFieldDefaults.colors(focusedBorderColor = SwipeHomeTheme.colors.primary, unfocusedBorderColor = SwipeHomeTheme.colors.neutral)
-        )
+            }
+        }
         Spacer(modifier = Modifier.height(8.dp))
         Row(verticalAlignment = Alignment.CenterVertically){
             Icon(painterResource(Res.drawable.ic_check_circle_outline), contentDescription = null, tint = SwipeHomeTheme.colors.primary, modifier = Modifier.size(14.dp))

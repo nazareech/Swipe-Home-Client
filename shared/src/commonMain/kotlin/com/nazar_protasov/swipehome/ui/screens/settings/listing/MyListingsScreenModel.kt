@@ -138,6 +138,8 @@ class MyListingsScreenModel(private val apiService: PropertyApiService, private 
                                 title = dto.title,
                                 description = dto.description,
                                 address = dto.localization,
+                                latitude = 0.0, // TODO: dto.lat,
+                                longitude = 0.0, // TODO: dto.lon,
                                 area = dto.area.toString(),
                                 price = dto.price.toString(),
                                 bedrooms = dto.rooms,
