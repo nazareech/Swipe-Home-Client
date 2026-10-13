@@ -114,6 +114,7 @@ fun PropertyDTO.toUIDetailsProperty(): PropertyDetails {
 
 class PropertyApiService(private val client: io.ktor.client.HttpClient){
     companion object {
+        // adb reverse tcp:8080 tcp:8080
         const val BASE_URL = "http://192.168.1.6:8080"
     }
 
@@ -139,6 +140,7 @@ class PropertyApiService(private val client: io.ktor.client.HttpClient){
         } catch (e: Exception) {
             if (e is CancellationException) throw e
             println("Error fetching properties: ${e.message}")
+            e.printStackTrace()
             emptyList() // Повертаємо пустий список у разі помилки
         }
     }

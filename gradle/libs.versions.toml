@@ -2,7 +2,7 @@
 agp = "9.4.1"
 androidCompileSdk = "37"
 androidMinSdk = "24"
-androidTargetSdk = "37"
+androidTargetSdk = "34"
 androidx-activity = "1.13.0"
 androidx-lifecycle = "2.11.0"
 composeMultiplatform = "1.12.1"
