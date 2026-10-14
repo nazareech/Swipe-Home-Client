@@ -18,6 +18,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.ui.window.PopupProperties
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.rememberLazyGridState
@@ -341,6 +342,10 @@ fun Step1BasicInfo(
             DropdownMenu(
                 expanded = isDropdownVisible && addressSuggestions.isNotEmpty(),
                 onDismissRequest = { isDropdownVisible = false },
+                properties = PopupProperties(
+                    focusable = false,
+                    dismissOnBackPress = true
+                ),
                 modifier = Modifier
                     .fillMaxWidth(0.9f)
                     .background(SwipeHomeTheme.colors.background)
@@ -624,7 +629,7 @@ fun ParkingDropdownMenu(
                 focusedBorderColor = SwipeHomeTheme.colors.primary,
                 unfocusedBorderColor = SwipeHomeTheme.colors.neutral
             ),
-            modifier = Modifier.fillMaxWidth().menuAnchor(),
+            modifier = Modifier.fillMaxWidth(),
         )
 
         // Випадне меню

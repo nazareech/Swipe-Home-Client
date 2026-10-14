@@ -34,6 +34,8 @@ data class PropertyDTO(
     val title: String,
     val description: String,
     val localization: String,
+    val latitude: Double,
+    val longitude: Double,
     val price: Double,
     val area: Double,
     val rooms: Int,

@@ -135,6 +135,18 @@ class CreateListingScreenModel(
                 .filter { it.startsWith("http") }
                 .map { it.substringAfter("/uploads/") } // Передаємо бекенду тільки відносні шляхи
 
+            // Перевірка на наявність даних про довготу та широту
+            if (lat == 0.0 && lon == 0.0 && address.isNotBlank()) {
+                // Якщо не вказано, просто беремо перший збіг за введеною адресою
+                val firstMatch = apiGeocodingService.getCoordinates(address).firstOrNull()
+                if (firstMatch != null) {
+                    lat = firstMatch.lat.toDoubleOrNull() ?: 0.0
+                    lon = firstMatch.lon.toDoubleOrNull() ?: 0.0
+                } else {
+                    throw Exception("Координати не визначені")
+                }
+            }
+
             // Готуємо дані для відправки на сервер
             val request = CreatePropertyRequest(
                 idProperty = this@CreateListingScreenModel.serverId,
@@ -143,6 +155,8 @@ class CreateListingScreenModel(
                 photosList = existingPhotosOnServer,
                 mainPhoto = uploadedPhotos.firstOrNull(),
                 localization = address,
+                latitude = lat,
+                longitude = lon,
                 price = price.toDoubleOrNull() ?: 0.0,
                 area = area.toDoubleOrNull() ?: 0.0,
                 rooms = countBedrooms,
