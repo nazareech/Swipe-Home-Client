@@ -1,0 +1,39 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+android:width="24dp"
+android:height="24dp"
+android:viewportWidth="24"
+android:viewportHeight="24">
+
+<!-- Зовнішнє коло (циферблат компаса) -->
+<path
+    android:strokeColor="#000000"
+    android:strokeWidth="2"
+    android:pathData="M12,2A10,10 0,1 0,22 12,10 10,0 0,0 12,2z" />
+
+<!-- Короткі мітки сторін світу (північ, південь, захід, схід) -->
+<path
+    android:strokeColor="#000000"
+    android:strokeWidth="2"
+    android:strokeLineCap="round"
+    android:pathData="M12,2v2 M12,20v2 M2,12h2 M20,12h2" />
+
+<!-- Темна стрілка (вказує на північ/вгору) -->
+<path
+    android:fillColor="#000000"
+    android:pathData="M12,4 L12,12 L8.5,13.5 Z" />
+
+<!-- Світла стрілка (вказує на південь/вниз, контрастна частина) -->
+<path
+    android:strokeColor="#000000"
+    android:strokeWidth="1.5"
+    android:strokeLineJoin="round"
+    android:pathData="M12,4 L12,12 L15.5,13.5 Z" />
+
+<!-- Центральна вісь/пін стрілки -->
+<circle
+    android:fillColor="#000000"
+    android:cx="12"
+    android:cy="12"
+    android:r="1" />
+
+</vector>

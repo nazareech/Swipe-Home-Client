@@ -1,4 +1,6 @@
 import androidx.room.gradle.RoomExtension
+import java.util.Properties
+import com.codingfeline.buildkonfig.compiler.FieldSpec.Type.STRING // <-- ДОДАЙ ЦЕЙ ІМПОРТ
 
 plugins {
     alias(libs.plugins.kotlinMultiplatform)
@@ -8,15 +10,16 @@ plugins {
     alias(libs.plugins.kotlin.serialization)
     alias(libs.plugins.ksp)
     alias(libs.plugins.androidx.room)
+    alias(libs.plugins.buildkonfig)
 }
 
 kotlin {
     // Вказуємо єдину версію Java для всього проєкту
     jvmToolchain(11)
 
-    // 1. Стандартна реєстрація Android-таргету
+    // Стандартна реєстрація Android-таргету
     androidTarget()
-    // 2. Налаштування для iOS
+    // Налаштування для iOS
     listOf(
         iosArm64(),
         iosSimulatorArm64()
@@ -27,7 +30,7 @@ kotlin {
         }
     }
 
-    // 3. Залежності
+    // Залежності
     sourceSets {
         commonMain.dependencies {
             implementation(libs.compose.runtime)
@@ -82,6 +85,7 @@ kotlin {
 
         androidMain.dependencies {
             implementation(libs.ktor.client.android)
+            implementation(libs.maplibre.android)
         }
 
         iosMain.dependencies {
@@ -90,7 +94,22 @@ kotlin {
     }
 }
 
-// 4. Окремий блок для конфігурації Android-модуля
+buildkonfig {
+    packageName = "com.nazar_protasov.swipehome"
+
+    defaultConfigs {
+        val properties = Properties()
+        val localProperties = project.rootProject.file("local.properties")
+        if (localProperties.exists()) {
+            properties.load(localProperties.inputStream())
+        }
+        val apiKey = properties.getProperty("MAPTILER_API_KEY") ?: ""
+
+        buildConfigField(STRING, "MAPTILER_API_KEY", apiKey)
+    }
+}
+
+// Окремий блок для конфігурації Android-модуля
 android {
     namespace = "com.nazar_protasov.swipehome.shared"
     compileSdk = libs.versions.androidCompileSdk.get().toInt()
@@ -105,12 +124,12 @@ android {
     }
 }
 
-// 5. Налаштування Room KMP
+// Налаштування Room KMP
 configure<RoomExtension> {
     schemaDirectory("$projectDir/schemas")
 }
 
-// 6. Залежності компілятора (KSP)
+// Залежності компілятора (KSP)
 dependencies {
     // Вказуємо KSP для всіх таргетів
     add("kspAndroid", libs.androidx.room.compiler)

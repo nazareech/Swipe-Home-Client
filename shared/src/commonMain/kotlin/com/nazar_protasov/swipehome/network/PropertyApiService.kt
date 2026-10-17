@@ -98,6 +98,8 @@ fun PropertyDTO.toUIDetailsProperty(): PropertyDetails {
         title = this.title,
         description = this.description,
         localization = this.localization,
+        lat = this.latitude,
+        lon = this.longitude,
         price = formattedPrice,
         area = this.area.toString(),
         rooms = this.rooms.toString(),
@@ -117,7 +119,7 @@ fun PropertyDTO.toUIDetailsProperty(): PropertyDetails {
 class PropertyApiService(private val client: io.ktor.client.HttpClient){
     companion object {
         // adb reverse tcp:8080 tcp:8080
-        const val BASE_URL = "http://192.168.1.6:8080"
+        const val BASE_URL = "http://127.0.0.1:8080"
     }
 
     suspend fun fetchProperties(

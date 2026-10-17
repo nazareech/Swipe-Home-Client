@@ -20,6 +20,8 @@ data class PropertyDetails(
     val title: String,
     val description: String,
     val localization: String,
+    val lat: Double,
+    val lon: Double,
     val price: String,
     val area: String,
     val rooms: String,

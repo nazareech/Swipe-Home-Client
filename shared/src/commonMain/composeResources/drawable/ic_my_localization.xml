@@ -1,0 +1,25 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+android:width="24dp"
+android:height="24dp"
+android:viewportWidth="24"
+android:viewportHeight="24">
+
+<!-- Внутрішня суцільна точка (поточна геопозиція) -->
+<path
+    android:fillColor="#000000"
+    android:pathData="M12,12m-3,0a3,3 0,1 1,6 0a3,3 0,1 1,-6 0" />
+
+<!-- Зовнішнє коло цілі -->
+<path
+    android:strokeColor="#000000"
+    android:strokeWidth="2"
+    android:pathData="M12,20C7.58,20 4,16.42 4,12C4,7.58 7.58,4 12,4C16.42,4 20,7.58 20,12C20,16.42 16.42,20 12,20Z" />
+
+<!-- Прицільні засічки (північ, південь, захід, схід) -->
+<path
+    android:strokeColor="#000000"
+    android:strokeWidth="2"
+    android:strokeLineCap="round"
+    android:pathData="M12,2V5 M12,19V22 M2,12H5 M19,12H22" />
+
+</vector>

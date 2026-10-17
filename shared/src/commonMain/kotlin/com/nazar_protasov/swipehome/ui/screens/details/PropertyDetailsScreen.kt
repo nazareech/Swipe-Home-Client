@@ -27,6 +27,7 @@ import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedButton
@@ -60,6 +61,8 @@ import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.Navigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import coil3.compose.AsyncImage
+import com.nazar_protasov.swipehome.ui.components.map.MapController
+import com.nazar_protasov.swipehome.ui.components.map.PropertyMapView
 import com.nazar_protasov.swipehome.ui.models.PropertyDetails
 import com.nazar_protasov.swipehome.ui.screens.chat.ChatScreen
 import com.nazar_protasov.swipehome.ui.theme.SwipeHomeTheme
@@ -87,10 +90,14 @@ import mymultiplatformproject.shared.generated.resources.ic_arrow_single_down
 import mymultiplatformproject.shared.generated.resources.ic_arrow_single_up
 import mymultiplatformproject.shared.generated.resources.ic_bedroom
 import mymultiplatformproject.shared.generated.resources.ic_close
+import mymultiplatformproject.shared.generated.resources.ic_compass
 import mymultiplatformproject.shared.generated.resources.ic_home_area
 import mymultiplatformproject.shared.generated.resources.ic_location_pin
+import mymultiplatformproject.shared.generated.resources.ic_my_localization
 import mymultiplatformproject.shared.generated.resources.ic_parking
 import mymultiplatformproject.shared.generated.resources.ic_share
+import mymultiplatformproject.shared.generated.resources.ic_zoom_in
+import mymultiplatformproject.shared.generated.resources.ic_zoom_out
 import mymultiplatformproject.shared.generated.resources.owner_description
 import mymultiplatformproject.shared.generated.resources.search_card_section_area
 import org.jetbrains.compose.resources.painterResource
@@ -162,7 +169,11 @@ data class PropertyDetailsScreen(val property: PropertyDetails) : Screen {
 
                 Spacer(modifier = Modifier.height(24.dp))
 
-                LocationSection()
+                LocationSection(
+                    localizationText = property.localization,
+                    lat = property.lat,
+                    lon = property.lon
+                )
 
                 Spacer(modifier = Modifier.height(24.dp))
 
@@ -601,7 +612,13 @@ data class PropertyDetailsScreen(val property: PropertyDetails) : Screen {
     }
 
     @Composable
-    fun LocationSection() {
+    fun LocationSection(
+        localizationText: String,
+        lat: Double,
+        lon: Double
+    ) {
+        var isFullScreenMapVisible by remember { mutableStateOf(false) }
+
         Column(modifier = Modifier.padding(horizontal = 16.dp)) {
             Row(
                 modifier = Modifier.fillMaxSize(),
@@ -609,7 +626,7 @@ data class PropertyDetailsScreen(val property: PropertyDetails) : Screen {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = property.localization,
+                    text = localizationText,
                     style = SwipeHomeTheme.typography.subheadline,
                     fontWeight = FontWeight.Bold,
                     color = SwipeHomeTheme.colors.neutral
@@ -624,20 +641,154 @@ data class PropertyDetailsScreen(val property: PropertyDetails) : Screen {
 
             Spacer(modifier = Modifier.height(12.dp))
 
-            /*TODO:"Замінити на реальну мапу з Google Maps / MapBox*/
+            // Прев'ю 3D-карти (180.dp)
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(180.dp)
                     .clip(SwipeHomeTheme.shapes.mediumShape)
                     .background(SwipeHomeTheme.colors.surface),
-                contentAlignment = Alignment.Center
             ){
-                Text(
-                    "Карта",
-                    style = SwipeHomeTheme.typography.headline,
-                    color = SwipeHomeTheme.colors.onSurfaceSecondary
+                PropertyMapView(
+                    lat = lat,
+                    lon = lon,
+                    isInteractive = false,
+                    modifier = Modifier.fillMaxSize()
+
+
                 )
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .clickable { isFullScreenMapVisible = !isFullScreenMapVisible }
+                )
+            }
+        }
+
+        // Діалог повноекранної 3D-карти
+        if(isFullScreenMapVisible) {
+            FullScreen3DMapDialog(
+                lat = lat,
+                lon = lon,
+                onDismiss = { isFullScreenMapVisible = false }
+            )
+        }
+    }
+
+    @Composable
+    fun FullScreen3DMapDialog(lat: Double, lon: Double, onDismiss: () -> Unit) {
+        var mapController by remember { mutableStateOf<MapController?>(null) }
+        var is3DEnabled by remember { mutableStateOf(true) }
+
+        Dialog(
+            onDismissRequest = onDismiss,
+            properties = DialogProperties(
+                usePlatformDefaultWidth = false, // Розтягуємо на весь екран
+                dismissOnBackPress = true,
+            )
+        ) {
+            Box(modifier = Modifier.fillMaxSize()){
+                // Сама інтерактивна 3D-карта
+                PropertyMapView(
+                    lat = lat,
+                    lon = lon,
+                    isInteractive = true,
+                    modifier = Modifier.fillMaxSize(),
+                    onMapLoaded = { controller ->
+                        mapController = controller
+                    }
+                )
+
+                // Кнопка назад
+                Row(
+                    modifier = Modifier
+                        .align(Alignment.TopStart)
+                        .padding(top = 48.dp, start = 16.dp)
+                        .clip(SwipeHomeTheme.shapes.mediumShape)
+                        .background(SwipeHomeTheme.colors.primary.copy(alpha = 0.85f))
+                        .clickable { onDismiss() }
+                        .padding(horizontal = 16.dp, vertical = 10.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ){
+                    Icon(
+                        painterResource(Res.drawable.ic_arrow_back),
+                        contentDescription = "Back",
+                        tint = SwipeHomeTheme.colors.onPrimary,
+                        modifier = Modifier.size(18.dp)
+                    )
+                    Spacer(modifier = Modifier.width(6.dp))
+                    Text(
+                        text = stringResource(string.btn_back),
+                        style = SwipeHomeTheme.typography.body,
+                        fontWeight = FontWeight.Medium,
+                        color = SwipeHomeTheme.colors.onPrimary
+                    )
+                }
+
+                // Панель керування картою
+                Column(
+                    modifier = Modifier
+                        .align(Alignment.CenterEnd)
+                        .padding(bottom = 16.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    // Основний блок кнопок (+, Компас, 2D/3D, -)
+                    Column(
+                        modifier = Modifier
+                            .width(48.dp)
+                            .clip(SwipeHomeTheme.shapes.mediumShape)
+                            .background(SwipeHomeTheme.colors.primary.copy(alpha = 0.9f)),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ){
+                        // Кнопка збільшення масштабу (+)
+                        IconButton(onClick = { mapController?.zoomIn() }){
+                            Icon(painterResource(Res.drawable.ic_zoom_in), contentDescription = null, tint = SwipeHomeTheme.colors.onPrimary)
+                        }
+                        HorizontalDivider(color = SwipeHomeTheme.colors.primary.copy(alpha = 0.15f), thickness = 1.dp)
+
+                        // Кнопка Компаса (Скидання на північ)
+                        IconButton(onClick = { mapController?.resetNorth() }){
+                            Icon(painterResource(Res.drawable.ic_compass), contentDescription = null, tint = SwipeHomeTheme.colors.onPrimary)
+                        }
+                        HorizontalDivider(color = SwipeHomeTheme.colors.primary.copy(alpha = 0.15f), thickness = 1.dp)
+
+                        // Кнопка Перемикання 2D / 3D
+                        IconButton(onClick = {
+                            mapController?.let{
+                                is3DEnabled = it.toggle3D()
+                            }
+                        }){
+                            Text(
+                                text = if(is3DEnabled) "2D" else "3D",
+                                style = SwipeHomeTheme.typography.label,
+                                fontWeight = FontWeight.Bold,
+                                color = SwipeHomeTheme.colors.onPrimary
+                            )
+                        }
+                        HorizontalDivider(color = SwipeHomeTheme.colors.primary.copy(alpha = 0.15f), thickness = 1.dp)
+
+                        // Кнопка зменшення масштабу (-)
+                        IconButton(onClick = { mapController?.zoomOut() }){
+                            Icon(painterResource(Res.drawable.ic_zoom_out), contentDescription = null, tint = SwipeHomeTheme.colors.onPrimary)
+                        }
+                    }
+                    // Окрема кнопка центрування локалізації
+                    Box(
+                        modifier = Modifier
+                            .size(48.dp)
+                            .clip(SwipeHomeTheme.shapes.mediumShape)
+                            .background(SwipeHomeTheme.colors.primary.copy(alpha = 0.9f))
+                            .clickable { mapController?.moveToUserLocation() },
+                        contentAlignment = Alignment.Center
+                    ){
+                        Icon(
+                            painterResource(Res.drawable.ic_my_localization),
+                            contentDescription = "My Localization",
+                            tint = SwipeHomeTheme.colors.onPrimary,
+                            modifier = Modifier.size(22.dp)
+                        )
+                    }
+                }
             }
         }
     }
