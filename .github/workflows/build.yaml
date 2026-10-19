@@ -61,7 +61,7 @@ jobs:
             -configuration Debug \
             -sdk iphoneos \
             -arch arm64 \
-            -derivedDataPath DerivedData \
+            SYMROOT=$(pwd)/build \
             CODE_SIGNING_ALLOWED=NO \
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGN_IDENTITY="" \
@@ -70,7 +70,7 @@ jobs:
       - name: Package IPA
         run: |
           mkdir -p Payload
-          cp -R DerivedData/Build/Products/Debug-iphoneos/*.app Payload/
+          cp -R build/Debug-iphoneos/*.app Payload/
           zip -r iosApp.ipa Payload
 
       - name: Upload iOS IPA
