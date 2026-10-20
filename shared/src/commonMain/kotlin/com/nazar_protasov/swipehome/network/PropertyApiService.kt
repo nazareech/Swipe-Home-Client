@@ -119,7 +119,8 @@ fun PropertyDTO.toUIDetailsProperty(): PropertyDetails {
 class PropertyApiService(private val client: io.ktor.client.HttpClient){
     companion object {
         // adb reverse tcp:8080 tcp:8080
-        const val BASE_URL = "http://127.0.0.1:8080"
+        // const val BASE_URL = "http://127.0.0.1:8080"
+        const val BASE_URL = "https://profile-spout-nutmeg.ngrok-free.dev"
     }
 
     suspend fun fetchProperties(
