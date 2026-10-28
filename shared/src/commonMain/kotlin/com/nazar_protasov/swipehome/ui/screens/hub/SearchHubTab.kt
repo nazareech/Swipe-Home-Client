@@ -74,6 +74,8 @@ internal object SearchHubScreen : Screen {
         val currentList = if (selectedTab == 0) savedProperties else rejectedProperties
         var showComparisonSheet by remember { mutableStateOf(false) }
 
+        val currentDataFilter by screenModel.selectedDateFilter.collectAsState()
+
         Scaffold(
             topBar = {SearchHubTopBar() },
             containerColor = SwipeHomeTheme.colors.background
@@ -180,8 +182,15 @@ internal object SearchHubScreen : Screen {
                                 )
                             }
                             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                                BadgeChip(stringResource(Res.string.search_hub_btn_all), true)
-                                BadgeChip(stringResource(Res.string.search_hub_btn_new), false)
+                                BadgeChip(
+                                    stringResource(Res.string.search_hub_btn_all), isSelected = currentDataFilter == DateFilter.ALL,
+                                    onClick = {screenModel.setDataFilter(DateFilter.ALL)}
+                                )
+                                BadgeChip(
+                                    stringResource(Res.string.search_hub_btn_new),
+                                    isSelected = currentDataFilter == DateFilter.NEWEST,
+                                    onClick = {screenModel.setDataFilter(DateFilter.NEWEST)}
+                                )
                             }
                         }
                     }

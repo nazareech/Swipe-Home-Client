@@ -1,6 +1,8 @@
 package com.nazar_protasov.swipehome.network
 
 import com.nazar_protasov.swipehome.network.dto.FilterRequestDTO
+import com.nazar_protasov.swipehome.network.dto.SwipeHistoryItemDTO
+import com.nazar_protasov.swipehome.network.dto.SwipeHistoryResponseDTO
 import com.nazar_protasov.swipehome.ui.models.Property
 import com.nazar_protasov.swipehome.ui.models.PropertyDetails
 import com.nazar_protasov.swipehome.ui.utils.readBytesFromCache
@@ -310,6 +312,19 @@ class PropertyApiService(private val client: io.ktor.client.HttpClient){
             if (e is CancellationException) throw e
             println("Error deleting property: ${e.message}")
             null
+        }
+    }
+
+    suspend fun fetchSwipeHistory(token: String): List<SwipeHistoryItemDTO> {
+        return try {
+            val response: SwipeHistoryResponseDTO = client.get("${BASE_URL}/swipes/history") {
+                header("Authorization", "Bearer $token")
+            }.body()
+            response.history
+        } catch (e: Exception) {
+            if (e is CancellationException) throw e
+            println("Error fetching swipe history: ${e.message}")
+            emptyList()
         }
     }
 }

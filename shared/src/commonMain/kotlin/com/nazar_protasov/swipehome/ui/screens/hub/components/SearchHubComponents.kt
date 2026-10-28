@@ -36,6 +36,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.fastForEachIndexed
 import coil3.compose.AsyncImage
+import com.nazar_protasov.swipehome.data.local.entity.HistoryPropertyEntity
+import com.nazar_protasov.swipehome.network.PropertyApiService
 import com.nazar_protasov.swipehome.ui.models.Property
 import com.nazar_protasov.swipehome.ui.theme.SwipeHomeTheme
 import mymultiplatformproject.shared.generated.resources.Res
@@ -134,12 +136,13 @@ fun StatItem(value: String, label: String, isHighlighted: Boolean, modifier: Mod
 }
 
 @Composable
-fun BadgeChip(text: String, isSelected: Boolean) {
+fun BadgeChip(text: String, isSelected: Boolean, onClick: () -> Unit) {
     Box(
         modifier = Modifier
             .clip(SwipeHomeTheme.shapes.mediumShape)
             .background(if (isSelected) SwipeHomeTheme.colors.primary else SwipeHomeTheme.colors.surface)
             .padding(horizontal = 12.dp, vertical = 6.dp)
+            .clickable { onClick() }
     ){
         Text(
             text,
@@ -350,4 +353,27 @@ fun ComparisonRow(label: String, values: List<String>){
         }
     }
     HorizontalDivider(color = SwipeHomeTheme.colors.outline, thickness = 0.5.dp)
+}
+
+// Мапер для конвертації
+fun HistoryPropertyEntity.toUIProperty(): Property {
+    val photoNames = if (imagesList.isNotBlank()) imagesList.split(",") else emptyList()
+
+    val targetImage = mainImage ?: photoNames.firstOrNull()
+    val fullImageUrl = targetImage?.let {
+        val cleanPath = it.removePrefix("/")
+        "${PropertyApiService.BASE_URL}/uploads/$cleanPath"
+    } ?: "${PropertyApiService.BASE_URL}/uploads/"
+
+    return Property(
+        id = idProperty,
+        imagesUrl = listOf(fullImageUrl),
+        price = price.toString(),
+        title = title,
+        location = localization.ifBlank { "Локалізація ще не вказана" },
+        rooms = rooms,
+        area = area,
+        buildingType = buildingType,
+        isNew = false // Можна вирахувати на основі дати
+    )
 }

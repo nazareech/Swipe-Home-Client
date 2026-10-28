@@ -11,9 +11,10 @@ import androidx.room.TypeConverters
 @Database(
     entities = [
         MyListingEntity::class,
-        SwipeEntity::class
+        SwipeEntity::class,
+        HistoryPropertyEntity::class
        ],
-    version = 2,
+    version = 3,
     exportSchema = false
 )
 @TypeConverters(SwipeHomeTypeConverters::class)

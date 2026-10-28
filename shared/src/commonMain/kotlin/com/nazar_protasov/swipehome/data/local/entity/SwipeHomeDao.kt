@@ -46,4 +46,15 @@ interface SwipeHomeDao {
     @Transaction
     @Query("SELECT * FROM my_listings WHERE localId = :id")
     suspend fun getListWithAnalyticsById(id: String): MyListingEntity?
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertSwipeHistory(items: List<HistoryPropertyEntity>)
+
+    // Отримання списку за дією ("RIGHT" або "LEFT")
+    @Query("SELECT * FROM swipe_history_properties p WHERE p.`action` = :action ORDER BY createsAt DESC")
+    fun getSwipeHistoryByAction(action: String): Flow<List<HistoryPropertyEntity>>
+
+    // Очищення або отримання всіх
+    @Query("SELECT * FROM swipe_history_properties ORDER BY createsAt DESC")
+    fun getAllSwipeHistory(): List<HistoryPropertyEntity>
 }

@@ -54,7 +54,7 @@ val appModule: Module = module {
 
     // Моделі екранів (Factory, бо вони створюються заново для нових екранів)
     single { HomeScreenModel(get()) }
-    factory { SearchHubScreenModel() }
+    factory { SearchHubScreenModel(get(), get(), get()) }
     factory { MyListingsScreenModel(get(), get()) }
     factory { AnalyticsScreenModel(get()) }
     factory { EditProfileScreenModel(get(), get()) }
