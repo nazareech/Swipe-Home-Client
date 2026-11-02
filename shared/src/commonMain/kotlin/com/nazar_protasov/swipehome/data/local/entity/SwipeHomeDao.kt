@@ -56,5 +56,5 @@ interface SwipeHomeDao {
 
     // Очищення або отримання всіх
     @Query("SELECT * FROM swipe_history_properties ORDER BY createsAt DESC")
-    fun getAllSwipeHistory(): List<HistoryPropertyEntity>
+    suspend fun getAllSwipeHistory(): List<HistoryPropertyEntity>
 }

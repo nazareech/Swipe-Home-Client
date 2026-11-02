@@ -13,7 +13,7 @@ import platform.Foundation.NSUserDomainMask
 actual fun createDataStore(): DataStore<Preferences> {
     return PreferenceDataStoreFactory.createWithPath(
         produceFile = {
-            val documentDirectory = NSFileManager.defaultManager().URLForDirectory(
+            val documentDirectory = NSFileManager.defaultManager.URLForDirectory(
                 directory = NSDocumentDirectory,
                 inDomain = NSUserDomainMask,
                 appropriateForURL = null,
