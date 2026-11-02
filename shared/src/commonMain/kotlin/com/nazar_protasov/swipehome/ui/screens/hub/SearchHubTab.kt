@@ -20,17 +20,23 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import cafe.adriel.voyager.core.annotation.InternalVoyagerApi
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.uniqueScreenKey
+import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.Navigator
+import cafe.adriel.voyager.navigator.currentOrThrow
+import cafe.adriel.voyager.navigator.internal.BackHandler
 import cafe.adriel.voyager.navigator.tab.Tab
 import cafe.adriel.voyager.navigator.tab.TabOptions
+import com.nazar_protasov.swipehome.ui.screens.details.PropertyDetailsScreen
 import com.nazar_protasov.swipehome.ui.screens.hub.components.BadgeChip
 import com.nazar_protasov.swipehome.ui.screens.hub.components.CompareFloatingBar
 import com.nazar_protasov.swipehome.ui.screens.hub.components.ComparisonTableContent
 import com.nazar_protasov.swipehome.ui.screens.hub.components.HubGridCard
 import com.nazar_protasov.swipehome.ui.screens.hub.components.SearchHubTopBar
 import com.nazar_protasov.swipehome.ui.screens.hub.components.StatisticsSection
+import com.nazar_protasov.swipehome.ui.screens.hub.components.toFallbackDetailsProperty
 import com.nazar_protasov.swipehome.ui.theme.SwipeHomeTheme
 import mymultiplatformproject.shared.generated.resources.Res
 import mymultiplatformproject.shared.generated.resources.ic_hub_compare
@@ -60,7 +66,7 @@ class SearchHubTab : Tab {
 }
 
 internal object SearchHubScreen : Screen {
-    @OptIn(ExperimentalMaterial3Api::class)
+    @OptIn(ExperimentalMaterial3Api::class, InternalVoyagerApi::class)
     @Composable
     override fun Content() {
         val screenModel: SearchHubScreenModel = koinInject()
@@ -75,6 +81,19 @@ internal object SearchHubScreen : Screen {
         var showComparisonSheet by remember { mutableStateOf(false) }
 
         val currentDataFilter by screenModel.selectedDateFilter.collectAsState()
+
+        val navigator = LocalNavigator.currentOrThrow
+
+        // Шукаємо кореневий навігатор, щоб деталі відкривалися на весь екран (поверх BottomBar)
+        // і щоб уникнути помилки ClassCastException в TabNavigator
+        var rootNavigator = navigator
+        while (rootNavigator.parent != null) {
+            rootNavigator = rootNavigator.parent!!
+        }
+
+        BackHandler(enabled = isCompareMode){
+            screenModel.exitCompareMode()
+        }
 
         Scaffold(
             topBar = {SearchHubTopBar() },
@@ -106,58 +125,40 @@ internal object SearchHubScreen : Screen {
                     }
 
                     item(span = { GridItemSpan(maxLineSpan) }) {
-                        Column(
-                            horizontalAlignment = Alignment.CenterHorizontally,
-                            modifier = Modifier.fillMaxWidth()
-                        ) {
-                            Button(
-                                onClick = { screenModel.toggleCompareMode() },
-                                colors = ButtonDefaults.buttonColors(
-                                    containerColor = if (isCompareMode) SwipeHomeTheme.colors.primary.copy(alpha = 0.8f) else SwipeHomeTheme.colors.primary
-                                ),
-                                shape = SwipeHomeTheme.shapes.largeShape,
-                                modifier = Modifier.height(40.dp)
-                            ) {
-                                Text(stringResource(Res.string.search_hub_btn_comparison), color = SwipeHomeTheme.colors.onPrimary)
+                        SecondaryTabRow(
+                            selectedTabIndex = selectedTab,
+                            containerColor = Color.Transparent,
+                            indicator = {
+                                TabRowDefaults.SecondaryIndicator(
+                                    modifier = Modifier.tabIndicatorOffset(selectedTab),
+                                    color = SwipeHomeTheme.colors.primary
+                                )
                             }
-
-                            Spacer(modifier = Modifier.height(16.dp))
-
-                            SecondaryTabRow(
-                                selectedTabIndex = selectedTab,
-                                containerColor = Color.Transparent,
-                                indicator = {
-                                    TabRowDefaults.SecondaryIndicator(
-                                        modifier = Modifier.tabIndicatorOffset(selectedTab),
-                                        color = SwipeHomeTheme.colors.primary
+                        ) {
+                            Tab(
+                                selected = selectedTab == 0,
+                                onClick = { screenModel.setTabIndex(0) },
+                                text = {
+                                    Text(
+                                        stringResource(Res.string.search_hub_saved),
+                                        style = SwipeHomeTheme.typography.label,
+                                        fontWeight = FontWeight.Bold,
+                                        color = if (selectedTab == 0) SwipeHomeTheme.colors.neutral else SwipeHomeTheme.colors.onSurfaceSecondary
                                     )
                                 }
-                            ) {
-                                Tab(
-                                    selected = selectedTab == 0,
-                                    onClick = { screenModel.setTabIndex(0) },
-                                    text = {
-                                        Text(
-                                            stringResource(Res.string.search_hub_saved),
-                                            style = SwipeHomeTheme.typography.label,
-                                            fontWeight = FontWeight.Bold,
-                                            color = if (selectedTab == 0) SwipeHomeTheme.colors.neutral else SwipeHomeTheme.colors.onSurfaceSecondary
-                                        )
-                                    }
-                                )
-                                Tab(
-                                    selected = selectedTab == 1,
-                                    onClick = { screenModel.setTabIndex(1) },
-                                    text = {
-                                        Text(
-                                            stringResource(Res.string.search_hub_rejected),
-                                            style = SwipeHomeTheme.typography.label,
-                                            fontWeight = FontWeight.Bold,
-                                            color = if (selectedTab == 1) SwipeHomeTheme.colors.neutral else SwipeHomeTheme.colors.onSurfaceSecondary
-                                        )
-                                    }
-                                )
-                            }
+                            )
+                            Tab(
+                                selected = selectedTab == 1,
+                                onClick = { screenModel.setTabIndex(1) },
+                                text = {
+                                    Text(
+                                        stringResource(Res.string.search_hub_rejected),
+                                        style = SwipeHomeTheme.typography.label,
+                                        fontWeight = FontWeight.Bold,
+                                        color = if (selectedTab == 1) SwipeHomeTheme.colors.neutral else SwipeHomeTheme.colors.onSurfaceSecondary
+                                    )
+                                }
+                            )
                         }
                     }
 
@@ -204,7 +205,15 @@ internal object SearchHubScreen : Screen {
                                 if (isCompareMode) {
                                     screenModel.togglePropertySelection(property.id)
                                 } else {
-                                    // TODO: Перехід на PropertyDetailsScreen
+                                    val details = screenModel.getPropertyDetails(property.id)
+                                        ?: property.toFallbackDetailsProperty()
+                                    rootNavigator.push(PropertyDetailsScreen(details))
+                                }
+                            },
+                            onLongClick = {
+                                // Якщо ще не в режимі вибору — вмикаємо його і вибираємо поточну картку
+                                if (!isCompareMode){
+                                    screenModel.startCompareMode(property.id)
                                 }
                             }
                         )

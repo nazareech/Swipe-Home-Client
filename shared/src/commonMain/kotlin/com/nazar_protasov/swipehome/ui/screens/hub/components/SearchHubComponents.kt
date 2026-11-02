@@ -3,6 +3,7 @@ package com.nazar_protasov.swipehome.ui.screens.hub.components
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -39,6 +40,7 @@ import coil3.compose.AsyncImage
 import com.nazar_protasov.swipehome.data.local.entity.HistoryPropertyEntity
 import com.nazar_protasov.swipehome.network.PropertyApiService
 import com.nazar_protasov.swipehome.ui.models.Property
+import com.nazar_protasov.swipehome.ui.models.PropertyDetails
 import com.nazar_protasov.swipehome.ui.theme.SwipeHomeTheme
 import mymultiplatformproject.shared.generated.resources.Res
 import mymultiplatformproject.shared.generated.resources.btn_filter
@@ -63,6 +65,7 @@ import mymultiplatformproject.shared.generated.resources.search_hub_statistic_vi
 import mymultiplatformproject.shared.generated.resources.search_hub_title
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
+import kotlin.String
 
 @Composable
 fun SearchHubTopBar(){
@@ -158,13 +161,18 @@ fun HubGridCard(
     property: Property,
     isCompareMode: Boolean,
     isSelected: Boolean,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    onLongClick: () -> Unit,
 ){
     Card(
         modifier = Modifier
             .fillMaxWidth()
             .height(220.dp)
-            .clickable { onClick() }
+            .clip(SwipeHomeTheme.shapes.mediumShape)
+            .combinedClickable(
+                onClick = onClick,
+                onLongClick = onLongClick
+            )
             .border(
                 width = if (isSelected) 2.dp else 0.dp,
                 color = if (isSelected) SwipeHomeTheme.colors.primary else Color.Transparent,
@@ -172,12 +180,12 @@ fun HubGridCard(
             ),
         shape = SwipeHomeTheme.shapes.mediumShape
     ) {
-        Box(modifier = Modifier.fillMaxWidth()) {
+        Box(modifier = Modifier.fillMaxSize()) {
             AsyncImage(
-                model = property.imagesUrl,
+                model = property.imagesUrl.firstOrNull(),
                 contentDescription = stringResource(Res.string.photo_description),
                 contentScale = ContentScale.Crop,
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxSize()
             )
 
             // Градієнт для читабельності тексту
@@ -271,7 +279,7 @@ fun CompareFloatingBar(
         ){
             selectedProperties.take(3).forEach { property ->
                 AsyncImage(
-                    model = property.imagesUrl,
+                    model = property.imagesUrl.firstOrNull(),
                     contentDescription = stringResource(Res.string.photo_description),
                     modifier = Modifier.size(40.dp).clip(CircleShape).border(2.dp, SwipeHomeTheme.colors.background, CircleShape)
                 )
@@ -375,5 +383,73 @@ fun HistoryPropertyEntity.toUIProperty(): Property {
         area = area,
         buildingType = buildingType,
         isNew = false // Можна вирахувати на основі дати
+    )
+}
+
+fun HistoryPropertyEntity.toUIDetailsProperty(): PropertyDetails {
+    val photoNames = if (imagesList.isNotBlank()) imagesList.split(",") else emptyList()
+    val allPhotos = if (mainImage != null) {
+        listOf(mainImage) + photoNames.filter { it != mainImage }
+    } else {
+        photoNames
+    }
+    val fullImageUrls = if (allPhotos.isNotEmpty()) {
+        allPhotos.map { photo ->
+            val cleanPath = photo.removePrefix("/")
+            "${PropertyApiService.BASE_URL}/uploads/$cleanPath"
+        }
+    } else {
+        listOf("${PropertyApiService.BASE_URL}/uploads/photo_not_found.jpg")
+    }
+
+    val formattedPrice = "$${price.toInt()}"
+    val formatedCreatedAt = createsAt.split("T").getOrNull(0) ?: createsAt
+
+    return PropertyDetails(
+        idProperty = idProperty,
+        idOwner = idOwner,
+        title = title,
+        description = description,
+        localization = localization,
+        lat = latitude,
+        lon = longitude,
+        price = formattedPrice,
+        area = area.toString(),
+        rooms = rooms.toString(),
+        category = category,
+        subCategory = subcategory,
+        parking = parking,
+        petsAllowed = petsAllowed,
+        elevator = elevator,
+        furniture = furniture,
+        buildingType = buildingType,
+        status = status,
+        imagesUrl = fullImageUrls,
+        createsAt = formatedCreatedAt
+    )
+}
+
+fun Property.toFallbackDetailsProperty(): PropertyDetails {
+    return PropertyDetails(
+        idProperty = id,
+        idOwner = "",
+        title = title,
+        description = "",
+        localization = location,
+        lat = 0.0,
+        lon = 0.0,
+        price = price,
+        area = area.toString(),
+        rooms = rooms.toString(),
+        category = "",
+        subCategory = "",
+        parking = "",
+        petsAllowed = false,
+        elevator = false,
+        furniture = false,
+        buildingType = buildingType,
+        status = "",
+        imagesUrl = imagesUrl,
+        createsAt = ""
     )
 }

@@ -79,3 +79,8 @@ build/
 local.properties
 formData.kt
 multipart.kt
+
+# Brag Skill (promo video)
+.agents/
+brag-output/
+skills-lock.json

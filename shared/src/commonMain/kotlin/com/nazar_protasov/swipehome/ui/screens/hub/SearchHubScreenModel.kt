@@ -8,6 +8,8 @@ import com.nazar_protasov.swipehome.data.local.entity.SwipeHomeDao
 import com.nazar_protasov.swipehome.data.local.entity.toEntity
 import com.nazar_protasov.swipehome.network.PropertyApiService
 import com.nazar_protasov.swipehome.ui.models.Property
+import com.nazar_protasov.swipehome.ui.models.PropertyDetails
+import com.nazar_protasov.swipehome.ui.screens.hub.components.toUIDetailsProperty
 import com.nazar_protasov.swipehome.ui.screens.hub.components.toUIProperty
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -15,6 +17,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -34,21 +37,36 @@ class SearchHubScreenModel(
     private val _selectedDateFilter = MutableStateFlow(DateFilter.ALL)
     val selectedDateFilter: StateFlow<DateFilter> = _selectedDateFilter.asStateFlow()
 
-
-    // Реактивні списки з бази
-    val savedProperties: StateFlow<List<Property>> = combine(
+    // Сутності з бази даних
+    private val savedEntities: StateFlow<List<HistoryPropertyEntity>> = combine(
         dao.getSwipeHistoryByAction("RIGHT"),
         _selectedDateFilter
     ) { entities, filter ->
-        applyFilter(entities, filter).map { it.toUIProperty() }
+        applyFilter(entities, filter)
     }.stateIn(screenModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
 
-    val rejectedProperties: StateFlow<List<Property>> = combine(
+    private val rejectedEntities: StateFlow<List<HistoryPropertyEntity>> = combine(
         dao.getSwipeHistoryByAction("LEFT"),
         _selectedDateFilter
     ) { entities, filter ->
-        applyFilter(entities, filter).map { it.toUIProperty() }
+        applyFilter(entities, filter)
     }.stateIn(screenModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
+    // Реактивні списки з бази для UI
+    val savedProperties: StateFlow<List<Property>> = savedEntities
+        .map { list -> list.map { it.toUIProperty() } }
+        .stateIn(screenModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
+    val rejectedProperties: StateFlow<List<Property>> = rejectedEntities
+        .map { list -> list.map { it.toUIProperty() } }
+        .stateIn(screenModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
+
+    fun getPropertyDetails(propertyId: String): PropertyDetails? {
+        val currentEntities = if (_selectedTabIndex.value == 0) savedEntities.value else rejectedEntities.value
+        val entity = currentEntities.firstOrNull { it.idProperty == propertyId }
+            ?: (savedEntities.value + rejectedEntities.value).firstOrNull { it.idProperty == propertyId }
+        return entity?.toUIDetailsProperty()
+    }
 
     init {
 //        screenModelScope.launch {
@@ -65,7 +83,6 @@ class SearchHubScreenModel(
             // Завантажуємо з сервера
             val dtoList = apiService.fetchSwipeHistory(token)
 
-            println("Отримано ${dtoList} з сервера")
             if (dtoList.isNotEmpty()) {
                 // Зберігаємо в Room (UI оновиться сам через Flow)
                 dao.insertSwipeHistory(dtoList.map {it.toEntity()})
@@ -112,11 +129,27 @@ class SearchHubScreenModel(
 
     fun togglePropertySelection(propertyId: String) {
         _selectedForCompare.update { currentSet ->
-            if (currentSet.contains(propertyId)) {
+            val newSet = if (currentSet.contains(propertyId)) {
                 currentSet - propertyId
             } else {
                 currentSet + propertyId
             }
+
+            // Якщо зняті всі галочки з усіх карточок, вимикаємо режим вибору
+            if (newSet.isEmpty()) {
+                _isCompareMode.value = false
+            }
+            newSet
         }
+    }
+
+    fun startCompareMode(propertyId: String){
+        _isCompareMode.value = true
+        _selectedForCompare.value = setOf(propertyId)
+    }
+
+    fun exitCompareMode(){
+        _isCompareMode.value = false
+        _selectedForCompare.value = emptySet()
     }
 }
