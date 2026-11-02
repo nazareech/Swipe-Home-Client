@@ -41,7 +41,6 @@ import com.nazar_protasov.swipehome.ui.theme.SwipeHomeTheme
 import mymultiplatformproject.shared.generated.resources.Res
 import mymultiplatformproject.shared.generated.resources.ic_hub_compare
 import mymultiplatformproject.shared.generated.resources.search_hub_btn_all
-import mymultiplatformproject.shared.generated.resources.search_hub_btn_comparison
 import mymultiplatformproject.shared.generated.resources.search_hub_btn_new
 import mymultiplatformproject.shared.generated.resources.search_hub_count_objects
 import mymultiplatformproject.shared.generated.resources.search_hub_name

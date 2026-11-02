@@ -49,6 +49,7 @@ import com.nazar_protasov.swipehome.network.toUIProperty
 import com.nazar_protasov.swipehome.ui.screens.home.main.HomeBottomActionButtons
 import com.nazar_protasov.swipehome.ui.screens.home.main.HomeScreenModel
 import com.nazar_protasov.swipehome.ui.screens.home.filter.FilterScreen
+import com.nazar_protasov.swipehome.ui.utils.SwipeAction
 import kotlinx.coroutines.launch
 import mymultiplatformproject.shared.generated.resources.ic_refresh
 import org.koin.compose.koinInject
@@ -186,14 +187,14 @@ internal class HomeScreen : Screen {
                                     onSwipeLeft = {
                                         coroutineScope.launch {
                                             swipeCardState.swipeLeft()
-                                            screenModel.onCardSwiped()
+                                            screenModel.onCardSwiped(SwipeAction.LEFT)
                                             swipeCardState.snapToCenter()
                                         }
                                     },
                                     onSwipeRight = {
                                         coroutineScope.launch {
                                             swipeCardState.swipeRight()
-                                            screenModel.onCardSwiped()
+                                            screenModel.onCardSwiped(SwipeAction.RIGHT)
                                             swipeCardState.snapToCenter()
                                         }
                                     }
@@ -232,7 +233,7 @@ internal class HomeScreen : Screen {
                     if (properties.isNotEmpty()) {
                         coroutineScope.launch {
                             swipeCardState.swipeLeft()
-                            screenModel.onCardSwiped()
+                        screenModel.onCardSwiped(SwipeAction.LEFT)
                             swipeCardState.snapToCenter()
                         }
                     }
@@ -251,7 +252,7 @@ internal class HomeScreen : Screen {
                     if (properties.isNotEmpty()) {
                         coroutineScope.launch {
                             swipeCardState.swipeRight()
-                            screenModel.onCardSwiped()
+                            screenModel.onCardSwiped(SwipeAction.RIGHT)
                             swipeCardState.snapToCenter()
                         }
                     }

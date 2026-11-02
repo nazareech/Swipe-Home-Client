@@ -3,6 +3,7 @@ package com.nazar_protasov.swipehome.network
 import com.nazar_protasov.swipehome.network.dto.FilterRequestDTO
 import com.nazar_protasov.swipehome.network.dto.SwipeHistoryItemDTO
 import com.nazar_protasov.swipehome.network.dto.SwipeHistoryResponseDTO
+import com.nazar_protasov.swipehome.network.dto.SwipeRequestDTO
 import com.nazar_protasov.swipehome.ui.models.Property
 import com.nazar_protasov.swipehome.ui.models.PropertyDetails
 import com.nazar_protasov.swipehome.ui.utils.readBytesFromCache
@@ -121,8 +122,8 @@ fun PropertyDTO.toUIDetailsProperty(): PropertyDetails {
 class PropertyApiService(private val client: io.ktor.client.HttpClient){
     companion object {
         // adb reverse tcp:8080 tcp:8080
-        // const val BASE_URL = "http://127.0.0.1:8080"
-        const val BASE_URL = "https://profile-spout-nutmeg.ngrok-free.dev"
+         const val BASE_URL = "http://127.0.0.1:8080"
+//        const val BASE_URL = "https://profile-spout-nutmeg.ngrok-free.dev"
     }
 
     suspend fun fetchProperties(
@@ -325,6 +326,28 @@ class PropertyApiService(private val client: io.ktor.client.HttpClient){
             if (e is CancellationException) throw e
             println("Error fetching swipe history: ${e.message}")
             emptyList()
+        }
+    }
+
+    suspend fun sendSwipe(
+        token: String,
+        infoDTO: SwipeRequestDTO
+    ): Boolean{
+        return try {
+            val url = "${BASE_URL}/properties/swipe"
+            println("Спроба обробка свайпу: $url")
+            val response = client.post(url) {
+                contentType(ContentType.Application.Json)
+                header("Authorization", "Bearer $token")
+                setBody(infoDTO)
+            }
+
+            println("Дані відправки: $response")
+            response.status.isSuccess()
+        } catch (e: Exception){
+            if (e is CancellationException) throw e
+            println("Помилка відправки свайпу: ${e.message}")
+            false
         }
     }
 }

@@ -2,15 +2,22 @@ package com.nazar_protasov.swipehome.ui.screens.home.main
 
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
+import com.nazar_protasov.swipehome.data.local.SessionManager
 import com.nazar_protasov.swipehome.network.PropertyApiService
 import com.nazar_protasov.swipehome.network.PropertyDTO
 import com.nazar_protasov.swipehome.network.dto.FilterRequestDTO
+import com.nazar_protasov.swipehome.network.dto.SwipeRequestDTO
+import com.nazar_protasov.swipehome.ui.utils.SwipeAction
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 
-class HomeScreenModel(private val apiService: PropertyApiService) : ScreenModel {
+class HomeScreenModel(
+    private val apiService: PropertyApiService,
+    private val sessionManager: SessionManager
+) : ScreenModel {
 
     // Стан списку нерухомості
     private val _properties = MutableStateFlow<List<PropertyDTO>>(emptyList())
@@ -60,10 +67,34 @@ class HomeScreenModel(private val apiService: PropertyApiService) : ScreenModel 
 
 
     // Функція для видалення першої картинки зі списку після свайпу
-    fun onCardSwiped(){
+    fun onCardSwiped(action: SwipeAction){
         val currentList = _properties.value
+
+        if(currentList.isEmpty()) return
+
         if (currentList.isNotEmpty()){
+            // Беремо першу картку перед тим, як її видалити
+            val swipedProperty = currentList.first()
+
+            // Видаляємо картку зі списку на екрані
             _properties.value = currentList.drop(1)
+
+            // У фоні відправляємо свайп на сервер
+            screenModelScope.launch {
+                val propertyIdInt = swipedProperty.idProperty?.toIntOrNull() ?: return@launch
+
+                val token = sessionManager.tokenFlow.firstOrNull() ?: fakeUserToken
+
+                val request = SwipeRequestDTO(
+                    propertyIdInt,
+                    action.toString()
+                )
+                apiService.sendSwipe(
+                    token = token,
+                    infoDTO = request
+                )
+            }
+
             // Коли карток стає мало (наприклад менше ніж 2), можна додавати логіку збільшення
             // offset та дозавантаження (пагінації)
         }
