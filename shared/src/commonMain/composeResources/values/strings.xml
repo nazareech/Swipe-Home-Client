@@ -7,7 +7,8 @@
     <string name="btn_share">Поділитися</string>
     <string name="btn_register">Зареєструватися</string>
     <string name="or_divider">АБО</string>
-    <string name="email_login_label">Email або Логін</string>
+    <string name="email_label">Email</string>
+    <string name="login_label">Логін</string>
     <string name="password_label">Пароль</string>
     <string name="password_placeholder">Введіть ваш пароль</string>
     <string name="btn_filter">Фільтри</string>

@@ -5,6 +5,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import cafe.adriel.voyager.core.model.ScreenModel
 import cafe.adriel.voyager.core.model.screenModelScope
+import com.nazar_protasov.swipehome.data.local.SessionManager
 import com.nazar_protasov.swipehome.data.local.entity.MyListingEntity
 import com.nazar_protasov.swipehome.data.local.entity.SwipeHomeDao
 import com.nazar_protasov.swipehome.network.PropertyApiService
@@ -19,13 +20,18 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withTimeoutOrNull
 import kotlin.random.Random
 import kotlin.time.Duration.Companion.seconds
 
-class MyListingsScreenModel(private val apiService: PropertyApiService, private val dao: SwipeHomeDao) : ScreenModel {
+class MyListingsScreenModel(
+    private val apiService: PropertyApiService,
+    private val dao: SwipeHomeDao,
+    private val sessionManager: SessionManager
+) : ScreenModel {
     val myListingProperties = dao.getMyListing()
 
     private val _properties = MutableStateFlow<List<PropertyDTO>>(emptyList())
@@ -42,8 +48,6 @@ class MyListingsScreenModel(private val apiService: PropertyApiService, private 
     var isDeleting by mutableStateOf(false)
         private set
 
-    // TODO: Отримати реальний токен з сервера
-    private val fakeUserToken = "d0d20eeb-2c54-4363-9b7b-0631ae0f9892"
 
     init{
         // При створенні екрана одразу йдемо на сервер
@@ -72,10 +76,12 @@ class MyListingsScreenModel(private val apiService: PropertyApiService, private 
                     _snackbarEvent.send("Чернетку успішно видалено.")
                 } else {
 
+                    val userToken = sessionManager.tokenFlow.firstOrNull() ?: return@launch
+
                     println("Відправляємо запит на сервер для видалення ID $serverIdToDelete")
                     // Відправляємо Запит видалення (Отримуємо об'єкт відповіді від сервера)
                     val serverResponse = withTimeoutOrNull(10.seconds) {
-                        apiService.deleteProperty(serverIdToDelete, fakeUserToken)
+                        apiService.deleteProperty(serverIdToDelete, userToken)
                     }
                     if (serverResponse != null) {
                         println("Відповідь сервера: $serverResponse")
@@ -102,10 +108,12 @@ class MyListingsScreenModel(private val apiService: PropertyApiService, private 
             _isLoading.value = true
             try {
 
+                val userToken = sessionManager.tokenFlow.firstOrNull() ?: return@launch
+
                 // Передаємо токен і поточні фільтри в API
                 val result = withTimeoutOrNull(10.seconds) {
                     apiService.fetchOwnProperties(
-                        token = fakeUserToken
+                        token = userToken
                     )
                 }
 

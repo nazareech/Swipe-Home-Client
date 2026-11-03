@@ -11,6 +11,7 @@ import com.nazar_protasov.swipehome.ui.utils.SwipeAction
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 
 class HomeScreenModel(
@@ -36,8 +37,6 @@ class HomeScreenModel(
     private var isLoadingMore = false
     private var isLastPage = false
 
-    private val userToken = sessionManager.tokenFlow.toString()
-
     init{
         // При створенні екрана одразу йдемо на сервер
         fetchProperties()
@@ -53,6 +52,8 @@ class HomeScreenModel(
             // Скидаємо offset на 0 при повному оновленні
             val initialFilters = _currentFilters.value.copy(offset = 0)
             _currentFilters.value = initialFilters
+
+            val userToken = sessionManager.tokenFlow.firstOrNull() ?: return@launch
 
             // Передаємо токен і поточні фільтри в API
             val result = apiService.fetchProperties(
@@ -80,6 +81,8 @@ class HomeScreenModel(
                 offset = _currentFilters.value.offset + _currentFilters.value.limit
             )
             _currentFilters.value = nextFilters
+
+            val userToken = sessionManager.tokenFlow.firstOrNull() ?: return@launch
 
             val newProperties = apiService.fetchProperties(
                 token = userToken,
@@ -123,6 +126,8 @@ class HomeScreenModel(
         screenModelScope.launch {
             val propertyIdInt = swipedProperty.idProperty?.toIntOrNull() ?: return@launch
 
+            val userToken = sessionManager.tokenFlow.firstOrNull() ?: return@launch
+            
             val request = SwipeRequestDTO(
                 propertyIdInt,
                 action.toString()

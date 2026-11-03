@@ -9,6 +9,7 @@ import com.nazar_protasov.swipehome.data.local.getRoomDatabase
 import com.nazar_protasov.swipehome.data.local.store.createDataStore
 import com.nazar_protasov.swipehome.network.API.GeocodingApiService
 import com.nazar_protasov.swipehome.network.PropertyApiService
+import com.nazar_protasov.swipehome.ui.screens.auth.RegisterScreenModel
 import com.nazar_protasov.swipehome.ui.screens.home.main.HomeScreenModel
 import com.nazar_protasov.swipehome.ui.screens.hub.SearchHubScreenModel
 import com.nazar_protasov.swipehome.ui.screens.settings.analystics.AnalyticsScreenModel
@@ -53,11 +54,12 @@ val appModule: Module = module {
     }
 
     // Моделі екранів (Factory, бо вони створюються заново для нових екранів)
-single { HomeScreenModel(get(), get()) }
+    single { HomeScreenModel(get(), get()) }
     factory { SearchHubScreenModel(get(), get(), get()) }
-    factory { MyListingsScreenModel(get(), get()) }
+    factory { MyListingsScreenModel(get(), get(), get()) }
     factory { AnalyticsScreenModel(get()) }
     factory { EditProfileScreenModel(get(), get()) }
+    factory { RegisterScreenModel(get(), get()) }
     single { SessionManager(get()) }
     single { GeocodingApiService(get()) }
     factory { CreateListingScreenModel(get(), get(), get()) }

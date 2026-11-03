@@ -1,6 +1,8 @@
 package com.nazar_protasov.swipehome.network
 
+import com.nazar_protasov.swipehome.network.dto.AuthResponseDTO
 import com.nazar_protasov.swipehome.network.dto.FilterRequestDTO
+import com.nazar_protasov.swipehome.network.dto.RegisterRequestDTO
 import com.nazar_protasov.swipehome.network.dto.SwipeHistoryItemDTO
 import com.nazar_protasov.swipehome.network.dto.SwipeHistoryResponseDTO
 import com.nazar_protasov.swipehome.network.dto.SwipeRequestDTO
@@ -348,6 +350,29 @@ class PropertyApiService(private val client: io.ktor.client.HttpClient){
             if (e is CancellationException) throw e
             println("Помилка відправки свайпу: ${e.message}")
             false
+        }
+    }
+
+    suspend fun registerUser(
+        request: RegisterRequestDTO
+    ): AuthResponseDTO? {
+        return try {
+            val response = client.post("${BASE_URL}/register") {
+                contentType(ContentType.Application.Json)
+                setBody(request)
+            }
+
+            if (response.status.isSuccess()) {
+                response.body<AuthResponseDTO>()
+            } else {
+                val errorBody = response.body<String>()
+                println("Помилка реєстрації: ${response.status} - $errorBody")
+                null
+            }
+        } catch (e: Exception) {
+            if (e is CancellationException) throw e
+            println("Помилка мережі при реєстрації: ${e.message}")
+            null
         }
     }
 }

@@ -44,7 +44,7 @@ import com.nazar_protasov.swipehome.ui.screens.RootScreen
 import com.nazar_protasov.swipehome.ui.theme.SwipeHomeTheme
 import mymultiplatformproject.shared.generated.resources.Res
 import mymultiplatformproject.shared.generated.resources.btn_register
-import mymultiplatformproject.shared.generated.resources.email_login_label
+import mymultiplatformproject.shared.generated.resources.email_label
 import mymultiplatformproject.shared.generated.resources.ic_apple_logo
 import mymultiplatformproject.shared.generated.resources.ic_eye_hidden
 import mymultiplatformproject.shared.generated.resources.ic_eye_visible
@@ -106,7 +106,7 @@ class LoginScreen: Screen {
             OutlinedTextField(
                 value = email,
                 onValueChange = { email = it },
-                label = { Text(stringResource(Res.string.email_login_label)) },
+                label = { Text(stringResource(Res.string.email_label)) },
                 modifier = Modifier.fillMaxWidth(),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
                 singleLine = true,
