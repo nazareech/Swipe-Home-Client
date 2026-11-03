@@ -11,7 +11,6 @@ import com.nazar_protasov.swipehome.ui.utils.SwipeAction
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 
 class HomeScreenModel(
@@ -33,24 +32,37 @@ class HomeScreenModel(
     private val _currentFilters = MutableStateFlow(FilterRequestDTO())
     val currentFilters: StateFlow<FilterRequestDTO> = _currentFilters.asStateFlow()
 
-    // TODO: Отримати реальний токен з сервера
-    private val fakeUserToken = "4002ad1c-513b-4b51-85b1-851e21ea202d"
+    // Прапорці для фонової пагінації (дозавантаження)
+    private var isLoadingMore = false
+    private var isLastPage = false
+
+    private val userToken = sessionManager.tokenFlow.toString()
 
     init{
         // При створенні екрана одразу йдемо на сервер
         fetchProperties()
     }
 
-    // Будемо викликати після оновлення фільтрів
+    // Будемо викликати при старті, оновленні списку або після зміни фільтрів
     fun fetchProperties(){
         screenModelScope.launch {
             _isLoading.value = true
+            isLastPage = false
+            isLoadingMore = false
+
+            // Скидаємо offset на 0 при повному оновленні
+            val initialFilters = _currentFilters.value.copy(offset = 0)
+            _currentFilters.value = initialFilters
 
             // Передаємо токен і поточні фільтри в API
             val result = apiService.fetchProperties(
-                token = fakeUserToken,
-                filterRequest = _currentFilters.value
+                token = userToken,
+                filterRequest = initialFilters
             )
+
+            if (result.size < initialFilters.limit) {
+                isLastPage = true
+            }
 
             // Викликаємо Ktor клієнт
             _properties.value = result
@@ -58,9 +70,37 @@ class HomeScreenModel(
         }
     }
 
+    // Фонове дозавантаження нових оголошень без показу повноекранного лоадера
+    private fun loadMoreProperties() {
+        if (isLoadingMore || isLastPage || _isLoading.value) return
+
+        isLoadingMore = true
+        screenModelScope.launch {
+            val nextFilters = _currentFilters.value.copy(
+                offset = _currentFilters.value.offset + _currentFilters.value.limit
+            )
+            _currentFilters.value = nextFilters
+
+            val newProperties = apiService.fetchProperties(
+                token = userToken,
+                filterRequest = nextFilters
+            )
+
+            if (newProperties.size < nextFilters.limit) {
+                isLastPage = true
+            }
+
+            if (newProperties.isNotEmpty()) {
+                _properties.value = (_properties.value + newProperties).distinctBy { it.idProperty }
+            }
+
+            isLoadingMore = false
+        }
+    }
+
     // Функція для оновлення фільтрів з екрана фільтрації
     fun updateFilters(newFilters: FilterRequestDTO){
-        _currentFilters.value = newFilters
+        _currentFilters.value = newFilters.copy(offset = 0)
         // Автоматично робимо новий запит на сервер після застосування фільтрів
         fetchProperties()
     }
@@ -72,31 +112,30 @@ class HomeScreenModel(
 
         if(currentList.isEmpty()) return
 
-        if (currentList.isNotEmpty()){
-            // Беремо першу картку перед тим, як її видалити
-            val swipedProperty = currentList.first()
+        // Беремо першу картку перед тим, як її видалити
+        val swipedProperty = currentList.first()
 
-            // Видаляємо картку зі списку на екрані
-            _properties.value = currentList.drop(1)
+        // Видаляємо картку зі списку на екрані
+        val updatedList = currentList.drop(1)
+        _properties.value = updatedList
 
-            // У фоні відправляємо свайп на сервер
-            screenModelScope.launch {
-                val propertyIdInt = swipedProperty.idProperty?.toIntOrNull() ?: return@launch
+        // У фоні відправляємо свайп на сервер
+        screenModelScope.launch {
+            val propertyIdInt = swipedProperty.idProperty?.toIntOrNull() ?: return@launch
 
-                val token = sessionManager.tokenFlow.firstOrNull() ?: fakeUserToken
+            val request = SwipeRequestDTO(
+                propertyIdInt,
+                action.toString()
+            )
+            apiService.sendSwipe(
+                token = userToken,
+                infoDTO = request
+            )
+        }
 
-                val request = SwipeRequestDTO(
-                    propertyIdInt,
-                    action.toString()
-                )
-                apiService.sendSwipe(
-                    token = token,
-                    infoDTO = request
-                )
-            }
-
-            // Коли карток стає мало (наприклад менше ніж 2), можна додавати логіку збільшення
-            // offset та дозавантаження (пагінації)
+        // Коли в стеку залишилось 3 або менше непереглянутих оголошень — підвантажуємо нові
+        if (updatedList.size <= 3) {
+            loadMoreProperties()
         }
     }
 }
