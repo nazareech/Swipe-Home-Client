@@ -74,6 +74,7 @@ gen/
 .gradle
 .gradle/
 build/
+.kotlin/errors
 
 # Local configuration file
 local.properties

@@ -2,10 +2,14 @@ package com.nazar_protasov.swipehome.network
 
 import com.nazar_protasov.swipehome.network.dto.AuthResponseDTO
 import com.nazar_protasov.swipehome.network.dto.FilterRequestDTO
+import com.nazar_protasov.swipehome.network.dto.ForgotPasswordRequestDTO
+import com.nazar_protasov.swipehome.network.dto.MessageResponseDTO
 import com.nazar_protasov.swipehome.network.dto.RegisterRequestDTO
+import com.nazar_protasov.swipehome.network.dto.ResetPasswordRequestDTO
 import com.nazar_protasov.swipehome.network.dto.SwipeHistoryItemDTO
 import com.nazar_protasov.swipehome.network.dto.SwipeHistoryResponseDTO
 import com.nazar_protasov.swipehome.network.dto.SwipeRequestDTO
+import com.nazar_protasov.swipehome.network.dto.VerifyCodeRequestDTO
 import com.nazar_protasov.swipehome.ui.models.Property
 import com.nazar_protasov.swipehome.ui.models.PropertyDetails
 import com.nazar_protasov.swipehome.ui.utils.readBytesFromCache
@@ -373,6 +377,89 @@ class PropertyApiService(private val client: io.ktor.client.HttpClient){
             if (e is CancellationException) throw e
             println("Помилка мережі при реєстрації: ${e.message}")
             null
+        }
+    }
+
+    suspend fun forgotPassword(
+        emailOrLogin: String
+    ): Boolean {
+        return try {
+            val response = client.post("${BASE_URL}/auth/forgot-password") {
+                contentType(ContentType.Application.Json)
+                setBody(ForgotPasswordRequestDTO(emailOrLogin = emailOrLogin))
+            }
+
+            if (response.status.isSuccess()) {
+                true
+            } else {
+                val errorBody = response.body<String>()
+                println("Помилка forgot-password: ${response.status} - $errorBody")
+                false
+            }
+        } catch (e: Exception) {
+            if (e is CancellationException) throw e
+            println("Помилка мережі при forgot-password: ${e.message}")
+            false
+        }
+    }
+
+    suspend fun verifyCode(
+        emailOrLogin: String,
+        code: String
+    ): Result<String> {
+        return try {
+            val response = client.post("${BASE_URL}/auth/verify-code") {
+                contentType(ContentType.Application.Json)
+                setBody(VerifyCodeRequestDTO(emailOrLogin = emailOrLogin, code = code))
+            }
+
+            if (response.status.isSuccess()) {
+                val msg = try {
+                    response.body<MessageResponseDTO>().message
+                } catch (_: Exception) {
+                    response.body<String>()
+                }
+                Result.success(msg)
+            } else {
+                val errorBody = response.body<String>()
+                println("Помилка verify-code: ${response.status} - $errorBody")
+                Result.failure(Exception(errorBody.ifBlank { "Невірний або прострочений код" }))
+            }
+        } catch (e: Exception) {
+            if (e is CancellationException) throw e
+            println("Помилка мережі при verify-code: ${e.message}")
+            Result.failure(e)
+        }
+    }
+
+    suspend fun resetPassword(
+        emailOrLogin: String,
+        code: Int,
+        newPassword: String
+    ): Boolean {
+        return try {
+            val response = client.post("${BASE_URL}/auth/reset-password") {
+                contentType(ContentType.Application.Json)
+                setBody(
+                    ResetPasswordRequestDTO(
+                        emailOrLogin = emailOrLogin,
+                        code = code,
+                        newPassword = newPassword
+                    )
+                )
+            }
+
+            if (response.status.isSuccess()) {
+                true
+            } else {
+                val errorBody = response.body<String>()
+                println("Помилка reset-password: ${response.status} - $errorBody")
+                false
+            }
+        } catch (e: Exception) {
+            if (e is CancellationException) throw e
+            println("Помилка мережі при reset-password: ${e.message}")
+            false
         }
     }
 }

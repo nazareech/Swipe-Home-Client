@@ -23,24 +23,29 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.RadioButtonDefaults
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -50,6 +55,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.uniqueScreenKey
+import cafe.adriel.voyager.koin.koinScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.nazar_protasov.swipehome.ui.theme.SwipeHomeTheme
@@ -104,109 +110,144 @@ class ForgotPasswordScreen : Screen {
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
         val scrollState = rememberScrollState()
+        val snackbarHostState = remember { SnackbarHostState() }
 
-        var currentStep by rememberSaveable { mutableStateOf(1) }
-        var loginOrEmail by rememberSaveable { mutableStateOf("") }
-        var recoveryMethod by rememberSaveable { mutableStateOf("sms") }
-        var otpCode by rememberSaveable { mutableStateOf("") }
-        var newPassword by rememberSaveable { mutableStateOf("") }
-        var confirmPassword by rememberSaveable { mutableStateOf("") }
+        val screenModel = koinScreenModel<ForgotPasswordScreenModel>()
 
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(SwipeHomeTheme.colors.background)
-                .padding(horizontal = 24.dp)
-                .padding(top = 16.dp, bottom = 24.dp)
-                .verticalScroll(scrollState)
-        ) {
-            // --- ВЕРХНЯ ПАНЕЛЬ ---
-            Row(
-                modifier = Modifier.fillMaxWidth() .padding(top = 18.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ){
-                IconButton(
-                    onClick = {
-                        if (currentStep > 1) currentStep-- else navigator.pop()
+        LaunchedEffect(Unit) {
+            screenModel.snackbarEvent.collect { message ->
+                snackbarHostState.showSnackbar(message)
+            }
+        }
+
+        Scaffold(
+            snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
+            containerColor = SwipeHomeTheme.colors.background
+        ) { paddingValues ->
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues)
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(SwipeHomeTheme.colors.background)
+                        .padding(horizontal = 24.dp)
+                        .padding(top = 16.dp, bottom = 24.dp)
+                        .verticalScroll(scrollState)
+                ) {
+                    // --- ВЕРХНЯ ПАНЕЛЬ ---
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(top = 18.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        IconButton(
+                            onClick = {
+                                if (screenModel.currentStep > 1) screenModel.currentStep-- else navigator.pop()
+                            }
+                        ) {
+                            Icon(
+                                painter = painterResource(Res.drawable.ic_arrow_back),
+                                contentDescription = stringResource(Res.string.btn_back),
+                                tint = SwipeHomeTheme.colors.neutral
+                            )
+                        }
+
+                        Text(
+                            text = when (screenModel.currentStep) {
+                                1 -> stringResource(Res.string.fogot_paswd_title_step1)
+                                2 -> stringResource(Res.string.fogot_paswd_title_step2)
+                                3 -> stringResource(Res.string.fogot_paswd_title_step3)
+                                else -> stringResource(Res.string.fogot_paswd_title_step4)
+                            },
+                            style = SwipeHomeTheme.typography.subheadline,
+                            color = SwipeHomeTheme.colors.primary,
+                            modifier = Modifier.weight(1f),
+                            textAlign = TextAlign.Center
+                        )
+                        Spacer(modifier = Modifier.size(48.dp))
                     }
-                ){
-                    Icon(
-                        painter = painterResource(Res.drawable.ic_arrow_back),
-                        contentDescription = stringResource(Res.string.btn_back),
-                        tint = SwipeHomeTheme.colors.neutral
-                    )
+                    Spacer(modifier = Modifier.height(24.dp))
+
+                    // --- ВМІСТ КРОКІВ ---
+                    when (screenModel.currentStep) {
+                        1 -> Step1RecoveryMethod(
+                            loginOrEmail = screenModel.loginOrEmail,
+                            onLoginOrEmailChange = { screenModel.loginOrEmail = it }
+                        )
+                        2 -> Step2RecoveryMethod(
+                            selectedMethod = screenModel.recoveryMethod,
+                            onMethodSelected = { screenModel.recoveryMethod = it }
+                        )
+                        3 -> Step3OutpInput(
+                            otpCode = screenModel.otpCode,
+                            onOtpCodeChange = { screenModel.otpCode = it },
+                            selectedMethod = screenModel.recoveryMethod,
+                            onResendCodeClick = { screenModel.resendCode() }
+                        )
+                        4 -> Step4NewPassword(
+                            newPassword = screenModel.newPassword,
+                            onNewPasswordChange = { screenModel.newPassword = it },
+                            confirmPassword = screenModel.confirmPassword,
+                            onConfirmPasswordChange = { screenModel.confirmPassword = it }
+                        )
+                    }
+                    Spacer(modifier = Modifier.weight(1f))
+                    Spacer(modifier = Modifier.height(32.dp))
+
+                    // --- НИЖНЯ КНОПКА ---
+                    Button(
+                        onClick = {
+                            screenModel.onMainButtonClick(
+                                onSuccess = {
+                                    navigator.pop()
+                                }
+                            )
+                        },
+                        enabled = !screenModel.isLoading,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(56.dp),
+                        shape = SwipeHomeTheme.shapes.smallShape,
+                        colors = ButtonDefaults.buttonColors(containerColor = SwipeHomeTheme.colors.primary)
+                    ) {
+                        Text(
+                            text = when (screenModel.currentStep) {
+                                1 -> stringResource(Res.string.btn_next)
+                                2 -> stringResource(Res.string.btn_send_code)
+                                3 -> stringResource(Res.string.btn_accept_code)
+                                else -> stringResource(Res.string.btn_reset_paswd)
+                            },
+                            style = SwipeHomeTheme.typography.body,
+                            fontWeight = FontWeight.Bold,
+                            color = SwipeHomeTheme.colors.onPrimary
+                        )
+                    }
                 }
 
-                Text(
-                    text = when(currentStep){
-                        1 -> stringResource(Res.string.fogot_paswd_title_step1)
-                        2 -> stringResource(Res.string.fogot_paswd_title_step2)
-                        3 -> stringResource(Res.string.fogot_paswd_title_step3)
-                        else -> stringResource(Res.string.fogot_paswd_title_step4)
-                    },
-                    style = SwipeHomeTheme.typography.subheadline,
-                    color = SwipeHomeTheme.colors.primary,
-                    modifier = Modifier.weight(1f),
-                    textAlign = TextAlign.Center
-                )
-                Spacer(modifier = Modifier.size(48.dp))
-            }
-            Spacer(modifier = Modifier.height(24.dp))
-
-            // --- ВМІСТ КРОКІВ ---
-            when(currentStep){
-                1 -> Step1RecoveryMethod(
-                    loginOrEmail = loginOrEmail,
-                    onLoginOrEmailChange = { loginOrEmail = it }
-                )
-                2 -> Step2RecoveryMethod(
-                    selectedMethod = recoveryMethod,
-                    onMethodSelected = { recoveryMethod = it }
-                )
-                3 -> Step3OutpInput(
-                    otpCode = otpCode,
-                    onOtpCodeChange = { otpCode = it },
-                    selectedMethod = recoveryMethod,
-                )
-                4 -> Step4NewPassword(
-                    newPassword = newPassword,
-                    onNewPasswordChange = { newPassword = it },
-                    confirmPassword = confirmPassword,
-                    onConfirmPasswordChange = { confirmPassword = it }
-                )
-            }
-            Spacer(modifier = Modifier.weight(1f))
-            Spacer(modifier = Modifier.height(32.dp))
-
-            // --- НИЖНЯ КНОПКА ---
-            Button(
-                onClick = {
-                    if (currentStep < 4) currentStep++ else {/*TODO: Оновлення пароля*/}
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(56.dp),
-                shape = SwipeHomeTheme.shapes.smallShape,
-                colors = ButtonDefaults.buttonColors(containerColor = SwipeHomeTheme.colors.primary)
-            ){
-                Text(
-                    text = when (currentStep){
-                        1 -> stringResource(Res.string.btn_next)
-                        2 -> stringResource(Res.string.btn_send_code)
-                        3 -> stringResource(Res.string.btn_accept_code)
-                        else -> stringResource(Res.string.btn_reset_paswd)
-                    },
-                    style = SwipeHomeTheme.typography.body,
-                    fontWeight = FontWeight.Bold,
-                    color = SwipeHomeTheme.colors.onPrimary
-                )
+                if (screenModel.isLoading) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .background(SwipeHomeTheme.colors.background.copy(alpha = 0.4f))
+                            .pointerInput(Unit) {},
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator(
+                            color = SwipeHomeTheme.colors.primary
+                        )
+                    }
+                }
             }
         }
     }
 
     // --- Крок 1: Ввід логіну ---
     @Composable
-    fun Step1RecoveryMethod(loginOrEmail: String, onLoginOrEmailChange: (String) -> Unit){
+    fun Step1RecoveryMethod(loginOrEmail: String, onLoginOrEmailChange: (String) -> Unit) {
         Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
             Text(
                 text = stringResource(Res.string.email_label),
@@ -294,7 +335,7 @@ class ForgotPasswordScreen : Screen {
                 .clickable { onClick() }
                 .padding(16.dp),
             verticalAlignment = Alignment.CenterVertically
-        ){
+        ) {
             Box(
                 modifier = Modifier
                     .size(48.dp)
@@ -310,7 +351,7 @@ class ForgotPasswordScreen : Screen {
                 )
             }
             Spacer(modifier = Modifier.width(16.dp))
-            Column(modifier = Modifier.weight(1f)){
+            Column(modifier = Modifier.weight(1f)) {
                 Text(title, style = SwipeHomeTheme.typography.body, fontWeight = FontWeight.Bold, color = SwipeHomeTheme.colors.neutral)
                 Text(subtitle, color = SwipeHomeTheme.colors.onSurfaceSecondary, style = SwipeHomeTheme.typography.caption)
             }
@@ -327,7 +368,12 @@ class ForgotPasswordScreen : Screen {
 
     // --- Крок 3: Введення OTP ---
     @Composable
-    fun Step3OutpInput(otpCode: String, onOtpCodeChange: (String) -> Unit, selectedMethod: String) {
+    fun Step3OutpInput(
+        otpCode: String,
+        onOtpCodeChange: (String) -> Unit,
+        selectedMethod: String,
+        onResendCodeClick: () -> Unit
+    ) {
         Column(
             modifier = Modifier.fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally
@@ -394,8 +440,7 @@ class ForgotPasswordScreen : Screen {
 
             Spacer(modifier = Modifier.height(32.dp))
 
-            TextButton(
-                onClick = {/*TODO: Отримати новий код*/}) {
+            TextButton(onClick = onResendCodeClick) {
                 Text(
                     text = stringResource(Res.string.btn_resend_code),
                     color = SwipeHomeTheme.colors.primary,
@@ -412,7 +457,8 @@ class ForgotPasswordScreen : Screen {
         newPassword: String,
         onNewPasswordChange: (String) -> Unit,
         confirmPassword: String,
-        onConfirmPasswordChange: (String) -> Unit ){
+        onConfirmPasswordChange: (String) -> Unit
+    ) {
         var newPasswordVisible by remember { mutableStateOf(false) }
         var confirmPasswordVisible by remember { mutableStateOf(false) }
 
@@ -493,7 +539,7 @@ class ForgotPasswordScreen : Screen {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ){
+            ) {
                 repeat(4) { index ->
                     Box(
                         modifier = Modifier
@@ -508,7 +554,7 @@ class ForgotPasswordScreen : Screen {
                 }
             }
 
-            if(newPassword.isNotEmpty()){
+            if (newPassword.isNotEmpty()) {
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
                     text = stringResource(Res.string.fogot_paswd_strength_prefix) + strengthText,
@@ -559,8 +605,8 @@ class ForgotPasswordScreen : Screen {
                     .clip(SwipeHomeTheme.shapes.smallShape)
                     .background(SwipeHomeTheme.colors.surface)
                     .padding(16.dp),
-            ){
-                Row{
+            ) {
+                Row {
                     Icon(
                         painterResource(Res.drawable.ic_hint),
                         contentDescription = null,
