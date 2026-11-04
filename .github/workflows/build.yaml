@@ -33,9 +33,9 @@ jobs:
           name: android-debug-apk
           path: androidApp/build/outputs/apk/debug/*.apk
 
-  # --- Збірка iOS IPA для Sideloadly / AltStore ---
+  # --- Збірка iOS IPA та запуск у симуляторі для збору логів ---
   build-ios:
-    name: Build iOS IPA
+    name: Build iOS IPA & Test Run
     runs-on: macos-latest
     steps:
       - name: Checkout repository
@@ -51,10 +51,11 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
-      - name: Compile Kotlin iOS Framework (arm64)
-        run: ./gradlew :shared:linkDebugFrameworkIosArm64
-
-      - name: Build iOS App (.app)
+      # 1. Збірка Kotlin Framework та iOS App для фізичного пристрою (.app -> .ipa)
+      # Дозволяємо xcodebuild самому запустити Gradle через "Compile Kotlin Framework" build phase.
+      # Використовуємо CODE_SIGN_IDENTITY="-" (ad-hoc) щоб embedAndSignAppleFrameworkForXcode
+      # змогла підписати Shared.framework. Повний підпис .app відключено (CODE_SIGNING_ALLOWED=NO).
+      - name: Build iOS App for Device
         run: |
           xcodebuild -project iosApp/iosApp.xcodeproj \
             -target iosApp \
@@ -64,8 +65,25 @@ jobs:
             SYMROOT=$(pwd)/build \
             CODE_SIGNING_ALLOWED=NO \
             CODE_SIGNING_REQUIRED=NO \
-            CODE_SIGN_IDENTITY="" \
+            CODE_SIGN_IDENTITY="-" \
             build
+
+      - name: Ad-hoc sign app binary and frameworks for sideloading
+        run: |
+          APP_DIR=$(find build/Debug-iphoneos -name "*.app" -maxdepth 1 | head -n 1)
+          echo "App dir: $APP_DIR"
+          # Підписуємо всі frameworks всередині .app (включаючи Shared.framework)
+          find "$APP_DIR/Frameworks" -name "*.framework" -type d 2>/dev/null | while read fw; do
+            BIN="$fw/$(basename "$fw" .framework)"
+            if [ -f "$BIN" ]; then
+              echo "Ad-hoc signing: $BIN"
+              codesign --force --sign "-" "$BIN"
+            fi
+          done
+          # Підписуємо сам бінарник програми
+          APP_BIN="$APP_DIR/$(basename "$APP_DIR" .app)"
+          echo "Ad-hoc signing app binary: $APP_BIN"
+          codesign --force --sign "-" "$APP_BIN"
 
       - name: Package IPA
         run: |
@@ -78,3 +96,80 @@ jobs:
         with:
           name: ios-debug-ipa
           path: iosApp.ipa
+
+      # 2. Збірка для iOS Симулятора (щоб запустити прямо на GitHub macOS машині)
+      - name: Build iOS App for Simulator
+        run: |
+          xcodebuild -project iosApp/iosApp.xcodeproj \
+            -target iosApp \
+            -configuration Debug \
+            -sdk iphonesimulator \
+            -arch arm64 \
+            SYMROOT=$(pwd)/build-sim \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY="-" \
+            build
+
+      # 3. Запуск симулятора, запуск програми та збір логів вильоту
+      - name: Run on iOS Simulator & Capture Crash Logs
+        run: |
+          # Знаходимо доступний iPhone симулятор
+          UDID=$(xcrun simctl list devices "iPhone" available | grep -E "iPhone [0-9]+" | head -n 1 | grep -oE '[0-9A-F]{8}-([0-9A-F]{4}-){3}[0-9A-F]{12}')
+          if [ -z "$UDID" ]; then
+            UDID=$(xcrun simctl list devices available | grep -E "iPhone" | head -n 1 | grep -oE '[0-9A-F]{8}-([0-9A-F]{4}-){3}[0-9A-F]{12}')
+          fi
+          echo "Selected Simulator UDID: $UDID"
+
+          # Запускаємо симулятор
+          xcrun simctl boot "$UDID" || true
+          xcrun simctl bootstatus "$UDID" -b
+
+          # Знаходимо скомпільований додаток та його Bundle Identifier
+          APP_PATH=$(find build-sim/Debug-iphonesimulator -name "*.app" -maxdepth 1 | head -n 1)
+          echo "App path: $APP_PATH"
+          BUNDLE_ID=$(/usr/libexec/PlistBuddy -c "Print :CFBundleIdentifier" "$APP_PATH/Info.plist")
+          echo "Bundle ID: $BUNDLE_ID"
+
+          # Встановлюємо додаток у симулятор
+          xcrun simctl install "$UDID" "$APP_PATH"
+
+          # Запускаємо додаток і пишемо консоль (stdout/stderr) у файл app_console.log
+          echo "Launching app..."
+          xcrun simctl launch --console-pty "$UDID" "$BUNDLE_ID" > app_console.log 2>&1 &
+          APP_PID=$!
+
+          # Даємо додатку 12 секунд (якщо є краш під час старту — він завершиться відразу)
+          sleep 12
+          kill $APP_PID 2>/dev/null || true
+
+          echo "=================== APP CONSOLE OUTPUT ==================="
+          cat app_console.log || true
+          echo "=========================================================="
+
+          # Перевіряємо системні crash reports у macOS
+          CRASH_DIR="$HOME/Library/Logs/DiagnosticReports"
+          echo "=================== CRASH REPORTS CHECK ==================="
+          CRASH_FILES=$(find "$CRASH_DIR" -type f \( -name "*MyMultiplatformProject*" -o -name "*iosApp*" \) -mmin -5 2>/dev/null || true)
+          if [ -n "$CRASH_FILES" ]; then
+            echo "CRASH DETECTED!"
+            for f in $CRASH_FILES; do
+              echo "--- File: $f ---"
+              cat "$f"
+            done
+          else
+            echo "No system crash reports created. (Check console output above for Kotlin/Swift exceptions)."
+          fi
+          echo "==========================================================="
+
+      # 4. Завантажуємо логи консолі та звіти про падіння як артефакт
+      - name: Upload Simulator Logs & Crash Reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-test-logs
+          path: |
+            app_console.log
+            /Users/runner/Library/Logs/DiagnosticReports/*.ips
+            /Users/runner/Library/Logs/DiagnosticReports/*.crash
+          if-no-files-found: ignore
