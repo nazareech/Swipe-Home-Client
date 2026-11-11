@@ -41,6 +41,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import cafe.adriel.voyager.core.screen.Screen
 import cafe.adriel.voyager.core.screen.uniqueScreenKey
+import cafe.adriel.voyager.koin.koinScreenModel
 import cafe.adriel.voyager.navigator.LocalNavigator
 import cafe.adriel.voyager.navigator.currentOrThrow
 import com.nazar_protasov.swipehome.ui.screens.home.filter.components.CustomChip
@@ -63,58 +64,13 @@ class FilterScreen(private val homeScreenModel: HomeScreenModel) : Screen {
     override fun Content() {
         val navigator = LocalNavigator.currentOrThrow
         val scrollState = rememberScrollState()
+        val screenModel = koinScreenModel<FilterScreenModel>()
 
         // Localized strings
-        val apartmentStr = stringResource(string.filter_property_apartment)
-        val houseStr = stringResource(string.filter_property_house)
-        val roomsStr = stringResource(string.filter_property_rooms)
-        val allStr = stringResource(string.filter_deal_all)
-        val rentStr = stringResource(string.filter_deal_rent)
-        val saleStr = stringResource(string.filter_deal_sale)
-        val allTypesStr = stringResource(string.filter_building_all)
-        val anyFloorStr = stringResource(string.filter_floor_any)
         val studioStr = stringResource(string.filter_rooms_studio)
 
-        // Отримуємо поточні (раніше збережені) фільтри
-        val activeFilters = homeScreenModel.currentFilters.value
-
-        // --- Стани фільтрів ---
-        var selectedCategoryLabel by remember { mutableStateOf(apartmentStr) }
-        var selectedDealLabel by remember { mutableStateOf(allStr) }
-
-        var minPrice by remember { mutableStateOf(activeFilters.priceMin?.toInt()?.toString() ?: "") }
-        var maxPrice by remember { mutableStateOf(activeFilters.priceMax?.toInt()?.toString() ?: "") }
-
-        var minArea by remember { mutableStateOf(activeFilters.areaMin?.toInt()?.toString() ?: "") }
-        var maxArea by remember { mutableStateOf(activeFilters.areaMax?.toInt()?.toString() ?: "") }
-
-        var selectedRooms by remember { mutableStateOf(activeFilters.rooms?.toString() ?: "1") }
-
         var buildingTypeExpanded by remember { mutableStateOf(false) }
-        var selectedTypeExpanded by remember { mutableStateOf(activeFilters.buildingType ?: allTypesStr) }
-
         var floorExpanded by remember { mutableStateOf(false) }
-        var selectedFloor by remember { mutableStateOf(activeFilters.floor ?: anyFloorStr) }
-
-        var selectedParking by remember { mutableStateOf(activeFilters.parking ?: allStr) }
-
-        // Зручності
-        var petsAllowed by remember { mutableStateOf(activeFilters.petsAllowed ?: false) }
-        var hasElevator by remember { mutableStateOf(activeFilters.elevator ?: false) }
-        var withFurniture by remember { mutableStateOf(activeFilters.furniture ?: false) }
-        var hasBalcony by remember { mutableStateOf(activeFilters.balcony ?: false) }
-
-        // Мапінг текстових назв категорій
-        val labelToCategory = mapOf(
-            apartmentStr to "APARTMENT",
-            houseStr to "HOUSE",
-            roomsStr to "ROOM"
-        )
-
-        val labelToDeal = mapOf(
-            rentStr to "RENT",
-            saleStr to "SALE"
-        )
 
         Scaffold(
             topBar = {
@@ -136,15 +92,15 @@ class FilterScreen(private val homeScreenModel: HomeScreenModel) : Screen {
                                 color = SwipeHomeTheme.colors.error,
                                 modifier = Modifier
                                     .clickable {
-                                        selectedCategoryLabel = apartmentStr
-                                        selectedDealLabel = allStr
-                                        minPrice = ""; maxPrice = ""
-                                        minArea = ""; maxArea = ""
-                                        selectedRooms = "1"
-                                        selectedTypeExpanded = allTypesStr
-                                        selectedFloor = anyFloorStr
-                                        selectedParking = allStr
-                                        petsAllowed = false; hasElevator = false; withFurniture = false; hasBalcony = false
+                                        screenModel.selectedCategory = null
+                                        screenModel.dealType = null
+                                        screenModel.minPrice = null; screenModel.maxPrice = null
+                                        screenModel.minArea = null; screenModel.maxArea = null
+                                        screenModel.selectedRooms = null
+                                        screenModel.buildingType = null
+                                        screenModel.selectedFloor = null
+                                        screenModel.selectedParking = null
+                                        screenModel.petsAllowed = null; screenModel.hasElevator = null; screenModel.withFurniture = null; screenModel.hasBalcony = null
                                     }
                                     .padding(bottom = 2.dp)
                             )
@@ -185,24 +141,24 @@ class FilterScreen(private val homeScreenModel: HomeScreenModel) : Screen {
                             val request = FilterRequestDTO(
                                 limit = 10,
                                 offset = 0,
-                                category = labelToCategory[selectedCategoryLabel],
-                                subcategory = labelToDeal[selectedDealLabel],
+                                category = screenModel.selectedCategory,
+                                dealType = screenModel.dealType,
                                 localization = null,
-                                priceMin = minPrice.toDoubleOrNull(),
-                                priceMax = maxPrice.toDoubleOrNull(),
-                                areaMin = minArea.toDoubleOrNull(),
-                                areaMax = maxArea.toDoubleOrNull(),
-                                rooms = if (selectedRooms == studioStr) null else selectedRooms.toIntOrNull(),
-                                floor = if (selectedFloor == anyFloorStr) null else selectedFloor,
-                                parking = if (selectedParking == allStr) null else selectedParking,
-                                petsAllowed = petsAllowed,
-                                elevator = hasElevator,
-                                furniture = withFurniture,
-                                balcony = hasBalcony,
-                                buildingType = if (selectedTypeExpanded == allTypesStr) null else selectedTypeExpanded,
+                                priceMin = screenModel.minPrice?.toDoubleOrNull(),
+                                priceMax = screenModel.maxPrice?.toDoubleOrNull(),
+                                areaMin = screenModel.minArea?.toDoubleOrNull(),
+                                areaMax = screenModel.maxArea?.toDoubleOrNull(),
+                                rooms = if (screenModel.selectedRooms == studioStr) null else screenModel.selectedRooms?.toIntOrNull(),
+                                floor = if (screenModel.selectedFloor == Floor.ALL.name) null else screenModel.selectedFloor,
+                                parking = if (screenModel.selectedParking == Parking.ALL.name) null else screenModel.selectedParking,
+                                petsAllowed = screenModel.petsAllowed,
+                                elevator = screenModel.hasElevator,
+                                furniture = screenModel.withFurniture,
+                                balcony = screenModel.hasBalcony,
+                                buildingType = if (screenModel.buildingType == BuildingType.ALL.name) null else screenModel.buildingType,
                             )
-                            homeScreenModel.updateFilters(request)
                             navigator.pop()
+                            homeScreenModel.updateFilters(request)
                         },
                         modifier = Modifier.weight(1.5f).height(56.dp),
                         shape = SwipeHomeTheme.shapes.smallShape,
@@ -232,12 +188,14 @@ class FilterScreen(private val homeScreenModel: HomeScreenModel) : Screen {
                 // --- Тип нерухомості ---
                 FilterSection(title = stringResource(string.filter_section_property_type)){
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)){
-                        val categories = listOf(apartmentStr, houseStr, roomsStr)
-                        categories.forEach { category ->
+                        PropertyType.entries.forEach { category ->
                             CustomChip(
-                                text = category,
-                                isSelected = selectedCategoryLabel == category,
-                                onClick = { selectedCategoryLabel = category },
+                                text = category.getLabel(),
+                                isSelected = screenModel.selectedCategory == category.name,
+                                onClick = {
+                                    val it = category.name
+                                    screenModel.selectedCategory = it
+                                },
                                 modifier = Modifier.weight(1f)
                             )
                         }
@@ -247,12 +205,11 @@ class FilterScreen(private val homeScreenModel: HomeScreenModel) : Screen {
                 // --- Тип угоди ---
                 FilterSection(title = stringResource(string.filter_section_deal_type)){
                     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)){
-                        val typeOfDeal = listOf(allStr, rentStr, saleStr)
-                        typeOfDeal.forEach { type ->
+                        DealType.entries.forEach { type ->
                             CustomChip(
-                                text = type,
-                                isSelected = selectedDealLabel == type,
-                                onClick = { selectedDealLabel = type },
+                                text = type.getName(),
+                                isSelected = screenModel.dealType == type.name,
+                                onClick = { screenModel.dealType = type.name },
                                 modifier = Modifier.weight(1f)
                             )
                         }
@@ -262,16 +219,16 @@ class FilterScreen(private val homeScreenModel: HomeScreenModel) : Screen {
                 // --- Ціна ---
                 FilterSection(title = stringResource(string.filter_section_price)){
                     RangeInputRow(
-                        minValue = minPrice, onMinChange = { minPrice = it }, minPlaceholder = stringResource(string.filter_price_placeholder_min),
-                        maxValue = maxPrice, onMaxChange = { maxPrice = it }, maxPlaceholder = stringResource(string.filter_price_placeholder_max)
+                        minValue = screenModel.minPrice, onMinChange = { screenModel.minPrice = it }, minPlaceholder = stringResource(string.filter_price_placeholder_min),
+                        maxValue = screenModel.maxPrice, onMaxChange = { screenModel.maxPrice = it }, maxPlaceholder = stringResource(string.filter_price_placeholder_max)
                     )
                 }
 
                 // --- Площа ---
                 FilterSection(title = stringResource(string.filter_section_area)){
                     RangeInputRow(
-                        minValue = minArea, onMinChange = { minArea = it }, minPlaceholder = stringResource(string.filter_area_placeholder_min),
-                        maxValue = maxArea, onMaxChange = { maxArea = it }, maxPlaceholder = stringResource(string.filter_area_placeholder_max)
+                        minValue = screenModel.minArea, onMinChange = { screenModel.minArea = it }, minPlaceholder = stringResource(string.filter_area_placeholder_min),
+                        maxValue = screenModel.maxArea, onMaxChange = { screenModel.maxArea = it }, maxPlaceholder = stringResource(string.filter_area_placeholder_max)
                     )
                 }
 
@@ -286,8 +243,8 @@ class FilterScreen(private val homeScreenModel: HomeScreenModel) : Screen {
                         roomCounts.forEach { room ->
                             CustomChip(
                                 text = room,
-                                isSelected = selectedRooms == room,
-                                onClick = { selectedRooms = room },
+                                isSelected = screenModel.selectedRooms == room,
+                                onClick = { screenModel.selectedRooms = room },
                                 modifier = if (room == studioStr) Modifier.weight(1f) else Modifier.defaultMinSize(minWidth = 48.dp)
                             )
                         }
@@ -296,35 +253,41 @@ class FilterScreen(private val homeScreenModel: HomeScreenModel) : Screen {
 
                 // --- Тип будівлі (Dropdown) ---
                 FilterSection(title = stringResource(string.filter_section_building_type)){
+                    // Отримуємо вибраний об'єкт
+                    val currentBuildingType = BuildingType.entries.find { it.name == screenModel.buildingType } ?: BuildingType.ALL
+                    // Створюємо список пар: об'єкт enum -> його локалізована назва
+                    val buildingOptions = BuildingType.entries.map { it to stringResource(it.resource) }
+
                     CustomDropdown(
                         expanded = buildingTypeExpanded,
                         onExpandedChange = { buildingTypeExpanded = it },
-                        selectedValue = selectedTypeExpanded,
-                        onValueSelected = { selectedTypeExpanded = it; buildingTypeExpanded = false },
-                        options = listOf(
-                            allTypesStr,
-                            stringResource(string.filter_building_new),
-                            stringResource(string.filter_building_khrushchovka),
-                            stringResource(string.filter_building_house),
-                            stringResource(string.filter_building_apartment),
-                            stringResource(string.filter_building_room)
-                        )
+                        selectedValue = stringResource(currentBuildingType.resource),
+                        onValueSelected = { selectedLabel ->
+                            val selectedEnum = buildingOptions.firstOrNull { it.second == selectedLabel }?.first ?: BuildingType.ALL
+                            screenModel.buildingType = if (selectedEnum == BuildingType.ALL) null else selectedEnum.name
+                            buildingTypeExpanded = false
+                        },
+                        options = buildingOptions.map { it.second }
                     )
                 }
 
                 // --- Поверх (Dropdown) ---
                 FilterSection(title = stringResource(string.filter_section_floor)){
+                    // Отримуємо вибраний об'єкт
+                    val currentFloor = Floor.entries.find { it.name == screenModel.selectedFloor } ?: Floor.ALL
+                    // Створюємо список пар: об'єкт enum -> його локалізована назва
+                    val floorOptions = Floor.entries.map { it to stringResource(it.resource) }
+
                     CustomDropdown(
                         expanded = floorExpanded,
                         onExpandedChange = { floorExpanded = it },
-                        selectedValue = selectedFloor,
-                        onValueSelected = { selectedFloor = it; floorExpanded = false },
-                        options = listOf(
-                            anyFloorStr,
-                            stringResource(string.filter_floor_first),
-                            stringResource(string.filter_floor_middle),
-                            stringResource(string.filter_floor_last)
-                        )
+                        selectedValue = stringResource(currentFloor.resource) ,
+                        onValueSelected = { selectLabel ->
+                            val selectEnum = floorOptions.firstOrNull { it.second == selectLabel }?.first ?: Floor.ALL
+                            screenModel.selectedFloor =  if (selectEnum == Floor.ALL) null else selectEnum.name
+                            floorExpanded = false
+                        },
+                        options = floorOptions.map { it.second }
                     )
                 }
 
@@ -335,17 +298,11 @@ class FilterScreen(private val homeScreenModel: HomeScreenModel) : Screen {
                         verticalArrangement = Arrangement.spacedBy(8.dp),
                         modifier = Modifier.fillMaxWidth()
                     ){
-                        val parkingOptions = listOf(
-                            allStr,
-                            stringResource(string.filter_parking_garage),
-                            stringResource(string.filter_parking_street),
-                            stringResource(string.filter_parking_secured)
-                        )
-                        parkingOptions.forEach { parking ->
+                        Parking.entries.forEach { parking ->
                             CustomChip(
-                                text = parking,
-                                isSelected = selectedParking == parking,
-                                onClick = { selectedParking = parking }
+                                text = parking.getName(),
+                                isSelected = screenModel.selectedParking == parking.name,
+                                onClick = { screenModel.selectedParking = parking.name }
                             )
                         }
                     }
@@ -363,7 +320,8 @@ class FilterScreen(private val homeScreenModel: HomeScreenModel) : Screen {
                             title = stringResource(string.filter_amenities_pets),
                             subtitle = stringResource(string.filter_amenities_pets_desc),
                             icon = painterResource(Res.drawable.ic_pets_allowed),
-                            checked = petsAllowed, onCheckedChange = { petsAllowed = it}
+                            checked = screenModel.petsAllowed ?: false,
+                            onCheckedChange = { screenModel.petsAllowed = it}
                         )
                         HorizontalDivider(color = SwipeHomeTheme.colors.outline, modifier = Modifier.padding(vertical = 12.dp))
 
@@ -371,7 +329,8 @@ class FilterScreen(private val homeScreenModel: HomeScreenModel) : Screen {
                             title = stringResource(string.filter_amenities_elevator),
                             subtitle = stringResource(string.filter_amenities_elevator_desc),
                             icon = painterResource(Res.drawable.ic_elevator),
-                            checked = hasElevator, onCheckedChange = { hasElevator = it}
+                            checked = screenModel.hasElevator ?: false,
+                            onCheckedChange = { screenModel.hasElevator = it}
                         )
                         HorizontalDivider(color = SwipeHomeTheme.colors.outline, modifier = Modifier.padding(vertical = 12.dp))
 
@@ -379,7 +338,8 @@ class FilterScreen(private val homeScreenModel: HomeScreenModel) : Screen {
                             title = stringResource(string.filter_amenities_furniture),
                             subtitle = stringResource(string.filter_amenities_furniture_desc),
                             icon = painterResource(Res.drawable.ic_sofa),
-                            checked = withFurniture, onCheckedChange = { withFurniture = it}
+                            checked = screenModel.withFurniture ?: false,
+                            onCheckedChange = { screenModel.withFurniture = it}
                         )
                         HorizontalDivider(color = SwipeHomeTheme.colors.outline, modifier = Modifier.padding(vertical = 12.dp))
 
@@ -387,7 +347,8 @@ class FilterScreen(private val homeScreenModel: HomeScreenModel) : Screen {
                             title = stringResource(string.filter_amenities_balcony),
                             subtitle = stringResource(string.filter_amenities_balcony_desc),
                             icon = painterResource(Res.drawable.ic_balcony),
-                            checked = hasBalcony, onCheckedChange = { hasBalcony = it}
+                            checked = screenModel.hasBalcony ?: false,
+                            onCheckedChange = { screenModel.hasBalcony = it}
                         )
                     }
                 }

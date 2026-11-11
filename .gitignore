@@ -80,8 +80,10 @@ build/
 local.properties
 formData.kt
 multipart.kt
+.bat
 
 # Brag Skill (promo video)
 .agents/
 brag-output/
 skills-lock.json
+*.bat

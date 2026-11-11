@@ -8,8 +8,8 @@ data class FilterRequestDTO(
     val offset: Int = 0,
 
     // Базові фільтри
-    val category: String? = null,       // APARTMENT, ROOM, HOUSE
-    val subcategory: String? = null,    // RENT, SALE
+    val category: String? = null,    // APARTMENT, ROOM, HOUSE
+    val dealType: String? = null,    // ALL, RENT, SALE
     val localization: String? = null,
 
     // Діапазони

@@ -66,7 +66,7 @@ import mymultiplatformproject.shared.generated.resources.btn_next
 import mymultiplatformproject.shared.generated.resources.btn_resend_code
 import mymultiplatformproject.shared.generated.resources.btn_reset_paswd
 import mymultiplatformproject.shared.generated.resources.btn_send_code
-import mymultiplatformproject.shared.generated.resources.email_label
+import mymultiplatformproject.shared.generated.resources.email_or_login_label
 import mymultiplatformproject.shared.generated.resources.fogot_paswd_confirm_password_label
 import mymultiplatformproject.shared.generated.resources.fogot_paswd_confirm_password_placeholder
 import mymultiplatformproject.shared.generated.resources.fogot_paswd_header_step1
@@ -250,7 +250,7 @@ class ForgotPasswordScreen : Screen {
     fun Step1RecoveryMethod(loginOrEmail: String, onLoginOrEmailChange: (String) -> Unit) {
         Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
             Text(
-                text = stringResource(Res.string.email_label),
+                text = stringResource(Res.string.email_or_login_label),
                 modifier = Modifier.fillMaxWidth(),
                 style = SwipeHomeTheme.typography.headline,
                 textAlign = TextAlign.Center,
@@ -269,7 +269,7 @@ class ForgotPasswordScreen : Screen {
             OutlinedTextField(
                 value = loginOrEmail,
                 onValueChange = onLoginOrEmailChange,
-                label = { Text(stringResource(Res.string.email_label)) },
+                label = { Text(stringResource(Res.string.email_or_login_label)) },
                 placeholder = { Text(stringResource(Res.string.reg_email_placeholder)) },
                 modifier = Modifier.fillMaxWidth(),
                 singleLine = true,

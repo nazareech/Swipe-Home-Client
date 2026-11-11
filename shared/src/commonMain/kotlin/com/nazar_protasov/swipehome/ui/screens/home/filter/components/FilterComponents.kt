@@ -33,6 +33,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.nazar_protasov.swipehome.ui.theme.SwipeHomeTheme
 import mymultiplatformproject.shared.generated.resources.Res.string
+import mymultiplatformproject.shared.generated.resources.filter_building_all
 import mymultiplatformproject.shared.generated.resources.filter_price_from
 import mymultiplatformproject.shared.generated.resources.filter_price_to
 import org.jetbrains.compose.resources.stringResource
@@ -54,7 +55,12 @@ fun FilterSection(title: String, content: @Composable () -> Unit){
 }
 
 @Composable
-fun CustomChip(text: String, isSelected: Boolean, onClick: () -> Unit, modifier: Modifier = Modifier){
+fun CustomChip(
+    text: String,
+    isSelected: Boolean,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+){
     val bdColor = if (isSelected) SwipeHomeTheme.colors.primary else SwipeHomeTheme.colors.surface
     val textColor = if (isSelected) SwipeHomeTheme.colors.onPrimary else SwipeHomeTheme.colors.onSurface
 
@@ -72,23 +78,22 @@ fun CustomChip(text: String, isSelected: Boolean, onClick: () -> Unit, modifier:
 
 @Composable
 fun RangeInputRow(
-    minValue: String, onMinChange: (String) -> Unit, minPlaceholder: String,
-    maxValue: String, onMaxChange: (String) -> Unit, maxPlaceholder: String
+    minValue: String?, onMinChange: (String) -> Unit, minPlaceholder: String,
+    maxValue: String?, onMaxChange: (String) -> Unit, maxPlaceholder: String
 ){
     Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(8.dp)) {
         CustomTextField(
-            value = minValue, onValueChange = onMinChange,
+            value = minValue ?: "", onValueChange = onMinChange,
             label = stringResource(string.filter_price_from), placeholder = minPlaceholder, modifier = Modifier.weight(1f)
         )
         Text("-", color = SwipeHomeTheme.colors.onSurfaceSecondary)
         CustomTextField(
-            value = maxValue, onValueChange = onMaxChange,
+            value = maxValue ?: "", onValueChange = onMaxChange,
             label = stringResource(string.filter_price_to), placeholder = maxPlaceholder, modifier = Modifier.weight(1f)
         )
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CustomTextField(value: String, onValueChange: (String) -> Unit, label: String, placeholder: String, modifier: Modifier = Modifier){
     TextField(
@@ -113,7 +118,7 @@ fun CustomTextField(value: String, onValueChange: (String) -> Unit, label: Strin
 fun CustomDropdown(
     expanded: Boolean,
     onExpandedChange: (Boolean) -> Unit,
-    selectedValue: String,
+    selectedValue: String?,
     onValueSelected: (String) -> Unit,
     options: List<String>
 ){
@@ -123,7 +128,7 @@ fun CustomDropdown(
         modifier = Modifier.fillMaxWidth()
     ){
         TextField(
-            value = selectedValue,
+            value = selectedValue?: stringResource(string.filter_building_all),
             onValueChange = {},
             readOnly = true,
             trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
@@ -156,7 +161,12 @@ fun CustomDropdown(
 
 // Допоміжний компонент для перемикачів
 @Composable
-fun SwitchRowExpanded(title: String, icon: Painter, subtitle: String, checked: Boolean, onCheckedChange: (Boolean) -> Unit){
+fun SwitchRowExpanded(
+    title: String,
+    icon: Painter,
+    subtitle: String,
+    checked: Boolean,
+    onCheckedChange: (Boolean) -> Unit){
     Row(
         modifier = Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically

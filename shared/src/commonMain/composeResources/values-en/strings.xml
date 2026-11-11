@@ -9,6 +9,7 @@
     <string name="or_divider">OR</string>
     <string name="email_label">Email</string>
     <string name="login_label">Login</string>
+    <string name="email_or_login_label">Email or Login</string>
     <string name="password_label">Password</string>
     <string name="password_placeholder">Enter your password</string>
     <string name="btn_filter">Filters</string>

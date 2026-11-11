@@ -11,6 +11,7 @@ import com.nazar_protasov.swipehome.network.API.GeocodingApiService
 import com.nazar_protasov.swipehome.network.PropertyApiService
 import com.nazar_protasov.swipehome.ui.screens.auth.ForgotPasswordScreenModel
 import com.nazar_protasov.swipehome.ui.screens.auth.RegisterScreenModel
+import com.nazar_protasov.swipehome.ui.screens.home.filter.FilterScreenModel
 import com.nazar_protasov.swipehome.ui.screens.home.main.HomeScreenModel
 import com.nazar_protasov.swipehome.ui.screens.hub.SearchHubScreenModel
 import com.nazar_protasov.swipehome.ui.screens.settings.analystics.AnalyticsScreenModel
@@ -62,6 +63,7 @@ val appModule: Module = module {
     factory { EditProfileScreenModel(get(), get()) }
     factory { RegisterScreenModel(get(), get()) }
     factory { ForgotPasswordScreenModel(get()) }
+    factory { FilterScreenModel(get(), get()) }
     single { SessionManager(get()) }
     single { GeocodingApiService(get()) }
     factory { CreateListingScreenModel(get(), get(), get()) }
